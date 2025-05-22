@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\ProjectCollection\\eAccounting\\eAccountingServer\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}|src\\eAccountingServer.Application\\eAccountingServer.Application.csproj|c:\\projectcollection\\eaccounting\\eaccountingserver\\src\\eaccountingserver.application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}|src\\eAccountingServer.Application\\eAccountingServer.Application.csproj|solutionrelative:src\\eaccountingserver.application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "LoginCommand.cs",
+              "DocumentMoniker": "C:\\ProjectCollection\\eAccounting\\eAccountingServer\\src\\eAccountingServer.Application\\Auth\\LoginCommand.cs",
+              "RelativeDocumentMoniker": "src\\eAccountingServer.Application\\Auth\\LoginCommand.cs",
+              "ToolTip": "C:\\ProjectCollection\\eAccounting\\eAccountingServer\\src\\eAccountingServer.Application\\Auth\\LoginCommand.cs",
+              "RelativeToolTip": "src\\eAccountingServer.Application\\Auth\\LoginCommand.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABkAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-22T20:46:26.297Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

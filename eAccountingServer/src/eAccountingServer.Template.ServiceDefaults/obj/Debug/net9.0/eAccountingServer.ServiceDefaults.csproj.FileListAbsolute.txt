@@ -1,0 +1,12 @@
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\bin\Debug\net9.0\eAccountingServer.ServiceDefaults.deps.json
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\bin\Debug\net9.0\eAccountingServer.ServiceDefaults.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\bin\Debug\net9.0\eAccountingServer.ServiceDefaults.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.csproj.AssemblyReference.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.GeneratedMSBuildEditorConfig.editorconfig
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.AssemblyInfoInputs.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.AssemblyInfo.cs
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.csproj.CoreCompileInputs.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\refint\eAccountingServer.ServiceDefaults.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\eAccountingServer.ServiceDefaults.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Template.ServiceDefaults\obj\Debug\net9.0\ref\eAccountingServer.ServiceDefaults.dll

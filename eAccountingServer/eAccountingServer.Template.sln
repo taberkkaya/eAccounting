@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E1D97168-A87F-45F0-9695-956E9B551BF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.Application", "src\eAccountingServer.Application\eAccountingServer.Application.csproj", "{E00C67B6-067F-48B2-8192-11A992186BE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.Domain", "src\eAccountingServer.Domain\eAccountingServer.Domain.csproj", "{0E7C4945-D6A0-42E5-AF82-AC19D1D697AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.Infrastructure", "src\eAccountingServer.Infrastructure\eAccountingServer.Infrastructure.csproj", "{A33BC739-3BAD-4958-9288-9DA8BE524EF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.AppHost", "src\eAccountingServer.Template.AppHost\eAccountingServer.AppHost.csproj", "{3A5418A4-45EA-47B2-9291-051C23E223E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.ServiceDefaults", "src\eAccountingServer.Template.ServiceDefaults\eAccountingServer.ServiceDefaults.csproj", "{2E2CB2BB-033D-4E24-AB49-F95CA747C76B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.WebApi", "src\eAccountingServer.WebApi\eAccountingServer.WebApi.csproj", "{55AC2C63-C77A-4CFB-B795-2E20E7043335}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E00C67B6-067F-48B2-8192-11A992186BE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E00C67B6-067F-48B2-8192-11A992186BE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E00C67B6-067F-48B2-8192-11A992186BE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E00C67B6-067F-48B2-8192-11A992186BE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E7C4945-D6A0-42E5-AF82-AC19D1D697AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E7C4945-D6A0-42E5-AF82-AC19D1D697AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E7C4945-D6A0-42E5-AF82-AC19D1D697AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E7C4945-D6A0-42E5-AF82-AC19D1D697AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A33BC739-3BAD-4958-9288-9DA8BE524EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A33BC739-3BAD-4958-9288-9DA8BE524EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A33BC739-3BAD-4958-9288-9DA8BE524EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A33BC739-3BAD-4958-9288-9DA8BE524EF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A5418A4-45EA-47B2-9291-051C23E223E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A5418A4-45EA-47B2-9291-051C23E223E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A5418A4-45EA-47B2-9291-051C23E223E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A5418A4-45EA-47B2-9291-051C23E223E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E2CB2BB-033D-4E24-AB49-F95CA747C76B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E2CB2BB-033D-4E24-AB49-F95CA747C76B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E2CB2BB-033D-4E24-AB49-F95CA747C76B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E2CB2BB-033D-4E24-AB49-F95CA747C76B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55AC2C63-C77A-4CFB-B795-2E20E7043335}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55AC2C63-C77A-4CFB-B795-2E20E7043335}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55AC2C63-C77A-4CFB-B795-2E20E7043335}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55AC2C63-C77A-4CFB-B795-2E20E7043335}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E00C67B6-067F-48B2-8192-11A992186BE1} = {E1D97168-A87F-45F0-9695-956E9B551BF2}
+		{0E7C4945-D6A0-42E5-AF82-AC19D1D697AC} = {E1D97168-A87F-45F0-9695-956E9B551BF2}
+		{A33BC739-3BAD-4958-9288-9DA8BE524EF0} = {E1D97168-A87F-45F0-9695-956E9B551BF2}
+		{3A5418A4-45EA-47B2-9291-051C23E223E7} = {E1D97168-A87F-45F0-9695-956E9B551BF2}
+		{2E2CB2BB-033D-4E24-AB49-F95CA747C76B} = {E1D97168-A87F-45F0-9695-956E9B551BF2}
+		{55AC2C63-C77A-4CFB-B795-2E20E7043335} = {E1D97168-A87F-45F0-9695-956E9B551BF2}
+	EndGlobalSection
+EndGlobal

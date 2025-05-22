@@ -1,0 +1,12 @@
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\bin\Debug\net9.0\eAccountingServer.Domain.deps.json
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\bin\Debug\net9.0\eAccountingServer.Domain.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\bin\Debug\net9.0\eAccountingServer.Domain.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.csproj.AssemblyReference.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.AssemblyInfoInputs.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.AssemblyInfo.cs
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.csproj.CoreCompileInputs.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\refint\eAccountingServer.Domain.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\eAccountingServer.Domain.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Domain\obj\Debug\net9.0\ref\eAccountingServer.Domain.dll

@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "CfRFNqkunsa+DQzI718DbB4t3ZSA3mC/c73TV82wO5I=",
+  "Source": "eAccountingServer.WebApi",
+  "BasePath": "_content/eAccountingServer.WebApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.Application", "src\eAccountingServer.Application\eAccountingServer.Application.csproj", "{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.Domain", "src\eAccountingServer.Domain\eAccountingServer.Domain.csproj", "{5D0CD9B4-A2EA-469E-96EF-25E299646DDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.Infrastructure", "src\eAccountingServer.Infrastructure\eAccountingServer.Infrastructure.csproj", "{C20404A8-7C3E-435C-9B6F-366D88653DC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.AppHost", "src\eAccountingServer.Template.AppHost\eAccountingServer.AppHost.csproj", "{1B1C1946-0963-4A9F-A4AA-17F2E157F2A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.ServiceDefaults", "src\eAccountingServer.Template.ServiceDefaults\eAccountingServer.ServiceDefaults.csproj", "{5E7DB14D-B9EB-4FDE-AC04-23AF78B1F58C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eAccountingServer.WebApi", "src\eAccountingServer.WebApi\eAccountingServer.WebApi.csproj", "{3A178179-86E9-4FD1-B9B7-B81C059A6EF5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{869E5E2A-C384-4C11-B9EB-A6AD757EEF03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0CD9B4-A2EA-469E-96EF-25E299646DDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0CD9B4-A2EA-469E-96EF-25E299646DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0CD9B4-A2EA-469E-96EF-25E299646DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0CD9B4-A2EA-469E-96EF-25E299646DDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C20404A8-7C3E-435C-9B6F-366D88653DC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C20404A8-7C3E-435C-9B6F-366D88653DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C20404A8-7C3E-435C-9B6F-366D88653DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C20404A8-7C3E-435C-9B6F-366D88653DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B1C1946-0963-4A9F-A4AA-17F2E157F2A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B1C1946-0963-4A9F-A4AA-17F2E157F2A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B1C1946-0963-4A9F-A4AA-17F2E157F2A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B1C1946-0963-4A9F-A4AA-17F2E157F2A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E7DB14D-B9EB-4FDE-AC04-23AF78B1F58C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E7DB14D-B9EB-4FDE-AC04-23AF78B1F58C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E7DB14D-B9EB-4FDE-AC04-23AF78B1F58C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E7DB14D-B9EB-4FDE-AC04-23AF78B1F58C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A178179-86E9-4FD1-B9B7-B81C059A6EF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A178179-86E9-4FD1-B9B7-B81C059A6EF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A178179-86E9-4FD1-B9B7-B81C059A6EF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A178179-86E9-4FD1-B9B7-B81C059A6EF5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,15 @@
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\bin\Debug\net9.0\eAccountingServer.Application.deps.json
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\bin\Debug\net9.0\eAccountingServer.Application.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\bin\Debug\net9.0\eAccountingServer.Application.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\bin\Debug\net9.0\eAccountingServer.Domain.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\bin\Debug\net9.0\eAccountingServer.Domain.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.csproj.AssemblyReference.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.AssemblyInfoInputs.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.AssemblyInfo.cs
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.csproj.CoreCompileInputs.cache
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccount.DCD72E14.Up2Date
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\refint\eAccountingServer.Application.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.pdb
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\ref\eAccountingServer.Application.dll
