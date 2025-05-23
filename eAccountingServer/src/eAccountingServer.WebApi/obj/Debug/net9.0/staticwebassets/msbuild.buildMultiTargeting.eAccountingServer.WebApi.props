@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\eAccountingServer.WebApi.props" />
-</Project>
