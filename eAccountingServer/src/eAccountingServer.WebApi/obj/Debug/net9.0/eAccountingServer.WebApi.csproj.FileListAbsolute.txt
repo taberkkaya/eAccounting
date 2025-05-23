@@ -225,3 +225,4 @@ C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.WebApi\
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.WebApi\obj\Debug\net9.0\eAccountingServer.WebApi.pdb
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.WebApi\obj\Debug\net9.0\eAccountingServer.WebApi.genruntimeconfig.cache
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.WebApi\obj\Debug\net9.0\ref\eAccountingServer.WebApi.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.WebApi\obj\Debug\net9.0\eAccountingServer.WebApi.sourcelink.json

@@ -30,7 +30,7 @@ namespace eAccountingServer.Infrastructure.Context
 
             HttpContextAccessor httpContextAccessor = new();
             Guid userId = Guid.TryParse(
-               httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(p => p.Type == "user-id")?.Value,
+               httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(p => p.Type == "Id")?.Value,
                out var parsedUserId) ? parsedUserId : Guid.Empty;
 
             foreach (var entry in entries)

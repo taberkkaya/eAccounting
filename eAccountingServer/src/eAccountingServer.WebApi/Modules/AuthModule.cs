@@ -8,7 +8,7 @@ namespace eAccountingServer.WebApi.Modules
     {
         public static void RegisterAuthRoutes(this IEndpointRouteBuilder app)
         {
-            RouteGroupBuilder group = app.MapGroup("/auth").WithTags("Auth");
+            RouteGroupBuilder group = app.MapGroup("api/auth").WithTags("auth");
 
             group.MapPost("login",
                 async (ISender sender, LoginCommand request, CancellationToken cancellationToken) =>

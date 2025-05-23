@@ -2,7 +2,7 @@
   {
     "ContainingType": "eAccountingServer.WebApi.Modules.AuthModule\u002B\u003C\u003Ec",
     "Method": "\u003CRegisterAuthRoutes\u003Eb__0_0",
-    "RelativePath": "auth/login",
+    "RelativePath": "api/auth/login",
     "HttpMethod": "POST",
     "IsController": false,
     "Order": 0,
@@ -23,7 +23,71 @@
       }
     ],
     "Tags": [
-      "Auth"
+      "auth"
     ]
+  },
+  {
+    "ContainingType": "eAccountingServer.WebApi.Controller.UsersController",
+    "Method": "Create",
+    "RelativePath": "api/Users/Create",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "eAccountingServer.Application.Features.User.CreateUserCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "eAccountingServer.WebApi.Controller.UsersController",
+    "Method": "DeleteById",
+    "RelativePath": "api/Users/DeleteById",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "eAccountingServer.Application.Features.User.DeleteUserByIdCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "eAccountingServer.WebApi.Controller.UsersController",
+    "Method": "GetAll",
+    "RelativePath": "api/Users/GetAll",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "eAccountingServer.Application.Features.User.GetAllUsersQuery",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "eAccountingServer.WebApi.Controller.UsersController",
+    "Method": "Update",
+    "RelativePath": "api/Users/Update",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "eAccountingServer.Application.Features.User.UpdateUserCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

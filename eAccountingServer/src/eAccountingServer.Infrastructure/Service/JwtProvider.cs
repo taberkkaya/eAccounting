@@ -15,7 +15,10 @@ namespace eAccountingServer.Infrastructure.Service
         {
             List<Claim> claims = new()
             {
-                new Claim("user-id",user.Id.ToString())
+                new Claim("Id",user.Id.ToString()),
+                new Claim("Name", user.FirstName +" "+user.LastName),
+                new Claim("UserName", user.UserName ?? ""),
+                new Claim("Email", user.Email ?? "")
             };
 
 

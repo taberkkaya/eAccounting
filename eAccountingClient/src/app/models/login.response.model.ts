@@ -1,5 +1,5 @@
-export class LoginResponseModel{
-    token: string = "";
-    refreshToken: string = "";
-    refreshTokenExpires: string = "";
+export class LoginResponseModel {
+  accessToken: string = '';
+  refreshToken: string = '';
+  refreshTokenExpires: string = '';
 }

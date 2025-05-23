@@ -13,3 +13,4 @@ C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Applica
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\refint\eAccountingServer.Application.dll
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.pdb
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\ref\eAccountingServer.Application.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Application\obj\Debug\net9.0\eAccountingServer.Application.sourcelink.json

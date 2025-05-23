@@ -1,0 +1,238 @@
+<app-blank pageName="Users" [routes]="['Users']">
+  <app-section sectionTitle="User List">
+    <div class="form-group row">
+      <div class="col-9">
+        <button
+          class="btn btn-dark"
+          data-toggle="modal"
+          data-target="#createModal"
+        >
+          <i class="fa-solid fa-plus me-1"></i>
+          Add User
+        </button>
+      </div>
+
+      <div class="col-3">
+        <input
+          [(ngModel)]="search"
+          type="search"
+          class="form-control"
+          placeholder="Search"
+        />
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(data of examples | user: search ;track data){
+          <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ data.fullName }}</td>
+            <td>{{ data.email }}</td>
+            <td>
+              <button
+                data-toggle="modal"
+                data-target="#updateModal"
+                (click)="get(data)"
+                class="btn btn-outline-primary btn-sm me-1"
+              >
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button
+                (click)="deleteById(data)"
+                class="btn btn-outline-danger btn-sm"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+</app-blank>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Add User</h1>
+        <button
+          type="button"
+          #createModalCloseBtn
+          class="btn btn-outline-danger"
+          data-dismiss="modal"
+        >
+          <i class="fa-solid fa-x"></i>
+        </button>
+      </div>
+      <form
+        formValidate
+        #createForm="ngForm"
+        autocomplete="off"
+        (ngSubmit)="create(createForm)"
+      >
+        <div class="modal-body">
+          <div class="form-group">
+            <label>First Name</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="createModel.firstName"
+              class="form-control"
+              name="firstName"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Last Name</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="createModel.lastName"
+              class="form-control"
+              name="lastName"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>User Name</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="createModel.userName"
+              class="form-control"
+              name="userName"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Email</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="createModel.email"
+              class="form-control"
+              name="email"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Passowrd</label>
+            <input
+              type="password"
+              required
+              [(ngModel)]="createModel.password"
+              class="form-control"
+              name="password"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-dark w-100">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Example Güncelleme Formu</h1>
+        <button
+          type="button"
+          #updateModalCloseBtn
+          class="btn btn-outline-danger"
+          data-dismiss="modal"
+        >
+          <i class="fa-solid fa-x"></i>
+        </button>
+      </div>
+      <form
+        formValidate
+        #updateForm="ngForm"
+        autocomplete="off"
+        (ngSubmit)="update(updateForm)"
+      >
+        <div class="modal-body">
+          <div class="form-group">
+            <label>First Name</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="updateModel.firstName"
+              class="form-control"
+              name="updateFirstName"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Last Name</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="updateModel.lastName"
+              class="form-control"
+              name="updateLastName"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group">
+            <label>User Name</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="updateModel.userName"
+              class="form-control"
+              name="updateUserName"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group">
+            <label>New Password</label>
+            <input
+              type="password"
+              required
+              [(ngModel)]="updateModel.password"
+              class="form-control"
+              name="updatePassword"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Güncelle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

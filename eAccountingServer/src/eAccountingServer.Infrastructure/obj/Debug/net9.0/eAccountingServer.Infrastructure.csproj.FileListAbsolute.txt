@@ -17,3 +17,4 @@ C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Infrast
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Infrastructure\obj\Debug\net9.0\eAccountingServer.Infrastructure.pdb
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Infrastructure\obj\Debug\net9.0\eAccountingServer.Infrastructure.genruntimeconfig.cache
 C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Infrastructure\obj\Debug\net9.0\ref\eAccountingServer.Infrastructure.dll
+C:\ProjectCollection\eAccounting\eAccountingServer\src\eAccountingServer.Infrastructure\obj\Debug\net9.0\eAccountingServer.Infrastructure.sourcelink.json

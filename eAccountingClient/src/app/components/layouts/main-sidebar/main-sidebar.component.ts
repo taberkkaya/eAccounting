@@ -10,13 +10,11 @@ import { AuthService } from '../../../services/auth.service';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, FormsModule, MenuPipe],
   templateUrl: './main-sidebar.component.html',
-  styleUrl: './main-sidebar.component.css'
+  styleUrl: './main-sidebar.component.css',
 })
 export class MainSidebarComponent {
-  search: string = "";
+  search: string = '';
   menus = Menus;
 
-  constructor(
-    public auth: AuthService
-  ){}
+  constructor(public auth: AuthService) {}
 }

@@ -24,8 +24,4 @@
 		<ProjectReference Include="..\eAccountingServer.Template.ServiceDefaults\eAccountingServer.ServiceDefaults.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Controller\" />
-	</ItemGroup>
-
 </Project>
