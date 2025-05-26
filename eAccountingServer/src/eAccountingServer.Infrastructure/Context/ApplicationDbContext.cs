@@ -1,4 +1,5 @@
 ﻿using eAccountingServer.Domain.Abstractions;
+using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Users;
 using GenericRepository;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,9 @@ namespace eAccountingServer.Infrastructure.Context
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }
+
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<CompanyUser> CompanyUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
@@ -63,8 +67,8 @@ namespace eAccountingServer.Infrastructure.Context
                     }
                 }
 
-                if (entry.State == EntityState.Deleted)
-                    throw new ArgumentException("Database üzerinden hard delete yapamazsınız.");
+                //if (entry.State == EntityState.Deleted)
+                //    throw new ArgumentException("Database üzerinden hard delete yapamazsınız.");
             }
 
             return base.SaveChangesAsync(cancellationToken);

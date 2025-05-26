@@ -1,4 +1,5 @@
 ﻿using eAccountingServer.Application.Services;
+using eAccountingServer.Domain.Repositories;
 using eAccountingServer.Domain.Users;
 using eAccountingServer.Infrastructure.Context;
 using eAccountingServer.Infrastructure.Options;
@@ -10,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Scrutor;
+using StackExchange.Redis;
 
 namespace eAccountingServer.Infrastructure
 {
@@ -17,6 +19,8 @@ namespace eAccountingServer.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddScoped<CompanyDbContext>();
+
             services.AddDbContext<ApplicationDbContext>(opt =>
             {
                 string connectionString = configuration
@@ -24,6 +28,7 @@ namespace eAccountingServer.Infrastructure
 
                 opt.UseSqlServer(connectionString);
             });
+
 
             services.AddIdentity<AppUser, IdentityRole<Guid>>(opt =>
             {
@@ -50,6 +55,13 @@ namespace eAccountingServer.Infrastructure
             services.AddAuthorization();
 
             services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
+
+            services.AddScoped<IUnitOfWorkCompany>(srv => srv.GetRequiredService<CompanyDbContext>());
+
+            services.AddMemoryCache();
+            services.AddScoped<ICacheService, MemoryCacheService>();
+            //services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+            //services.AddScoped<ICacheService,RedisCacheService>();
 
             services.Scan(opt => opt
                 .FromAssemblies(typeof(InfrastructureRegistrar).Assembly)

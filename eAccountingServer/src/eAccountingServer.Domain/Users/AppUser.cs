@@ -1,4 +1,5 @@
 ﻿using eAccountingServer.Domain.Abstractions;
+using eAccountingServer.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace eAccountingServer.Domain.Users
@@ -9,6 +10,8 @@ namespace eAccountingServer.Domain.Users
         {
             Id = Guid.CreateVersion7();
         }
+
+        public List<CompanyUser>? CompanyUsers { get; set; }
 
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;

@@ -4,7 +4,8 @@ import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
 import { NgForm } from '@angular/forms';
 import { SharedModule } from '../../modules/shared.module';
-import { UserPipe } from "../../pipes/user.pipe";
+import { UserPipe } from '../../pipes/user.pipe';
+import { CompanyModel } from '../../models/company.model';
 
 @Component({
   selector: 'app-users',
@@ -14,7 +15,8 @@ import { UserPipe } from "../../pipes/user.pipe";
   styleUrl: './users.component.css',
 })
 export class UsersComponent {
-  examples: UserModel[] = [];
+  users: UserModel[] = [];
+  companies: CompanyModel[] = [];
   search: string = '';
 
   @ViewChild('createModalCloseBtn') createModalCloseBtn:
@@ -31,11 +33,18 @@ export class UsersComponent {
 
   ngOnInit(): void {
     this.getAll();
+    this.getAllCompanies();
   }
 
   getAll() {
     this.http.post<UserModel[]>('Users/GetAll', {}, (res) => {
-      this.examples = res;
+      this.users = res;
+    });
+  }
+
+  getAllCompanies() {
+    this.http.post<CompanyModel[]>('Companies/GetAll', {}, (res) => {
+      this.companies = res;
     });
   }
 
@@ -65,10 +74,15 @@ export class UsersComponent {
 
   get(model: UserModel) {
     this.updateModel = { ...model };
+    this.updateModel.companyIds = this.updateModel.companyUsers.map(
+      (value) => value.companyId
+    );
   }
 
   update(form: NgForm) {
     if (form.valid) {
+      if (this.updateModel.password === '') this.updateModel.password = null;
+
       this.http.post<string>('Users/Update', this.updateModel, (res) => {
         this.swal.callToast(res, 'info');
         this.updateModalCloseBtn?.nativeElement.click();

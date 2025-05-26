@@ -1,4 +1,5 @@
 ﻿using eAccountingServer.Application.Behaviors;
+using eAccountingServer.Domain.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,9 +9,13 @@ namespace eAccountingServer.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            services.AddFluentEmail("info@eaccounting.com").AddSmtpSender("localhost", 2525);
+
             services.AddMediatR(conf =>
             {
-                conf.RegisterServicesFromAssembly(typeof(ApplicationRegistrar).Assembly);
+                conf.RegisterServicesFromAssemblies(
+                    typeof(ApplicationRegistrar).Assembly,
+                    typeof(AppUser).Assembly);
                 conf.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });
 

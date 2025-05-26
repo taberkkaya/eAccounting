@@ -15,7 +15,7 @@ export class AuthService {
   isAuthenticated() {
     this.accessToken = localStorage.getItem('accessToken') ?? '';
     if (this.accessToken === '') {
-      this.router.navigateByUrl('auth/login');
+      this.router.navigateByUrl('login');
       return false;
     }
 
@@ -24,7 +24,7 @@ export class AuthService {
     const now = new Date().getTime() / 1000;
 
     if (now > exp) {
-      this.router.navigateByUrl('auth/login');
+      this.router.navigateByUrl('login');
       return false;
     }
 
@@ -32,7 +32,8 @@ export class AuthService {
     this.user.name = decode['Name'];
     this.user.email = decode['Email'];
     this.user.userName = decode['UserName'];
-
+    this.user.companyId = decode['CompanyId'];
+    this.user.companies = JSON.parse(decode['Companies']);
     return true;
   }
 }

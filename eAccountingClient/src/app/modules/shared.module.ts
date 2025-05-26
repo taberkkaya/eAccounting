@@ -6,29 +6,30 @@ import { FormsModule } from '@angular/forms';
 import { TrCurrencyPipe } from 'tr-currency';
 import { FlexiGridModule } from 'flexi-grid';
 import { FlexiSelectModule } from 'flexi-select';
-
-
+import { FormValidateDirective } from 'form-validate-angular';
+import { SwalService } from '../services/swal.service';
 
 @NgModule({
-  declarations: [    
-  ],
+  declarations: [],
   imports: [
     CommonModule,
-    BlankComponent, 
+    BlankComponent,
     SectionComponent,
     FormsModule,
     TrCurrencyPipe,
     FlexiGridModule,
-    FlexiSelectModule
+    FlexiSelectModule,
+    FormValidateDirective,
   ],
   exports: [
     CommonModule,
-    BlankComponent, 
+    BlankComponent,
     SectionComponent,
     FormsModule,
     TrCurrencyPipe,
     FlexiGridModule,
-    FlexiSelectModule
-  ]
+    FlexiSelectModule,
+    FormValidateDirective,
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

@@ -1,4 +1,4 @@
-<app-blank pageName="Users" [routes]="['Users']">
+<app-blank pageName="Users" [routes]="['Admin', 'Users']">
   <app-section sectionTitle="User List">
     <div class="form-group row">
       <div class="col-9">
@@ -29,15 +29,23 @@
             <th>#</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Companies</th>
             <th>Operations</th>
           </tr>
         </thead>
         <tbody>
-          @for(data of examples | user: search ;track data){
+          @for(data of users | user: search ;track data){
           <tr>
             <td>{{ $index + 1 }}</td>
             <td>{{ data.fullName }}</td>
             <td>{{ data.email }}</td>
+            <td>
+              <ul>
+                @for(companyUser of data.companyUsers; track companyUser){
+                <li>{{ companyUser.company.name }}</li>
+                }
+              </ul>
+            </td>
             <td>
               <button
                 data-toggle="modal"
@@ -137,7 +145,7 @@
           </div>
 
           <div class="form-group mt-2">
-            <label>Passowrd</label>
+            <label>Password</label>
             <input
               type="password"
               required
@@ -145,6 +153,24 @@
               class="form-control"
               name="password"
             />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Companies</label>
+            <select
+              name="companyIds"
+              [(ngModel)]="createModel.companyIds"
+              class="form-control"
+              multiple
+              required
+            >
+              @for(company of companies; track company){
+              <option [value]="company.id">
+                {{ company.name }}
+              </option>
+              }
+            </select>
             <div class="invalid-feedback"></div>
           </div>
         </div>
@@ -217,18 +243,48 @@
             <div class="invalid-feedback"></div>
           </div>
 
+          <div class="form-group mt-2">
+            <label>Email</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="updateModel.email"
+              class="form-control"
+              name="updateEmail"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
           <div class="form-group">
-            <label>New Password</label>
+            <label>Password</label>
             <input
               type="password"
-              required
               [(ngModel)]="updateModel.password"
               class="form-control"
               name="updatePassword"
             />
             <div class="invalid-feedback"></div>
           </div>
+          <div class="form-group mt-2">
+            <label>Companies</label>
+            <select
+              name="updateCompanyIds"
+              [(ngModel)]="updateModel.companyIds"
+              class="form-control"
+              multiple
+              required
+            >
+              @for(company of companies; track company){
+              <option [value]="company.id">
+                {{ company.name }}
+              </option>
+              }
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
         </div>
+
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary w-100">Güncelle</button>
         </div>

@@ -1,7 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using eAccountingServer.Application.Services;
+using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Users;
 using eAccountingServer.Infrastructure.Options;
 using Microsoft.Extensions.Options;
@@ -11,14 +13,16 @@ namespace eAccountingServer.Infrastructure.Service
 {
     internal sealed class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
     {
-        public Task<string> CreateTokenAsync(AppUser user, string password, CancellationToken cancellationToken = default)
+        public Task<string> CreateTokenAsync(AppUser user, Guid? companyId, List<Company> companies, CancellationToken cancellationToken = default)
         {
             List<Claim> claims = new()
             {
                 new Claim("Id",user.Id.ToString()),
                 new Claim("Name", user.FirstName +" "+user.LastName),
-                new Claim("UserName", user.UserName ?? ""),
-                new Claim("Email", user.Email ?? "")
+                new Claim("UserName", user.UserName ?? string.Empty),
+                new Claim("Email", user.Email ?? string.Empty),
+                new Claim("CompanyId", companyId.ToString() ?? string.Empty),
+                new Claim("Companies", JsonSerializer.Serialize(companies))
             };
 
 

@@ -1,4 +1,5 @@
-﻿using eAccountingServer.Domain.Users;
+﻿using eAccountingServer.Application.Services;
+using eAccountingServer.Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using ResultKit;
@@ -8,7 +9,8 @@ public sealed record DeleteUserByIdCommand(
     Guid Id) : IRequest<Result<string>>;
 
 internal sealed class DeleteUserByIdCommandHandler(
-    UserManager<AppUser> userManager
+    UserManager<AppUser> userManager,
+    ICacheService cacheService
     ) : IRequestHandler<DeleteUserByIdCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(DeleteUserByIdCommand request, CancellationToken cancellationToken)
@@ -21,6 +23,8 @@ internal sealed class DeleteUserByIdCommandHandler(
         IdentityResult result = await userManager.UpdateAsync(user);
         if (!result.Succeeded)
             return Result<string>.Failure(result.Errors.Select(s => s.Description).ToList());
+
+        cacheService.Remove("users");
 
         return "User deleted successfully!";
     }
