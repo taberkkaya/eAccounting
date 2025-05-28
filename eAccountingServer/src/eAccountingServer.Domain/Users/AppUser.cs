@@ -12,7 +12,7 @@ namespace eAccountingServer.Domain.Users
         }
 
         public List<CompanyUser>? CompanyUsers { get; set; }
-
+        public bool IsAdmin { get; set; }
         public string FirstName { get; set; } = default!;
         public string LastName { get; set; } = default!;
         public string FullName => $"{FirstName} {LastName}";

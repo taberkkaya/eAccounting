@@ -16,5 +16,9 @@ export class MainSidebarComponent {
   search: string = '';
   menus = Menus;
 
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService) {
+    if (!this.auth.user.isAdmin) {
+      this.menus = this.menus.filter((p) => !p.showThisMenuJustAdmin);
+    }
+  }
 }

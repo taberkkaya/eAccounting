@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
+using eAccountingServer.Domain.Abstractions;
 using eAccountingServer.Domain.Entities;
+using eAccountingServer.Domain.Enums;
 using eAccountingServer.Domain.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +18,30 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
 
     public CompanyDbContext(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
     {
-        CreateConnectionString(httpContextAccessor,context);
+        CreateConnectionString(httpContextAccessor, context);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(connectionString);
+    }
+
+    public DbSet<CashRegister> CashRegisters { get; set; }
+    public DbSet<CashRegisterDetail> CashRegisterDetails { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<CashRegister>().Property(p => p.DepositAmount).HasColumnType("money");
+        modelBuilder.Entity<CashRegister>().Property(p => p.WithdrawalAmount).HasColumnType("money");
+        modelBuilder.Entity<CashRegister>()
+            .Property(p => p.CurrencyType)
+            .HasConversion(type => type.Value, value => CurrencyTypeEnum.FromValue(value));
+        modelBuilder.Entity<CashRegister>().HasMany(p => p.Details).WithOne().HasForeignKey(p => p.CashRegisterId);
+        modelBuilder.Entity<CashRegister>().HasQueryFilter(p => !p.IsDeleted);
+
+        modelBuilder.Entity<CashRegisterDetail>().Property(p => p.DepositAmount).HasColumnType("money");
+        modelBuilder.Entity<CashRegisterDetail>().Property(p => p.WithdrawalAmount).HasColumnType("money"); 
+        modelBuilder.Entity<CashRegisterDetail>().HasQueryFilter(p => !p.IsDeleted);
     }
 
     private void CreateConnectionString(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
@@ -61,6 +81,52 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
                 $"Trust Server Certificate=True;" +
                 $"Application Intent=ReadWrite;" +
                 $"Multi Subnet Failover=False";
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries<Entity>();
+
+        HttpContextAccessor httpContextAccessor = new();
+        Guid userId = Guid.TryParse(
+           httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(p => p.Type == "Id")?.Value,
+           out var parsedUserId) ? parsedUserId : Guid.Empty;
+
+        foreach (var entry in entries)
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Property(p => p.CreatedAt)
+                    .CurrentValue = DateTimeOffset.Now;
+                entry.Property(p => p.CreatedBy)
+                    .CurrentValue = userId;
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+
+                if (entry.Property(p => p.IsDeleted).CurrentValue == true)
+                {
+                    entry.Property(p => p.DeletedAt)
+                        .CurrentValue = DateTimeOffset.Now;
+                    entry.Property(p => p.DeletedBy)
+                        .CurrentValue = userId;
+                }
+
+                else
+                {
+                    entry.Property(p => p.UpdatedAt)
+                        .CurrentValue = DateTimeOffset.Now;
+                    entry.Property(p => p.UpdatedBy)
+                        .CurrentValue = userId;
+                }
+            }
+
+            //if (entry.State == EntityState.Deleted)
+            //    throw new ArgumentException("Database üzerinden hard delete yapamazsınız.");
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 }
 

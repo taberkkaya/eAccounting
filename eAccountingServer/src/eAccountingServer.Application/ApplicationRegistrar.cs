@@ -1,4 +1,5 @@
 ﻿using eAccountingServer.Application.Behaviors;
+using eAccountingServer.Application.Mapping;
 using eAccountingServer.Domain.Users;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,8 @@ namespace eAccountingServer.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
+            MapsterConfig.RegisterMappings();
+
             services.AddFluentEmail("info@eaccounting.com").AddSmtpSender("localhost", 2525);
 
             services.AddMediatR(conf =>

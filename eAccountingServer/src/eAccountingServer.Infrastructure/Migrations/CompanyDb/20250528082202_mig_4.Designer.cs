@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eAccountingServer.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using eAccountingServer.Infrastructure.Context;
 namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
 {
     [DbContext(typeof(CompanyDbContext))]
-    partial class CompanyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250528082202_mig_4")]
+    partial class mig_4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,6 +30,9 @@ namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("BalanceAmount")
+                        .HasColumnType("money");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
@@ -138,7 +144,7 @@ namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
                         .HasForeignKey("CashRegisterDetailOpasiteId");
 
                     b.HasOne("eAccountingServer.Domain.Entities.CashRegister", null)
-                        .WithMany("Details")
+                        .WithMany("CashRegisterDetails")
                         .HasForeignKey("CashRegisterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -148,7 +154,7 @@ namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
 
             modelBuilder.Entity("eAccountingServer.Domain.Entities.CashRegister", b =>
                 {
-                    b.Navigation("Details");
+                    b.Navigation("CashRegisterDetails");
                 });
 #pragma warning restore 612, 618
         }

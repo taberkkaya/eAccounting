@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eAccountingServer.Infrastructure.Context;
 
@@ -11,9 +12,11 @@ using eAccountingServer.Infrastructure.Context;
 namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
 {
     [DbContext(typeof(CompanyDbContext))]
-    partial class CompanyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250528081506_mig_3")]
+    partial class mig_3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,6 +30,9 @@ namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("BalanceAmount")
+                        .HasColumnType("money");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
@@ -79,9 +85,6 @@ namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
                     b.Property<Guid?>("CashRegisterDetailId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CashRegisterDetailOpasiteId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("CashRegisterId")
                         .HasColumnType("uniqueidentifier");
 
@@ -124,31 +127,7 @@ namespace eAccountingServer.Infrastructure.Migrations.CompanyDb
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CashRegisterDetailOpasiteId");
-
-                    b.HasIndex("CashRegisterId");
-
                     b.ToTable("CashRegisterDetails");
-                });
-
-            modelBuilder.Entity("eAccountingServer.Domain.Entities.CashRegisterDetail", b =>
-                {
-                    b.HasOne("eAccountingServer.Domain.Entities.CashRegisterDetail", "CashRegisterDetailOpasite")
-                        .WithMany()
-                        .HasForeignKey("CashRegisterDetailOpasiteId");
-
-                    b.HasOne("eAccountingServer.Domain.Entities.CashRegister", null)
-                        .WithMany("Details")
-                        .HasForeignKey("CashRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CashRegisterDetailOpasite");
-                });
-
-            modelBuilder.Entity("eAccountingServer.Domain.Entities.CashRegister", b =>
-                {
-                    b.Navigation("Details");
                 });
 #pragma warning restore 612, 618
         }

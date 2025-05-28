@@ -1,0 +1,301 @@
+<app-blank
+  pageName="{{ cashRegister.name }} Details"
+  [routes]="['Entries', 'Cash Registers', 'Cash Register Details']"
+>
+  <app-section
+    sectionTitle="{{ cashRegister.name }} Cash Register Details List"
+  >
+    <div class="form-group row">
+      <div class="col-3">
+        <button
+          class="btn btn-dark"
+          data-toggle="modal"
+          data-target="#createModal"
+        >
+          <i class="fa-solid fa-plus me-1"></i>
+          Add Action
+        </button>
+      </div>
+      <div class="col-6">
+        <div class="row">
+          <div class="col-4">
+            <input type="date" class="form-control" [(ngModel)]="startDate" />
+          </div>
+          <div class="col-4">
+            <input type="date" class="form-control" [(ngModel)]="endDate" />
+          </div>
+          <div>
+            <button class="btn btn-dark w-100" (click)="getAll()">Get</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-3">
+        <input
+          [(ngModel)]="search"
+          type="search"
+          class="form-control"
+          placeholder="search"
+        />
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Deposit Amount</th>
+            <th>Withdrawal Amount</th>
+            <th>Operations</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(data of cashRegister.details| cashRegisterDetail: search ;track
+          data){
+          <tr>
+            <td>{{ $index + 1 }}</td>
+            <td>{{ data.date | date : "dd.MM.yyyy" }}</td>
+            <td>
+              <span class="me-1">
+                {{ data.description }}
+              </span>
+              @if(data.cashRegisterDetailId){
+              <i class="fa-solid fa-right-left"></i>
+              }
+            </td>
+            <td>
+              {{
+                data.depositAmount
+                  | trCurrency
+                    : changeCurrencyNameToSymbol(cashRegister.currencyType.name)
+                    : true
+              }}
+            </td>
+            <td>
+              {{
+                data.withdrawalAmount
+                  | trCurrency
+                    : changeCurrencyNameToSymbol(cashRegister.currencyType.name)
+                    : true
+              }}
+            </td>
+            <td>
+              <button
+                data-toggle="modal"
+                data-target="#updateModal"
+                (click)="get(data)"
+                class="btn btn-outline-primary btn-sm me-1"
+              >
+                <i class="fa-solid fa-edit"></i>
+              </button>
+              <button
+                (click)="deleteById(data)"
+                class="btn btn-outline-danger btn-sm"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+</app-blank>
+
+<!-- Create Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title fs-5">Add Cash Register Detail Form</h3>
+        <button
+          type="button"
+          #createModalCloseBtn
+          class="btn btn-outline-danger"
+          data-dismiss="modal"
+        >
+          <i class="fa-solid fa-x"></i>
+        </button>
+      </div>
+      <form
+        formValidate
+        #createForm="ngForm"
+        autocomplete="off"
+        (ngSubmit)="create(createForm)"
+      >
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              required
+              [(ngModel)]="createModel.date"
+              class="form-control"
+              name="date"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Action Type</label>
+            <select
+              class="form-control"
+              name="type"
+              [(ngModel)]="createModel.type"
+              required
+            >
+              <option [value]="0">money inflow</option>
+              <option [value]="1">cash out</option>
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Amount</label>
+            <input
+              type="text"
+              required
+              [(ngModel)]="createModel.amount"
+              class="form-control"
+              name="amount"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>record type</label>
+            <select
+              class="form-control"
+              name="recordType"
+              [(ngModel)]="createModel.recordType"
+              required
+            >
+              <option [value]="0">other</option>
+              <option [value]="1">cash register</option>
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          @if(createModel.recordType == 1){
+
+          <div class="form-group mt-2">
+            <label>Cash Registers</label>
+            <select
+              class="form-control"
+              name="oppositeCashRegisterId"
+              (change)="setOppositeCashRegister()"
+              [(ngModel)]="createModel.oppositeCashRegisterId"
+            >
+              @for(data of cashRegisters; track data){
+              <option [value]="data.id">{{ data.name }}</option>
+              }
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          @if(createModel.oppositeCashRegister.currencyType.value !=
+          cashRegister.currencyType.value){
+          <div class="form-group mt-2">
+            <label>Opposite Amount</label>
+            <input
+              type="text"
+              [(ngModel)]="createModel.oppositeAmount"
+              class="form-control"
+              name="oppositeAmount"
+              required
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+          } }
+
+          <div class="form-group mt-2">
+            <label>Description</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="createModel.description"
+              class="form-control"
+              name="description"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-dark w-100">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Update Modal -->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title fs-5">Update Cash Register Detail Form</h3>
+        <button
+          type="button"
+          #updateModalCloseBtn
+          class="btn btn-outline-danger"
+          data-dismiss="modal"
+        >
+          <i class="fa-solid fa-x"></i>
+        </button>
+      </div>
+      <form
+        formValidate
+        #updateForm="ngForm"
+        autocomplete="off"
+        (ngSubmit)="update(updateForm)"
+      >
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              required
+              [(ngModel)]="updateModel.date"
+              class="form-control"
+              name="updateDate"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Amount</label>
+            <input
+              type="text"
+              required
+              [(ngModel)]="updateModel.amount"
+              class="form-control"
+              name="updateAmount"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Description</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="updateModel.description"
+              class="form-control"
+              name="updateDescription"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary w-100">Güncelle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

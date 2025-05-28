@@ -1,5 +1,4 @@
 ﻿using eAccountingServer.Application.Features.Companies;
-using eAccountingServer.Application.Features.User;
 using eAccountingServer.WebApi.Abstractions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

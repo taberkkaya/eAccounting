@@ -4,6 +4,7 @@ export class MenuModel {
   url: string = '';
   isTitle: boolean = false;
   subMenus: MenuModel[] = [];
+  showThisMenuJustAdmin: boolean = false;
 }
 
 export const Menus: MenuModel[] = [
@@ -13,6 +14,7 @@ export const Menus: MenuModel[] = [
     url: '/',
     isTitle: false,
     subMenus: [],
+    showThisMenuJustAdmin: false,
   },
   {
     name: 'Admin',
@@ -20,6 +22,7 @@ export const Menus: MenuModel[] = [
     url: '',
     isTitle: true,
     subMenus: [],
+    showThisMenuJustAdmin: true,
   },
   {
     name: 'Users',
@@ -27,6 +30,7 @@ export const Menus: MenuModel[] = [
     url: '/users',
     isTitle: false,
     subMenus: [],
+    showThisMenuJustAdmin: true,
   },
   {
     name: 'Companies',
@@ -34,5 +38,22 @@ export const Menus: MenuModel[] = [
     url: '/companies',
     isTitle: false,
     subMenus: [],
+    showThisMenuJustAdmin: true,
+  },
+  {
+    name: 'Entries',
+    icon: '',
+    url: '',
+    isTitle: true,
+    subMenus: [],
+    showThisMenuJustAdmin: false,
+  },
+  {
+    name: 'Cash Registers',
+    icon: 'fa-solid fa-cash-register',
+    url: '/cash-registers',
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: false,
   },
 ];
