@@ -1,4 +1,5 @@
-﻿using eAccountingServer.Application.Features.CashRegisters;
+﻿using eAccountingServer.Application.Features.Banks;
+using eAccountingServer.Application.Features.CashRegisters;
 using eAccountingServer.Application.Features.Companies;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Enums;
@@ -14,6 +15,14 @@ public static class MapsterConfig
             .Map(dest => dest.CurrencyType, src => CurrencyTypeEnum.FromValue(src.CurrencyTypeValue));
 
         TypeAdapterConfig<UpdateCacheRegisterCommand, CashRegister>
+            .NewConfig()
+            .Map(dest => dest.CurrencyType, src => CurrencyTypeEnum.FromValue(src.CurrencyTypeValue));
+
+        TypeAdapterConfig<CreateBankCommand, Bank>
+           .NewConfig()
+           .Map(dest => dest.CurrencyType, src => CurrencyTypeEnum.FromValue(src.CurrencyTypeValue));
+
+        TypeAdapterConfig<UpdateBankCommand, Bank>
             .NewConfig()
             .Map(dest => dest.CurrencyType, src => CurrencyTypeEnum.FromValue(src.CurrencyTypeValue));
     }

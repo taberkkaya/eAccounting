@@ -61,6 +61,7 @@ internal sealed class ChangeCompanyCommandHandler(
         var response = new LoginCommandResponse() { AccessToken = token };
 
         cacheService.Remove("cashRegisters");
+        cacheService.Remove("banks");
 
         return response;
     }
