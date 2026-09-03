@@ -1,0 +1,71 @@
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid #ced4da;
+  border-radius: 999px;
+  background: #f8f9fa;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+.demo-banner--warning {
+  border-color: #f0ad4e;
+  background: #fff8ec;
+}
+
+.demo-banner__tag {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: #343a40;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.demo-banner__metric {
+  color: #495057;
+}
+
+.demo-banner__metric i {
+  margin-right: 0.15rem;
+  opacity: 0.65;
+}
+
+.demo-banner__button {
+  padding: 0.15rem 0.55rem;
+  border: 1px solid #ced4da;
+  border-radius: 999px;
+  background: #fff;
+  color: #495057;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.demo-banner__button:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.demo-banner__button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.demo-banner__button--accent {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.demo-banner__button--accent:hover {
+  background: #e7f1ff;
+}
+
+@media (max-width: 767px) {
+  .demo-banner__metric,
+  .demo-banner__button {
+    font-size: 0.7rem;
+  }
+}

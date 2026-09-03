@@ -1,0 +1,7 @@
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+nuget.exe
+package/
+assets/

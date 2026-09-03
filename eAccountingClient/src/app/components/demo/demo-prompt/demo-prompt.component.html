@@ -1,0 +1,35 @@
+@if (kind(); as promptKind) {
+<div class="demo-prompt" [class.demo-prompt--soft]="promptKind === 'nudge'">
+  <div class="demo-prompt__card">
+    <div class="demo-prompt__icon">
+      <i class="fas" [class.fa-hourglass-end]="promptKind === 'ended'" [class.fa-hand-sparkles]="promptKind === 'nudge'"></i>
+    </div>
+
+    <h3 class="demo-prompt__title">{{ title() }}</h3>
+    <p class="demo-prompt__message">{{ message() }}</p>
+
+    <div class="demo-prompt__actions">
+      <button type="button" class="demo-prompt__action demo-prompt__action--primary" (click)="contact()">
+        <i class="fas fa-arrow-up-right-from-square"></i>
+        İletişime geç
+      </button>
+
+      @if (promptKind === 'ended') {
+      <button type="button" class="demo-prompt__action" (click)="startFresh()" [disabled]="demo.starting()">
+        <i class="fas fa-rotate"></i>
+        Yeni oturum başlat
+      </button>
+      <button type="button" class="demo-prompt__action demo-prompt__action--quiet" (click)="leave()">
+        Çıkış yap
+      </button>
+      } @else {
+      <button type="button" class="demo-prompt__action" (click)="dismiss()">
+        Denemeye devam et
+      </button>
+      }
+    </div>
+
+    <p class="demo-prompt__footnote">ataberkkaya.com</p>
+  </div>
+</div>
+}

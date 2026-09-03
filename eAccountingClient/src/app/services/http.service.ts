@@ -2,44 +2,34 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { api } from '../constants';
 import { ResultModel } from '../models/result.model';
-import { AuthService } from './auth.service';
 import { ErrorService } from './error.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HttpService {
-  constructor(
-    private http: HttpClient,
-    private auth: AuthService,
-    private error: ErrorService
-  ) {}
+  // The bearer token is attached by authInterceptor, so nothing here deals with headers.
+  constructor(private http: HttpClient, private error: ErrorService) {}
 
   get<T>(
     apiUrl: string,
     callBack: (res: T) => void,
     errorCallBack?: () => void
   ) {
-    this.http
-      .post<ResultModel<T>>(`${api}/${apiUrl}`, {
-        headers: {
-          Authorization: 'Bearer ' + this.auth.accessToken,
-        },
-      })
-      .subscribe({
-        next: (res) => {
-          if (res.data) {
-            callBack(res.data);
-          }
-        },
-        error: (err: HttpErrorResponse) => {
-          this.error.errorHandler(err);
+    this.http.get<ResultModel<T>>(`${api}/${apiUrl}`).subscribe({
+      next: (res) => {
+        if (res.data) {
+          callBack(res.data);
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.error.errorHandler(err);
 
-          if (errorCallBack) {
-            errorCallBack();
-          }
-        },
-      });
+        if (errorCallBack) {
+          errorCallBack();
+        }
+      },
+    });
   }
 
   post<T>(
@@ -48,25 +38,19 @@ export class HttpService {
     callBack: (res: T) => void,
     errorCallBack?: () => void
   ) {
-    this.http
-      .post<ResultModel<T>>(`${api}/${apiUrl}`, body, {
-        headers: {
-          Authorization: 'Bearer ' + this.auth.accessToken,
-        },
-      })
-      .subscribe({
-        next: (res) => {
-          if (res.data) {
-            callBack(res.data);
-          }
-        },
-        error: (err: HttpErrorResponse) => {
-          this.error.errorHandler(err);
+    this.http.post<ResultModel<T>>(`${api}/${apiUrl}`, body).subscribe({
+      next: (res) => {
+        if (res.data) {
+          callBack(res.data);
+        }
+      },
+      error: (err: HttpErrorResponse) => {
+        this.error.errorHandler(err);
 
-          if (errorCallBack) {
-            errorCallBack();
-          }
-        },
-      });
+        if (errorCallBack) {
+          errorCallBack();
+        }
+      },
+    });
   }
 }

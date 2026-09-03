@@ -6,6 +6,7 @@ import { LoginResponseModel } from '../../models/login.response.model';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SwalService } from '../../services/swal.service';
+import { DemoService } from '../../services/demo.service';
 
 @Component({
   selector: 'app-login',
@@ -18,12 +19,32 @@ export class LoginComponent {
   model: LoginModel = new LoginModel();
   email: string = '';
   isLoading: boolean = false;
+  isDemoLoading: boolean = false;
 
   constructor(
     private http: HttpService,
     private router: Router,
-    private swal: SwalService
+    private swal: SwalService,
+    private demo: DemoService
   ) {}
+
+  startDemo() {
+    this.isDemoLoading = true;
+
+    this.demo.start().subscribe({
+      next: () => {
+        this.isDemoLoading = false;
+        this.router.navigateByUrl('/');
+      },
+      error: () => {
+        this.isDemoLoading = false;
+        this.swal.callToast(
+          'Şu anda tüm demo oturumları dolu, birazdan tekrar deneyin.',
+          'error'
+        );
+      },
+    });
+  }
 
   @ViewChild('sendConfirmEmailModalCloseBtn') sendConfirmEmailModalCloseBtn:
     | ElementRef<HTMLButtonElement>
@@ -35,6 +56,8 @@ export class LoginComponent {
       'Auth/Login',
       this.model,
       (res) => {
+        // Clears any demo flag left behind by an earlier visit.
+        this.demo.clear();
         localStorage.setItem('accessToken', res.accessToken);
         this.router.navigateByUrl('/');
       },

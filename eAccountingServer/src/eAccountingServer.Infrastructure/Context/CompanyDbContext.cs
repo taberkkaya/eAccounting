@@ -97,7 +97,7 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
                 $"Initial Catalog={company.Database.DatabaseName};" +
             $"Integrated Security=False;" +
             $"User ID={company.Database.Username};" +
-                $"Password={company.Database.Password}" +
+                $"Password={company.Database.Password};" +
                 $"Connect Timeout=30;" +
                 $"Encrypt=True;" +
                 $"Trust Server Certificate=True;" +

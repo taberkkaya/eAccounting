@@ -1,0 +1,23 @@
+@if (isDemo()) {
+<div class="demo-banner" [class.demo-banner--warning]="isRunningOut()">
+  <span class="demo-banner__tag">DEMO</span>
+
+  <span class="demo-banner__metric" title="Bu oturumda kalan işlem hakkı">
+    <i class="fas fa-pen-to-square"></i>
+    {{ demo.writesLeft() }} işlem
+  </span>
+
+  <span class="demo-banner__metric" title="Oturumun kalan süresi">
+    <i class="fas fa-clock"></i>
+    {{ timeLeft() }}
+  </span>
+
+  <button type="button" class="demo-banner__button" (click)="resetSandbox()" [disabled]="demo.starting()">
+    <i class="fas fa-rotate"></i> Sıfırla
+  </button>
+
+  <button type="button" class="demo-banner__button demo-banner__button--accent" (click)="contact()">
+    <i class="fas fa-envelope"></i> İletişim
+  </button>
+</div>
+}

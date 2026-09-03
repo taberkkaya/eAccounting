@@ -83,6 +83,18 @@ namespace eAccountingServer.Infrastructure
             return services;
         }
 
+        /// <summary>
+        /// Applies the main database's migrations. Lives here because the context is
+        /// internal to this assembly.
+        /// </summary>
+        public static void MigrateApplicationDatabase(IServiceProvider serviceProvider)
+        {
+            using IServiceScope scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            context.Database.Migrate();
+        }
+
         private static IServiceCollection AddDemo(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DemoOptions>(configuration.GetSection(DemoOptions.SectionName));

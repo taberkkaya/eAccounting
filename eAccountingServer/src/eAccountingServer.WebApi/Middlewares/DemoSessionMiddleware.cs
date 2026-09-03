@@ -29,6 +29,14 @@ public sealed class DemoSessionMiddleware(RequestDelegate next)
             return;
         }
 
+        // The demo endpoints manage session lifetime themselves; gating them on a live
+        // session would make it impossible to start over once one has ended.
+        if (context.Request.Path.StartsWithSegments("/api/demo"))
+        {
+            await next(context);
+            return;
+        }
+
         if (!demoSessionService.IsAlive(sessionId))
         {
             await WriteAsync(context, StatusCodes.Status409Conflict, "session_ended",

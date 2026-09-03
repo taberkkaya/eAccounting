@@ -1,10 +1,22 @@
 using eAccountingServer.Domain.Users;
+using eAccountingServer.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 
 namespace eAccountingServer.WebApi
 {
     public static class ExtensionsMiddleware
     {
+        /// <summary>
+        /// Brings the main database up to date at boot. Off by default because applying
+        /// migrations automatically is a deployment decision, not a library one.
+        /// </summary>
+        public static void MigrateDatabase(WebApplication app)
+        {
+            if (!app.Configuration.GetValue("Database:MigrateOnStartup", false)) return;
+
+            InfrastructureRegistrar.MigrateApplicationDatabase(app.Services);
+        }
+
         public static void CreateFirstUser(WebApplication app)
         {
             using (var scoped = app.Services.CreateScope())

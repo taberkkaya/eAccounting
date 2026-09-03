@@ -1,5 +1,56 @@
 <app-blank pageName="Ana Sayfa">
-    <app-section sectionTitle="ERP">
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore illo ipsa porro laboriosam quaerat qui libero quisquam vitae, voluptates exercitationem quod commodi officia perspiciatis ut non doloribus. Quaerat, excepturi deserunt?</p>
-    </app-section>
+  <app-section sectionTitle="e-Accounting">
+    <p class="home-intro">
+      Çok kiracılı (multi-tenant) bir ön muhasebe uygulaması. Her firmanın verisi
+      <strong>kendi veritabanında</strong> tutulur; oturum açan kullanıcının firması JWT
+      üzerinden çözülerek bağlantı çalışma zamanında kurulur.
+    </p>
+
+    <div class="home-stack">
+      @for(item of stack; track item){
+      <span class="home-stack__chip">{{ item }}</span>
+      }
+    </div>
+
+    <div class="home-cards">
+      <a class="home-card" routerLink="/cash-registers">
+        <i class="fa-solid fa-cash-register home-card__icon"></i>
+        <span class="home-card__title">Kasalar</span>
+        <span class="home-card__text">
+          TL, USD ve EUR kasaları; tahsilat, ödeme ve kasalar arası virman.
+        </span>
+      </a>
+
+      <a class="home-card" routerLink="/banks">
+        <i class="fa-solid fa-building-columns home-card__icon"></i>
+        <span class="home-card__title">Bankalar</span>
+        <span class="home-card__text">
+          IBAN bazlı banka hesapları, hesap hareketleri ve bakiye takibi.
+        </span>
+      </a>
+
+      <a class="home-card" routerLink="/companies">
+        <i class="fa-solid fa-city home-card__icon"></i>
+        <span class="home-card__title">Firmalar</span>
+        <span class="home-card__text">
+          Firma tanımları ve her firma için ayrı veritabanı migrasyonu.
+        </span>
+      </a>
+    </div>
+
+    @if(demo.status(); as status){
+    <div class="home-demo">
+      <h4 class="home-demo__title">Demo oturumundasınız</h4>
+      <p class="home-demo__text">
+        Size özel, izole bir veritabanı ayrıldı. Kayıt ekleyip silebilirsiniz; bu oturum
+        için <strong>{{ demo.writesLeft() }} işlem hakkınız</strong> kaldı. Oturum
+        bittiğinde veriler otomatik sıfırlanır ve sandbox bir sonraki ziyaretçiye hazırlanır.
+      </p>
+      <button type="button" class="btn btn-primary btn-sm" (click)="contact()">
+        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>
+        Proje hakkında iletişime geç
+      </button>
+    </div>
+    }
+  </app-section>
 </app-blank>

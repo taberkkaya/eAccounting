@@ -62,7 +62,9 @@ app.MapScalarApiReference();
 
 app.MapDefaultEndpoints();
 
-app.UseHttpsRedirection();
+// A container that only listens on HTTP would redirect every request into a dead end.
+if (app.Configuration.GetValue("UseHttpsRedirection", true))
+    app.UseHttpsRedirection();
 
 app.UseCors(policy =>
 {
@@ -95,6 +97,7 @@ app.UseExceptionHandler();
 
 app.MapControllers().RequireRateLimiting("fixed").RequireAuthorization();
 
+ExtensionsMiddleware.MigrateDatabase(app);
 ExtensionsMiddleware.CreateFirstUser(app);
 
 app.Run();

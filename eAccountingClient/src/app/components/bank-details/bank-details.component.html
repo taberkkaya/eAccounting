@@ -1,15 +1,33 @@
-<app-blank pageName="Banks" [routes]="['Entries', 'Banks']">
-  <app-section sectionTitle="Bank List">
+<app-blank
+  pageName="{{ bank.name }} Details"
+  [routes]="['Entries', 'Banks', 'Bank Details']"
+>
+  <app-section
+    sectionTitle="{{ bank.name }} Bank Details List"
+  >
     <div class="form-group row">
-      <div class="col-9">
+      <div class="col-3">
         <button
           class="btn btn-dark"
           data-toggle="modal"
           data-target="#createModal"
         >
           <i class="fa-solid fa-plus me-1"></i>
-          Add Bank
+          Add Action
         </button>
+      </div>
+      <div class="col-6">
+        <div class="row">
+          <div class="col-4">
+            <input type="date" class="form-control" [(ngModel)]="startDate" />
+          </div>
+          <div class="col-4">
+            <input type="date" class="form-control" [(ngModel)]="endDate" />
+          </div>
+          <div>
+            <button class="btn btn-dark w-100" (click)="getAll()">Get</button>
+          </div>
+        </div>
       </div>
 
       <div class="col-3">
@@ -27,27 +45,32 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Name</th>
-            <th>IBAN</th>
-            <th>Currency Type</th>
+            <th>Date</th>
+            <th>Description</th>
             <th>Deposit Amount</th>
             <th>Withdrawal Amount</th>
-            <th>Balance Amount</th>
             <th>Operations</th>
           </tr>
         </thead>
         <tbody>
-          @for(data of banks | bank: search ;track data){
+          @for(data of bank.details| bankDetail: search ;track
+          data){
           <tr>
             <td>{{ $index + 1 }}</td>
-            <td>{{ data.name }}</td>
-            <td>{{ data.iban }}</td>
-            <td>{{ data.currencyType.name }}</td>
+            <td>{{ data.date | date : "dd.MM.yyyy" }}</td>
+            <td>
+              <span class="me-1">
+                {{ data.description }}
+              </span>
+              @if(data.bankDetailId){
+              <i class="fa-solid fa-right-left"></i>
+              }
+            </td>
             <td>
               {{
                 data.depositAmount
                   | trCurrency
-                    : changeCurrencyNameToSymbol(data.currencyType.name)
+                    : changeCurrencyNameToSymbol(bank.currencyType.name)
                     : true
               }}
             </td>
@@ -55,33 +78,11 @@
               {{
                 data.withdrawalAmount
                   | trCurrency
-                    : changeCurrencyNameToSymbol(data.currencyType.name)
+                    : changeCurrencyNameToSymbol(bank.currencyType.name)
                     : true
               }}
             </td>
             <td>
-              <span
-                [ngClass]="
-                  data.depositAmount > data.withdrawalAmount
-                    ? 'text-success'
-                    : 'text-danger'
-                "
-              >
-                {{
-                  data.depositAmount - data.withdrawalAmount
-                    | trCurrency
-                      : changeCurrencyNameToSymbol(data.currencyType.name)
-                      : true
-                }}
-              </span>
-            </td>
-            <td>
-              <button
-                class="btn btn-dark btn-sm me-1"
-                routerLink="/banks/details/{{ data.id }}"
-              >
-                <i class="fa-regular fa-file-lines me-1"></i>Details
-              </button>
               <button
                 data-toggle="modal"
                 data-target="#updateModal"
@@ -110,7 +111,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5">Add Bank Form</h1>
+        <h3 class="modal-title fs-5">Add Bank Detail Form</h3>
         <button
           type="button"
           #createModalCloseBtn
@@ -128,44 +129,102 @@
       >
         <div class="modal-body">
           <div class="form-group">
-            <label>Name</label>
+            <label>Date</label>
             <input
-              type="text"
+              type="date"
               required
-              minlength="3"
-              [(ngModel)]="createModel.name"
+              [(ngModel)]="createModel.date"
               class="form-control"
-              name="name"
+              name="date"
             />
             <div class="invalid-feedback"></div>
           </div>
-          <div class="form-group">
-            <label>IBAN</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.iban"
-              class="form-control"
-              name="iban"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
+
           <div class="form-group mt-2">
-            <label>Currency Type</label>
+            <label>Action Type</label>
             <select
               class="form-control"
               name="type"
-              [(ngModel)]="createModel.currencyTypeValue"
+              [(ngModel)]="createModel.type"
+              required
             >
-              @for(type of currencyTypes; track type){
-              <option [value]="type.value">{{ type.name }}</option>
+              <option [value]="0">money inflow</option>
+              <option [value]="1">cash out</option>
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Amount</label>
+            <input
+              type="text"
+              required
+              [(ngModel)]="createModel.amount"
+              class="form-control"
+              name="amount"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>record type</label>
+            <select
+              class="form-control"
+              name="recordType"
+              [(ngModel)]="createModel.recordType"
+              required
+            >
+              <option [value]="0">other</option>
+              <option [value]="1">bank</option>
+            </select>
+            <div class="invalid-feedback"></div>
+          </div>
+
+          @if(createModel.recordType == 1){
+
+          <div class="form-group mt-2">
+            <label>Banks</label>
+            <select
+              class="form-control"
+              name="oppositeBankId"
+              (change)="setOppositeBank()"
+              [(ngModel)]="createModel.oppositeBankId"
+            >
+              @for(data of banks; track data){
+              <option [value]="data.id">{{ data.name }}</option>
               }
             </select>
             <div class="invalid-feedback"></div>
           </div>
-        </div>
 
+          @if(createModel.oppositeBank.currencyType.value !=
+          bank.currencyType.value){
+          <div class="form-group mt-2">
+            <label>Opposite Amount</label>
+            <input
+              type="text"
+              [(ngModel)]="createModel.oppositeAmount"
+              class="form-control"
+              name="oppositeAmount"
+              required
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+          } }
+
+          <div class="form-group mt-2">
+            <label>Description</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="createModel.description"
+              class="form-control"
+              name="description"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+        </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-dark w-100">Kaydet</button>
         </div>
@@ -179,7 +238,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5">Update Add Form</h1>
+        <h3 class="modal-title fs-5">Update Bank Detail Form</h3>
         <button
           type="button"
           #updateModalCloseBtn
@@ -197,40 +256,39 @@
       >
         <div class="modal-body">
           <div class="form-group">
-            <label>Name</label>
+            <label>Date</label>
             <input
-              type="text"
+              type="date"
               required
-              minlength="3"
-              [(ngModel)]="updateModel.name"
+              [(ngModel)]="updateModel.date"
               class="form-control"
-              name="updateName"
+              name="updateDate"
             />
             <div class="invalid-feedback"></div>
           </div>
-          <div class="form-group">
-            <label>IBAN</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.iban"
-              class="form-control"
-              name="updateIban"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
+
           <div class="form-group mt-2">
-            <label>Currency Type</label>
-            <select
+            <label>Amount</label>
+            <input
+              type="text"
+              required
+              [(ngModel)]="updateModel.amount"
               class="form-control"
-              name="updateCurrencyType"
-              [(ngModel)]="updateModel.currencyTypeValue"
-            >
-              @for(type of currencyTypes; track type){
-              <option [value]="type.value">{{ type.name }}</option>
-              }
-            </select>
+              name="updateAmount"
+            />
+            <div class="invalid-feedback"></div>
+          </div>
+
+          <div class="form-group mt-2">
+            <label>Description</label>
+            <input
+              type="text"
+              required
+              minlength="3"
+              [(ngModel)]="updateModel.description"
+              class="form-control"
+              name="updateDescription"
+            />
             <div class="invalid-feedback"></div>
           </div>
         </div>

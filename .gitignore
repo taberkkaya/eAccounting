@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 **/nuget.exe
 *.nuspec
+
+# Local deployment secrets
+.env

@@ -1,3 +1,4 @@
+import { BankDetailModel } from './bankDetail.model';
 import { CurrencyTypeModel } from './currencyType.model';
 
 export class BankModel {
@@ -8,4 +9,5 @@ export class BankModel {
   withdrawalAmount: number = 0;
   currencyType: CurrencyTypeModel = new CurrencyTypeModel();
   currencyTypeValue: number = 1;
+  details: BankDetailModel[] = [];
 }

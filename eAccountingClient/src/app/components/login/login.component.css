@@ -9,3 +9,43 @@
     justify-content: center;
 
 }
+.demo-cta {
+    margin-top: 1rem;
+}
+
+.demo-cta__lead {
+    margin-bottom: 0.85rem;
+    color: #6c757d;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.demo-cta__button {
+    font-weight: 600;
+}
+
+.demo-cta__note {
+    margin: 0.5rem 0 0;
+    color: #adb5bd;
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.demo-cta__divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0 1rem;
+    color: #adb5bd;
+    font-size: 0.75rem;
+    text-transform: lowercase;
+}
+
+.demo-cta__divider::before,
+.demo-cta__divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #dee2e6;
+}

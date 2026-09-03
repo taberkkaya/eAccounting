@@ -1,0 +1,55 @@
+name: eaccounting
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?set MSSQL_SA_PASSWORD in .env}
+      MSSQL_PID: Express
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  api:
+    build:
+      context: ./eAccountingServer
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=eAccountingServerDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=True"
+      # Sandbox databases are created on the same server with the same credentials.
+      Jwt__SecretKey: ${JWT_SECRET:?set JWT_SECRET in .env}
+      Jwt__Issuer: eAccounting
+      Jwt__Audience: eAccounting
+      Database__MigrateOnStartup: "true"
+      Identity__RequireConfirmedEmail: "false"
+      Seed__AdminPassword: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      Demo__Enabled: "true"
+      Demo__SlotCount: "5"
+      Demo__WriteLimit: "40"
+      Demo__NudgeAfterWrites: "15"
+      Demo__IdleTimeoutMinutes: "15"
+      Demo__AbsoluteTimeoutMinutes: "45"
+      Demo__MemoryThresholdMegabytes: "768"
+      Demo__ContactUrl: ${CONTACT_URL:-https://ataberkkaya.com}
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./eAccountingClient
+    depends_on:
+      - api
+    ports:
+      - "${CLIENT_PORT:-8080}:80"
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:

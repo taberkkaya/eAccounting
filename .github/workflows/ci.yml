@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  server:
+    name: Server build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      # The AppHost project needs the Aspire workload, which a build check does not,
+      # so the deployable project is built directly.
+      - name: Restore
+        run: dotnet restore eAccountingServer/src/eAccountingServer.WebApi/eAccountingServer.WebApi.csproj
+
+      - name: Build
+        run: dotnet build eAccountingServer/src/eAccountingServer.WebApi/eAccountingServer.WebApi.csproj --no-restore -c Release
+
+  client:
+    name: Client build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: eAccountingClient
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: eAccountingClient/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build -- --configuration production
+
+  images:
+    name: Docker images
+    runs-on: ubuntu-latest
+    needs: [server, client]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API image
+        run: docker build -t eaccounting-api ./eAccountingServer
+
+      - name: Build client image
+        run: docker build -t eaccounting-client ./eAccountingClient

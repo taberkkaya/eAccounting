@@ -9,6 +9,9 @@ import { ActivatedRoute } from '@angular/router';
 import { CashRegisterDetailPipe } from '../../pipes/cash-register-detail.pipe';
 import { DatePipe } from '@angular/common';
 
+/** Opening range for the movement list, in days back from today. */
+const DEFAULT_RANGE_DAYS = 90;
+
 @Component({
   selector: 'app-cash-register-details',
   standalone: true,
@@ -44,10 +47,16 @@ export class CashRegisterDetailsComponent {
   ) {
     this.activated.params.subscribe((res) => {
       this.cashRegisterId = res['id'];
-      this.startDate = this.date.transform(new Date(), 'yyyy-MM-dd') ?? '';
-      this.endDate = this.date.transform(new Date(), 'yyyy-MM-dd') ?? '';
-      this.createModel.date =
-        this.date.transform(new Date(), 'yyyy-MM-dd') ?? '';
+
+      const today = new Date();
+      const rangeStart = new Date();
+      rangeStart.setDate(today.getDate() - DEFAULT_RANGE_DAYS);
+
+      // Opens on the recent history rather than today alone, so the page is not empty
+      // the first time it is visited.
+      this.startDate = this.date.transform(rangeStart, 'yyyy-MM-dd') ?? '';
+      this.endDate = this.date.transform(today, 'yyyy-MM-dd') ?? '';
+      this.createModel.date = this.date.transform(today, 'yyyy-MM-dd') ?? '';
       this.createModel.cashRegisterId = this.cashRegisterId;
       this.getAll();
       this.getAllCashRegisters();
@@ -70,7 +79,6 @@ export class CashRegisterDetailsComponent {
       },
       (res) => {
         this.cashRegister = res;
-        console.log(this.cashRegister);
       }
     );
   }

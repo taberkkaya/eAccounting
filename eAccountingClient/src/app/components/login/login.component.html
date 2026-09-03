@@ -9,7 +9,30 @@
     <div class="col-md-4 login-part-2">
       <h1 class="text-center"><b>AK </b>e-Accounting</h1>
 
-      <p class="login-box-msg">Giriş yapmak için bilgilerinizi doldurun</p>
+      <div class="demo-cta">
+        <p class="demo-cta__lead">
+          Ön muhasebe uygulamasını kendi izole veritabanınızda deneyin. Kasa ve banka
+          kayıtlarını ekleyip silebilir, hareket girebilirsiniz.
+        </p>
+
+        @if(!isDemoLoading){
+        <button (click)="startDemo()" class="btn btn-primary btn-block demo-cta__button">
+          <i class="fa-solid fa-play me-1"></i>
+          Demoyu Başlat
+        </button>
+        }@else {
+        <button class="btn btn-primary btn-block" type="button" disabled>
+          <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+          <span role="status">Demo hazırlanıyor...</span>
+        </button>
+        }
+
+        <p class="demo-cta__note">
+          Örnek verilerle açılır, oturum sonunda otomatik sıfırlanır.
+        </p>
+      </div>
+
+      <div class="demo-cta__divider"><span>veya hesabınızla girin</span></div>
 
       <div class="input-group mb-3">
         <input

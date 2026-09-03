@@ -53,7 +53,7 @@ internal sealed class DemoSessionService(
 
         _demoUserId = await EnsureDemoUserAsync(userManager);
 
-        string server = ResolveServer(context);
+        DemoDatabaseTarget target = ResolveDatabaseTarget(context);
         List<DemoSlot> slots = new();
 
         for (int index = 1; index <= _options.SlotCount; index++)
@@ -62,7 +62,7 @@ internal sealed class DemoSessionService(
 
             try
             {
-                Company company = await EnsureCompanyAsync(context, server, databaseName, cancellationToken);
+                Company company = await EnsureCompanyAsync(context, target, databaseName, cancellationToken);
 
                 using var companyContext = new CompanyDbContext(company);
                 await companyContext.Database.MigrateAsync(cancellationToken);
@@ -121,14 +121,26 @@ internal sealed class DemoSessionService(
 
     private async Task<Company> EnsureCompanyAsync(
         ApplicationDbContext context,
-        string server,
+        DemoDatabaseTarget target,
         string databaseName,
         CancellationToken cancellationToken)
     {
+        var database = new Database(target.Server, databaseName, target.Username, target.Password);
+
         Company? company = await context.Companies
             .FirstOrDefaultAsync(p => p.Database.DatabaseName == databaseName, cancellationToken);
 
-        if (company is not null) return company;
+        if (company is not null)
+        {
+            // The server or credentials can move between deployments while the row stays.
+            if (company.Database != database)
+            {
+                company.Database = database;
+                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            return company;
+        }
 
         company = new Company
         {
@@ -138,7 +150,7 @@ internal sealed class DemoSessionService(
             Address = "Atasehir, Istanbul",
             TaxDepartment = "Kadikoy",
             TaxNumber = $"90000000{databaseName[^2..]}",
-            Database = new Database(server, databaseName, string.Empty, string.Empty),
+            Database = database,
             CreatedAt = DateTimeOffset.Now,
             CreatedBy = _demoUserId
         };
@@ -149,14 +161,28 @@ internal sealed class DemoSessionService(
         return company;
     }
 
-    private string ResolveServer(ApplicationDbContext context)
-    {
-        if (!string.IsNullOrWhiteSpace(_options.DatabaseServer)) return _options.DatabaseServer;
+    private sealed record DemoDatabaseTarget(string Server, string Username, string Password);
 
+    /// <summary>
+    /// Sandbox databases sit next to the main one by default, reached with the same
+    /// credentials, so a deployment only has to configure a connection string once.
+    /// </summary>
+    private DemoDatabaseTarget ResolveDatabaseTarget(ApplicationDbContext context)
+    {
         var builder = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(
             context.Database.GetConnectionString());
 
-        return builder.DataSource;
+        string server = string.IsNullOrWhiteSpace(_options.DatabaseServer)
+            ? builder.DataSource
+            : _options.DatabaseServer;
+
+        string username = _options.DatabaseUsername
+            ?? (builder.IntegratedSecurity ? string.Empty : builder.UserID);
+
+        string password = _options.DatabasePassword
+            ?? (builder.IntegratedSecurity ? string.Empty : builder.Password);
+
+        return new DemoDatabaseTarget(server, username, password);
     }
 
     #endregion

@@ -1,1 +1,3 @@
-export const api: string = 'https://localhost:7222/api';
+import { environment } from '../environments/environment';
+
+export const api: string = environment.apiUrl;

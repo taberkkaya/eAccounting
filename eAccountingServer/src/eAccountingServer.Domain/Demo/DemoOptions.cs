@@ -19,6 +19,14 @@ public sealed class DemoOptions
     /// <summary>SQL Server instance the slot databases are created on. Falls back to the main connection string's server.</summary>
     public string? DatabaseServer { get; set; }
 
+    /// <summary>
+    /// SQL login for the sandbox databases. Left unset the demo reuses whatever the main
+    /// connection string uses, which is what a single-server deployment wants.
+    /// </summary>
+    public string? DatabaseUsername { get; set; }
+
+    public string? DatabasePassword { get; set; }
+
     /// <summary>Write operations (create/update/delete) a single session may perform before it is stopped.</summary>
     public int WriteLimit { get; set; } = 40;
 
