@@ -1,4 +1,4 @@
-﻿using eAccountingServer.Application.Services;
+using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Repositories;
 using MediatR;
@@ -38,19 +38,21 @@ internal sealed class DeleteBankDetailByIdCommandHandler(
             BankDetail? oppositeBankDetail = await bankDetailRepository
                 .GetByExpressionWithTrackingAsync(p => p.Id == bankDetail.BankDetailId, cancellationToken);
 
-            if (bankDetail is null)
-                return Result<string>.Failure("Bank detail not found.");
+            if (oppositeBankDetail is null)
+                return Result<string>.Failure("Opposite bank detail not found.");
 
 
-            Bank oppositeBank = await bankRepository
+            Bank? oppositeBank = await bankRepository
                 .GetByExpressionWithTrackingAsync(p => p.Id == oppositeBankDetail.BankId, cancellationToken);
 
-            if (bank is null)
-                return Result<string>.Failure("Bank not found.");
+            if (oppositeBank is null)
+                return Result<string>.Failure("Opposite bank not found.");
 
 
-            oppositeBank.DepositAmount -= oppositeBank.DepositAmount;
-            oppositeBank.WithdrawalAmount -= oppositeBank.WithdrawalAmount;
+            // Reverse only what this leg of the transfer contributed; subtracting the
+            // running balance from itself would zero the counter account.
+            oppositeBank.DepositAmount -= oppositeBankDetail.DepositAmount;
+            oppositeBank.WithdrawalAmount -= oppositeBankDetail.WithdrawalAmount;
 
             bankDetailRepository.Delete(oppositeBankDetail);
         }

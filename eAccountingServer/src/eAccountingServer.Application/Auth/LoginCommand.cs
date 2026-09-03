@@ -77,7 +77,7 @@ namespace eAccountingServer.Application.Auth
                 }).ToList();
             }
 
-            var token = await jwtProvider.CreateTokenAsync(user, companyId, companies, cancellationToken);
+            var token = await jwtProvider.CreateTokenAsync(user, companyId, companies, cancellationToken: cancellationToken);
 
             var response = new LoginCommandResponse() { AccessToken = token };
 

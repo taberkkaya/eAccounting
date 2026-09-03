@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using eAccountingServer.Domain.Abstractions;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Enums;
@@ -118,10 +118,15 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Property(p => p.CreatedAt)
-                    .CurrentValue = DateTimeOffset.Now;
-                entry.Property(p => p.CreatedBy)
-                    .CurrentValue = userId;
+                // Only stamp what the caller left unset, so seeded rows can carry
+                // their own historical timestamps and authorship.
+                if (entry.Property(p => p.CreatedAt).CurrentValue == default)
+                    entry.Property(p => p.CreatedAt)
+                        .CurrentValue = DateTimeOffset.Now;
+
+                if (entry.Property(p => p.CreatedBy).CurrentValue == Guid.Empty)
+                    entry.Property(p => p.CreatedBy)
+                        .CurrentValue = userId;
             }
 
             if (entry.State == EntityState.Modified)

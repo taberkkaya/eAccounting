@@ -1,4 +1,4 @@
-﻿using eAccountingServer.Domain.Users;
+using eAccountingServer.Domain.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +16,11 @@ namespace eAccountingServer.Domain.Abstractions
 
         public DateTimeOffset CreatedAt { get; set; } = default!;
         public Guid CreatedBy { get; set; } = default!;
-        public string CreateUserName => GetCreateUserName();
+        public string CreateUserName => ResolveUserName(CreatedBy) ?? string.Empty;
 
         public DateTimeOffset? UpdatedAt { get; set; }
         public Guid? UpdatedBy { get; set; }
-        public string? UpdateUserName => GetUpdateUserName();
+        public string? UpdateUserName => ResolveUserName(UpdatedBy);
 
         public DateTimeOffset? DeletedAt { get; set; }
         public Guid? DeletedBy { get; set; }
@@ -28,32 +28,27 @@ namespace eAccountingServer.Domain.Abstractions
         public bool IsDeleted { get; set; } = false;
         public bool IsActive { get; set; } = true;
 
-        private string GetCreateUserName()
+        /// <summary>
+        /// Resolved lazily during serialization. Rows can outlive the user that wrote
+        /// them, and entities are also materialized outside a request (seeding, hosted
+        /// services) where there is no HttpContext to resolve a UserManager from, so a
+        /// missing name is never treated as an error.
+        /// </summary>
+        private static string? ResolveUserName(Guid? userId)
         {
-            HttpContextAccessor httpContextAccessor = new();
-            var userManager = httpContextAccessor
-                .HttpContext
+            if (userId is null || userId == Guid.Empty) return null;
+
+            HttpContext? httpContext = new HttpContextAccessor().HttpContext;
+            if (httpContext is null) return null;
+
+            UserManager<AppUser>? userManager = httpContext
                 .RequestServices
-                .GetRequiredService<UserManager<AppUser>>();
+                .GetService<UserManager<AppUser>>();
 
-            AppUser appUser = userManager.Users.First(p => p.Id == CreatedBy);
+            AppUser? appUser = userManager?.Users.FirstOrDefault(p => p.Id == userId);
+            if (appUser is null) return null;
 
-            return appUser.FirstName + " " + appUser.LastName + " (" + appUser.Email + ")";
-        }
-
-        private string? GetUpdateUserName()
-        {
-            if (UpdatedBy is null) return null;
-
-            HttpContextAccessor httpContextAccessor = new();
-            var userManager = httpContextAccessor
-                .HttpContext
-                .RequestServices
-                .GetRequiredService<UserManager<AppUser>>();
-
-            AppUser appUser = userManager.Users.First(p => p.Id == UpdatedBy);
-
-            return appUser.FirstName + " " + appUser.LastName + " (" + appUser.Email + ")";
+            return $"{appUser.FirstName} {appUser.LastName} ({appUser.Email})";
         }
     }
 }

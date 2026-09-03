@@ -1,4 +1,4 @@
-﻿using eAccountingServer.Domain.Users;
+using eAccountingServer.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace eAccountingServer.WebApi
@@ -10,22 +10,31 @@ namespace eAccountingServer.WebApi
             using (var scoped = app.Services.CreateScope())
             {
                 var userManager = scoped.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+                var configuration = scoped.ServiceProvider.GetRequiredService<IConfiguration>();
 
-                if (!userManager.Users.Any(p => p.UserName == "admin"))
+                string userName = configuration["Seed:AdminUserName"] ?? "admin";
+
+                if (!userManager.Users.Any(p => p.UserName == userName))
                 {
                     AppUser user = new()
                     {
-                        UserName = "admin",
-                        Email = "admin@admin.com",
+                        UserName = userName,
+                        Email = configuration["Seed:AdminEmail"] ?? "admin@admin.com",
                         FirstName = "admin",
                         LastName = "admin",
                         EmailConfirmed = true,
+                        // Without this the seeded account cannot reach the admin screens
+                        // it exists to administer.
+                        IsAdmin = true,
                         CreatedAt = DateTimeOffset.Now
                     };
 
                     user.CreatedBy = user.Id;
 
-                    userManager.CreateAsync(user, "1").Wait();
+                    // Override in production via Seed__AdminPassword.
+                    string password = configuration["Seed:AdminPassword"] ?? "1";
+
+                    userManager.CreateAsync(user, password).Wait();
                 }
             }
         }

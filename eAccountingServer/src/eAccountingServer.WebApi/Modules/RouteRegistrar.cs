@@ -1,4 +1,4 @@
-﻿namespace eAccountingServer.WebApi.Modules
+namespace eAccountingServer.WebApi.Modules
 {
     public static class RouteRegistrar
     {
@@ -6,6 +6,7 @@
         {
 
             app.RegisterAuthRoutes();
+            app.RegisterDemoRoutes();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -44,19 +44,21 @@ public sealed class DeleteCashRegisterDetailByIdCommandHandler(
             CashRegisterDetail? oppositeCashRegisterDetail = await cashRegisterDetailRepository
                 .GetByExpressionWithTrackingAsync(p => p.Id == cashRegisterDetail.CashRegisterDetailId, cancellationToken);
 
-            if (cashRegisterDetail is null)
-                return Result<string>.Failure("Cash register detail not found.");
+            if (oppositeCashRegisterDetail is null)
+                return Result<string>.Failure("Opposite cash register detail not found.");
 
 
-            CashRegister oppositeCashRegister = await cashRegisterRepository
+            CashRegister? oppositeCashRegister = await cashRegisterRepository
                 .GetByExpressionWithTrackingAsync(p => p.Id == oppositeCashRegisterDetail.CashRegisterId, cancellationToken);
 
-            if (cashRegister is null)
-                return Result<string>.Failure("Cash register not found.");
+            if (oppositeCashRegister is null)
+                return Result<string>.Failure("Opposite cash register not found.");
 
 
-            oppositeCashRegister.DepositAmount -= oppositeCashRegister.DepositAmount;
-            oppositeCashRegister.WithdrawalAmount -= oppositeCashRegister.WithdrawalAmount;
+            // Reverse only what this leg of the transfer contributed; subtracting the
+            // running balance from itself would zero the counter account.
+            oppositeCashRegister.DepositAmount -= oppositeCashRegisterDetail.DepositAmount;
+            oppositeCashRegister.WithdrawalAmount -= oppositeCashRegisterDetail.WithdrawalAmount;
 
             cashRegisterDetailRepository.Delete(oppositeCashRegisterDetail);
         }

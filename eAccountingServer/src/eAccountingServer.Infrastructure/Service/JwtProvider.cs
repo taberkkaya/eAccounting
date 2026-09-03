@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -13,7 +13,13 @@ namespace eAccountingServer.Infrastructure.Service
 {
     internal sealed class JwtProvider(IOptions<JwtOptions> jwtOptions) : IJwtProvider
     {
-        public Task<string> CreateTokenAsync(AppUser user, Guid? companyId, List<Company> companies, CancellationToken cancellationToken = default)
+        public Task<string> CreateTokenAsync(
+            AppUser user,
+            Guid? companyId,
+            List<Company> companies,
+            IReadOnlyDictionary<string, string>? extraClaims = null,
+            TimeSpan? lifetime = null,
+            CancellationToken cancellationToken = default)
         {
             List<Claim> claims = new()
             {
@@ -26,8 +32,10 @@ namespace eAccountingServer.Infrastructure.Service
                 new Claim("IsAdmin", user.IsAdmin.ToString())
             };
 
+            if (extraClaims is not null)
+                claims.AddRange(extraClaims.Select(claim => new Claim(claim.Key, claim.Value)));
 
-            var expires = DateTime.Now.AddDays(1);
+            var expires = DateTime.Now.Add(lifetime ?? TimeSpan.FromDays(1));
 
             SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(jwtOptions.Value.SecretKey));
             SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha512);

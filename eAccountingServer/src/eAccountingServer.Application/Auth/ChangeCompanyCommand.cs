@@ -56,7 +56,7 @@ internal sealed class ChangeCompanyCommandHandler(
             }).ToList();
         }
 
-        var token = await jwtProvider.CreateTokenAsync(user, request.CompanyId, companies, cancellationToken);
+        var token = await jwtProvider.CreateTokenAsync(user, request.CompanyId, companies, cancellationToken: cancellationToken);
 
         var response = new LoginCommandResponse() { AccessToken = token };
 
