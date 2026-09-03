@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.Design;
+using System.ComponentModel.Design;
 using System.Security.Claims;
 using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Entities;
@@ -55,6 +55,11 @@ internal sealed class ChangeCompanyCommandHandler(
                 CreatedBy = s.CreatedBy,
             }).ToList();
         }
+
+        // The requested company was never checked against the caller's own companies, so
+        // any signed-in user could mint a token for any tenant and read its books.
+        if (!companyUsers.Any(p => p.CompanyId == request.CompanyId))
+            return Result<LoginCommandResponse>.Failure("Bu firmaya erişim yetkiniz yok.");
 
         var token = await jwtProvider.CreateTokenAsync(user, request.CompanyId, companies, cancellationToken: cancellationToken);
 

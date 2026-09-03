@@ -30,6 +30,8 @@ internal sealed class DemoSessionService(
     private readonly ConcurrentDictionary<Guid, DemoSession> _sessions = new();
     private readonly SemaphoreSlim _slotLock = new(1, 1);
 
+    private const string DemoCompanyName = "Demo Ticaret A.Ş.";
+
     private DemoSlot[] _slots = [];
     private Guid _demoUserId;
     private volatile bool _ready;
@@ -101,7 +103,7 @@ internal sealed class DemoSessionService(
             UserName = _options.UserName,
             Email = _options.Email,
             FirstName = "Demo",
-            LastName = "Ziyaretci",
+            LastName = "Ziyaretçi",
             EmailConfirmed = true,
             IsAdmin = false,
             CreatedAt = DateTimeOffset.Now
@@ -130,32 +132,24 @@ internal sealed class DemoSessionService(
         Company? company = await context.Companies
             .FirstOrDefaultAsync(p => p.Database.DatabaseName == databaseName, cancellationToken);
 
-        if (company is not null)
+        bool isNew = company is null;
+        company ??= new Company
         {
-            // The server or credentials can move between deployments while the row stays.
-            if (company.Database != database)
-            {
-                company.Database = database;
-                await context.SaveChangesAsync(cancellationToken);
-            }
-
-            return company;
-        }
-
-        company = new Company
-        {
-            // Every sandbox presents the same books, so the visitor sees the same company
-            // name regardless of which slot they were handed.
-            Name = "Demo Ticaret A.S.",
-            Address = "Atasehir, Istanbul",
-            TaxDepartment = "Kadikoy",
             TaxNumber = $"90000000{databaseName[^2..]}",
-            Database = database,
             CreatedAt = DateTimeOffset.Now,
             CreatedBy = _demoUserId
         };
 
-        context.Companies.Add(company);
+        // Rewritten on every startup so a slot row left behind by an earlier deployment
+        // picks up the current server, credentials and presentation. Every sandbox shows
+        // the same company, so the visitor sees the same name whichever slot they get.
+        company.Name = DemoCompanyName;
+        company.Address = "Ataşehir, İstanbul";
+        company.TaxDepartment = "Kadıköy";
+        company.Database = database;
+
+        if (isNew) context.Companies.Add(company);
+
         await context.SaveChangesAsync(cancellationToken);
 
         return company;
