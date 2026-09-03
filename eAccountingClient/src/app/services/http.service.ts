@@ -16,7 +16,7 @@ export class HttpService {
     callBack: (res: T) => void,
     errorCallBack?: () => void
   ) {
-    this.http.get<ResultModel<T>>(`${api}/${apiUrl}`).subscribe({
+    this.http.get<ResultModel<T>>(`${api()}/${apiUrl}`).subscribe({
       next: (res) => {
         if (res.data) {
           callBack(res.data);
@@ -38,7 +38,7 @@ export class HttpService {
     callBack: (res: T) => void,
     errorCallBack?: () => void
   ) {
-    this.http.post<ResultModel<T>>(`${api}/${apiUrl}`, body).subscribe({
+    this.http.post<ResultModel<T>>(`${api()}/${apiUrl}`, body).subscribe({
       next: (res) => {
         if (res.data) {
           callBack(res.data);

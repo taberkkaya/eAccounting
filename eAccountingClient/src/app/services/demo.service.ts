@@ -42,7 +42,7 @@ export class DemoService {
     this.starting.set(true);
 
     return this.http
-      .post<ResultModel<DemoStartModel>>(`${api}/demo/start`, {})
+      .post<ResultModel<DemoStartModel>>(`${api()}/demo/start`, {})
       .pipe(tap({
         next: (res) => {
           this.starting.set(false);
@@ -57,7 +57,7 @@ export class DemoService {
     this.starting.set(true);
 
     return this.http
-      .post<ResultModel<DemoStartModel>>(`${api}/demo/reset`, {})
+      .post<ResultModel<DemoStartModel>>(`${api()}/demo/reset`, {})
       .pipe(tap({
         next: (res) => {
           this.starting.set(false);
@@ -70,7 +70,7 @@ export class DemoService {
   refreshStatus(): void {
     if (!this.isDemo) return;
 
-    this.http.get<ResultModel<DemoStatusModel>>(`${api}/demo/status`).subscribe({
+    this.http.get<ResultModel<DemoStatusModel>>(`${api()}/demo/status`).subscribe({
       next: (res) => {
         if (res.data) this.applyStatus(res.data);
       },
@@ -98,7 +98,7 @@ export class DemoService {
   /** Leaves the demo behind and returns to the sign-in screen. */
   exit(): void {
     if (this.isDemo) {
-      this.http.post(`${api}/demo/end`, {}).subscribe({ next: () => {}, error: () => {} });
+      this.http.post(`${api()}/demo/end`, {}).subscribe({ next: () => {}, error: () => {} });
     }
 
     this.clear();

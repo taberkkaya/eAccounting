@@ -91,6 +91,20 @@ docker compose up -d --build
 Uygulama `http://localhost:8080` adresinde açılır. nginx `/api` isteklerini API
 konteynerine yönlendirir, böylece tarayıcı tarafında cross-origin çağrı olmaz.
 
+## 🪟 Plesk for Windows üzerine kurulum
+
+Docker'sız, panel üzerinden kurulum için: **[deploy/plesk/README.md](deploy/plesk/README.md)**.
+IIS altında ASP.NET Core uygulaması + Plesk'in kendi MSSQL'i ile çalışır.
+
+İstemcinin API adresi çalışma zamanında `assets/config.json` dosyasından okunur, yani
+adresi değiştirmek için yeniden derleme gerekmez:
+
+```json
+{ "apiUrl": "https://api.example.com/api" }
+```
+
+Dosya boş bırakılırsa derleme sırasındaki adres (`/api`) kullanılır.
+
 ## 💻 Lokal geliştirme
 
 ```bash

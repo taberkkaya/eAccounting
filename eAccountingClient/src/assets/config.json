@@ -1,0 +1,4 @@
+{
+  "_comment": "Leave apiUrl empty to use the URL the client was built with. Set it when the API is served from another host or subdomain, e.g. https://api.example.com/api",
+  "apiUrl": ""
+}
