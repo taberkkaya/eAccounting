@@ -5,7 +5,7 @@ using MediatR;
 using ResultKit;
 
 namespace eAccountingServer.Application.Features.BankDetails;
-public sealed record CreateBankDetail(
+public sealed record CreateBankDetailCommand(
     Guid BankId,
     DateOnly Date,
     int Type,
@@ -20,9 +20,9 @@ internal sealed class CreateBankDetailHandler(
     IBankDetailRepository bankDetailRepository,
     IUnitOfWorkCompany unitOfWorkCompany,
     ICacheService cacheService
-    ) : IRequestHandler<CreateBankDetail, Result<string>>
+    ) : IRequestHandler<CreateBankDetailCommand, Result<string>>
 {
-    public async Task<Result<string>> Handle(CreateBankDetail request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateBankDetailCommand request, CancellationToken cancellationToken)
     {
         Bank? bank = await bankRepository
       .GetByExpressionWithTrackingAsync(p => p.Id == request.BankId, cancellationToken);
