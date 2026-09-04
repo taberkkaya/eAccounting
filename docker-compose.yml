@@ -1,31 +1,17 @@
 name: eaccounting
 
+# The database is external by default: a deployment usually already has a SQL Server
+# it pays for, and running another one costs 2 GB of RAM for nothing. To get a
+# self-contained stack with its own SQL Server instead, add the override file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.sqlserver.yml up -d
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?set MSSQL_SA_PASSWORD in .env}
-      MSSQL_PID: Express
-    volumes:
-      - sqlserver-data:/var/opt/mssql
-    healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-      start_period: 30s
-
   api:
     build:
       context: ./eAccountingServer
-    depends_on:
-      sqlserver:
-        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=eAccountingServerDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=True"
-      # Sandbox databases are created on the same server with the same credentials.
+      ConnectionStrings__SqlServer: ${SQL_CONNECTION_STRING:?set SQL_CONNECTION_STRING in .env}
       Jwt__SecretKey: ${JWT_SECRET:?set JWT_SECRET in .env}
       Jwt__Issuer: eAccounting
       Jwt__Audience: eAccounting
@@ -33,12 +19,16 @@ services:
       Identity__RequireConfirmedEmail: "false"
       Seed__AdminPassword: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
       Demo__Enabled: "true"
-      Demo__SlotCount: "5"
+      # Sandbox databases reuse the server and credentials of the connection string
+      # above; only their names differ. They must already exist when the database
+      # user cannot create databases, which is the norm on managed hosting.
+      Demo__DatabaseNamePrefix: ${DEMO_DB_PREFIX:-eAccounting_Demo_Slot}
+      Demo__SlotCount: ${DEMO_SLOT_COUNT:-3}
       Demo__WriteLimit: "40"
       Demo__NudgeAfterWrites: "15"
       Demo__IdleTimeoutMinutes: "15"
       Demo__AbsoluteTimeoutMinutes: "45"
-      Demo__MemoryThresholdMegabytes: "768"
+      Demo__MemoryThresholdMegabytes: ${DEMO_MEMORY_MB:-768}
       Demo__ContactUrl: ${CONTACT_URL:-https://ataberkkaya.com}
       # Empty by default: Caddy serves the client on the same origin as the API.
       Cors__AllowedOrigins__0: ${CORS_ORIGIN:-}
@@ -65,6 +55,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlserver-data:
   caddy-data:
   caddy-config:

@@ -88,6 +88,18 @@ cp .env.example .env   # değerleri doldurun
 docker compose up -d --build
 ```
 
+Veritabanı varsayılan olarak **dışarıdadır** — `SQL_CONNECTION_STRING` ile mevcut bir
+SQL Server'ı gösterirsiniz. Yığının kendi SQL Server'ıyla gelmesini isterseniz:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.sqlserver.yml up -d --build
+```
+
+Demo sandbox veritabanları `DEMO_DB_PREFIX` + `01`, `02`, ... şeklinde adlandırılır.
+Veritabanı kullanıcısının `CREATE DATABASE` yetkisi yoksa (yönetilen hosting'de
+normaldir) bu veritabanlarının **önceden oluşturulmuş** olması ve kullanıcının hepsine
+erişebilmesi gerekir; uygulama tabloları içlerine kendisi kurar.
+
 Uygulama `http://localhost:8080` adresinde açılır. Caddy hem statik dosyaları sunar
 hem de `/api` isteklerini API konteynerine yönlendirir, böylece tarayıcı tarafında
 cross-origin çağrı olmaz.
