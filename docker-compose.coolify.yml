@@ -1,0 +1,48 @@
+# Variant for deployment through Coolify.
+#
+# Coolify runs its own reverse proxy on 80/443 and terminates TLS there, so nothing
+# here publishes a host port and Caddy inside the client serves plain HTTP on the
+# internal network. Everything else - the static bundle, the /api proxy, the demo
+# sandbox behaviour - is identical to the standalone stack.
+#
+# Set the environment variables in Coolify's UI; they are the same ones .env.example
+# documents.
+services:
+  api:
+    build:
+      context: ./eAccountingServer
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__SqlServer: ${SQL_CONNECTION_STRING}
+      Jwt__SecretKey: ${JWT_SECRET}
+      Jwt__Issuer: eAccounting
+      Jwt__Audience: eAccounting
+      Database__MigrateOnStartup: "true"
+      Identity__RequireConfirmedEmail: "false"
+      Seed__AdminPassword: ${ADMIN_PASSWORD}
+      Demo__Enabled: "true"
+      Demo__DatabaseNamePrefix: ${DEMO_DB_PREFIX}
+      Demo__SlotCount: ${DEMO_SLOT_COUNT}
+      Demo__WriteLimit: "40"
+      Demo__NudgeAfterWrites: "15"
+      Demo__IdleTimeoutMinutes: "15"
+      Demo__AbsoluteTimeoutMinutes: "45"
+      Demo__MemoryThresholdMegabytes: ${DEMO_MEMORY_MB}
+      Demo__ContactUrl: ${CONTACT_URL}
+      # The client reaches the API through Caddy on the same origin, so no CORS entry.
+      Cors__AllowedOrigins__0: ""
+    restart: unless-stopped
+
+  client:
+    build:
+      context: ./eAccountingClient
+    depends_on:
+      - api
+    environment:
+      # Coolify assigns the public domain and handles the certificate; Caddy here
+      # only answers on plain HTTP inside the Docker network.
+      SERVICE_FQDN_CLIENT_80: ${SERVICE_FQDN_CLIENT_80}
+      SITE_ADDRESS: ":80"
+    expose:
+      - "80"
+    restart: unless-stopped
