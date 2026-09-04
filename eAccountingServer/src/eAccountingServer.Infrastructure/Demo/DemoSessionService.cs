@@ -280,6 +280,12 @@ internal sealed class DemoSessionService(
 
         using var companyContext = new CompanyDbContext(company);
         await DemoDataSeeder.ResetAsync(companyContext, _demoUserId, cancellationToken);
+
+        // The rows changed without going through the cache, so anything held for this
+        // tenant is now wrong - the visitor would be shown the previous session's data
+        // and get "not found" when acting on it.
+        scope.ServiceProvider.GetRequiredService<ICacheService>()
+            .RemoveTenant(slot.CompanyId.ToString());
     }
 
     private async Task<string> CreateTokenAsync(DemoSession session, CancellationToken cancellationToken)
@@ -349,6 +355,9 @@ internal sealed class DemoSessionService(
 
         using var companyContext = new CompanyDbContext(company);
         await DemoDataSeeder.WipeAsync(companyContext, cancellationToken);
+
+        scope.ServiceProvider.GetRequiredService<ICacheService>()
+            .RemoveTenant(slot.CompanyId.ToString());
     }
 
     #endregion

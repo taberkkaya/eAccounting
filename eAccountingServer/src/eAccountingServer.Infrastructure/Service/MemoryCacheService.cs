@@ -35,6 +35,19 @@ internal class MemoryCacheService(
         return true;
     }
 
+    public void RemoveTenant(string tenantId)
+    {
+        string prefix = $"{tenantId}:";
+
+        foreach (var issuedKey in IssuedKeys.Keys)
+        {
+            if (!issuedKey.StartsWith(prefix, StringComparison.Ordinal)) continue;
+
+            cache.Remove(issuedKey);
+            IssuedKeys.TryRemove(issuedKey, out _);
+        }
+    }
+
     public void Set<T>(string key, T value, TimeSpan? expiry = null)
     {
         string qualifiedKey = keyScope.Qualify(key);

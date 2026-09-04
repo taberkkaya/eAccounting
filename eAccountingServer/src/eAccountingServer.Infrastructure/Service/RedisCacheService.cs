@@ -42,6 +42,18 @@ internal sealed class RedisCacheService : ICacheService
         return removed;
     }
 
+    public void RemoveTenant(string tenantId)
+    {
+        foreach (var endPoint in _redis.GetEndPoints())
+        {
+            IServer server = _redis.GetServer(endPoint);
+            if (!server.IsConnected || server.IsReplica) continue;
+
+            foreach (var redisKey in server.Keys(_database.Database, pattern: $"{tenantId}:*"))
+                _database.KeyDelete(redisKey);
+        }
+    }
+
     public void Set<T>(string key, T value, TimeSpan? expiry = null)
     {
         var serializedValue = JsonSerializer.Serialize(value);
