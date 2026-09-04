@@ -1,0 +1,29 @@
+# SITE_ADDRESS is the domain in production (Caddy then provisions a Let's Encrypt
+# certificate on its own) and ":80" for a local run, where TLS is neither possible
+# nor wanted.
+{$SITE_ADDRESS} {
+	root * /srv
+	encode gzip zstd
+
+	# Carries the API address and is read on every page load, so it must never be
+	# served from cache.
+	@runtime-config path /assets/config.json
+	header @runtime-config Cache-Control "no-store"
+
+	# Same origin as the client, so the browser never makes a cross-origin call and
+	# the API needs no CORS entry for this deployment.
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# Angular owns the routing: anything that is not a real file is index.html.
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}

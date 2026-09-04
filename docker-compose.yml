@@ -40,6 +40,8 @@ services:
       Demo__AbsoluteTimeoutMinutes: "45"
       Demo__MemoryThresholdMegabytes: "768"
       Demo__ContactUrl: ${CONTACT_URL:-https://ataberkkaya.com}
+      # Empty by default: Caddy serves the client on the same origin as the API.
+      Cors__AllowedOrigins__0: ${CORS_ORIGIN:-}
     restart: unless-stopped
 
   client:
@@ -47,9 +49,22 @@ services:
       context: ./eAccountingClient
     depends_on:
       - api
+    environment:
+      # A bare domain makes Caddy provision a certificate; ":80" keeps a local run
+      # on plain HTTP.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      ACME_AGREE: "true"
     ports:
-      - "${CLIENT_PORT:-8080}:80"
+      - "${HTTP_PORT:-8080}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    volumes:
+      # Certificates must survive a restart, or Let's Encrypt rate limits are hit
+      # after a few redeploys.
+      - caddy-data:/data
+      - caddy-config:/config
     restart: unless-stopped
 
 volumes:
   sqlserver-data:
+  caddy-data:
+  caddy-config:

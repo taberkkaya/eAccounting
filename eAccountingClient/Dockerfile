@@ -7,8 +7,8 @@ RUN npm ci
 COPY . .
 RUN npm run build -- --configuration production
 
-FROM nginx:1.27-alpine AS runtime
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /src/dist/erpclient/browser /usr/share/nginx/html
+FROM caddy:2-alpine AS runtime
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /src/dist/erpclient/browser /srv
 
-EXPOSE 80
+EXPOSE 80 443

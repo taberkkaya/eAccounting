@@ -88,8 +88,21 @@ cp .env.example .env   # değerleri doldurun
 docker compose up -d --build
 ```
 
-Uygulama `http://localhost:8080` adresinde açılır. nginx `/api` isteklerini API
-konteynerine yönlendirir, böylece tarayıcı tarafında cross-origin çağrı olmaz.
+Uygulama `http://localhost:8080` adresinde açılır. Caddy hem statik dosyaları sunar
+hem de `/api` isteklerini API konteynerine yönlendirir, böylece tarayıcı tarafında
+cross-origin çağrı olmaz.
+
+**Sunucuya kurarken** `.env` içinde şunları değiştirin:
+
+```
+SITE_ADDRESS=demo.example.com   # alan adı yazılırsa Caddy Let's Encrypt sertifikası alır
+HTTP_PORT=80
+HTTPS_PORT=443
+```
+
+Alan adının A kaydı sunucunun IP'sine bakıyorsa Caddy sertifikayı ilk açılışta kendi
+alır ve süresi dolmadan yeniler; 80 ve 443 portları doğrulama için dışarı açık olmalıdır.
+Sertifikalar `caddy-data` volume'ünde saklanır, konteyner yeniden kurulunca kaybolmaz.
 
 ## 🪟 Plesk for Windows üzerine kurulum
 
