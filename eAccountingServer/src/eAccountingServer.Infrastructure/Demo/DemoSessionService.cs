@@ -402,7 +402,11 @@ internal sealed class DemoSessionService(
             NudgeAfterWrites: _options.NudgeAfterWrites,
             ExpiresAt: session.ExpiresAt,
             SecondsRemaining: secondsRemaining,
-            ContactUrl: _options.ContactUrl,
+            // A deployment that leaves the variable empty still gets a usable link
+            // rather than a button that opens nothing.
+            ContactUrl: string.IsNullOrWhiteSpace(_options.ContactUrl)
+                ? DemoOptions.DefaultContactUrl
+                : _options.ContactUrl,
             IsActive: session.EndReason == DemoSessionEndReason.None,
             EndReason: session.EndReason == DemoSessionEndReason.None ? null : session.EndReason.ToString());
     }

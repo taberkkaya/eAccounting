@@ -26,7 +26,11 @@ export class DemoService {
     return status ? Math.max(0, status.writeLimit - status.writesUsed) : 0;
   });
 
-  readonly contactUrl = computed(() => this.status()?.contactUrl ?? 'https://ataberkkaya.com');
+  readonly contactUrl = computed(() => {
+    // Not ?? - the API can send an empty string, which would open a blank tab.
+    const url = this.status()?.contactUrl?.trim();
+    return url ? url : 'https://ataberkkaya.com';
+  });
 
   /** Set once per session so the invitation to get in touch is not shown repeatedly. */
   private nudged = false;

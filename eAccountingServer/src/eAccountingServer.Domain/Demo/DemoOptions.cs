@@ -45,8 +45,10 @@ public sealed class DemoOptions
 
     public int JanitorIntervalSeconds { get; set; } = 30;
 
+    public const string DefaultContactUrl = "https://ataberkkaya.com";
+
     /// <summary>Where an ended session sends the visitor for more detail about the project.</summary>
-    public string ContactUrl { get; set; } = "https://ataberkkaya.com";
+    public string ContactUrl { get; set; } = DefaultContactUrl;
 
     public string UserName { get; set; } = "demo";
 
