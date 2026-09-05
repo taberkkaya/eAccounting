@@ -118,91 +118,106 @@
         </div>
 
         <div class="ak-field ak-form-grid--full">
-          <label class="ak-label">Adres</label>
+          <label class="ak-label">Adres <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="createModel.address"
             class="ak-input"
             name="address"
           />
-          <div class="invalid-feedback"></div>
         </div>
 
         <div class="ak-field">
-          <label class="ak-label">Vergi Dairesi</label>
+          <label class="ak-label">Vergi Dairesi <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="createModel.taxDepartment"
             class="ak-input"
             name="taxDepartment"
           />
-          <div class="invalid-feedback"></div>
         </div>
 
         <div class="ak-field">
-          <label class="ak-label">Vergi No</label>
+          <label class="ak-label">Vergi No <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="createModel.taxNumber"
             class="ak-input"
             name="taxNumber"
           />
-          <div class="invalid-feedback"></div>
-        </div>
-
-        <div class="ak-field">
-          <label class="ak-label">Sunucu <span class="ak-muted">(isteğe bağlı)</span></label>
-          <input
-            type="text"
-            [(ngModel)]="createModel.database.server"
-            placeholder="Boş bırakın"
-            class="ak-input"
-            name="databaseServer"
-          />
-          <div class="invalid-feedback"></div>
-        </div>
-
-        <div class="ak-field">
-          <label class="ak-label">Veritabanı Adı <span class="ak-muted">(isteğe bağlı)</span></label>
-          <input
-            type="text"
-            [(ngModel)]="createModel.database.databaseName"
-            placeholder="Firma adından türetilir"
-            class="ak-input"
-            name="databaseDatabaseName"
-          />
-          <div class="invalid-feedback"></div>
-        </div>
-
-        <div class="ak-field">
-          <label class="ak-label">Kullanıcı Adı</label>
-          <input
-            type="text"
-            [(ngModel)]="createModel.database.username"
-            class="ak-input"
-            name="databaseUserName"
-          />
-        </div>
-
-        <div class="ak-field">
-          <label class="ak-label">Parola</label>
-          <input
-            type="password"
-            [(ngModel)]="createModel.database.password"
-            class="ak-input"
-            name="databasePassword"
-          />
         </div>
       </div>
 
-      <p class="ak-muted" style="margin: 4px 0 0; font-size: 0.78rem">
-        Bu alanları boş bırakırsanız firma, uygulamanın kendi veritabanı
-        sunucusuna kurulur ve kaydettiğiniz anda kullanıma hazır olur. Yalnızca
-        başka bir sunucu kullanacaksanız doldurun.
-      </p>
+      <!-- Veritabanı ayarları nadiren gerekiyor: varsayılan olarak kapalı duruyor
+           ve neye yaradığı açıkça yazıyor. -->
+      <div class="company-db">
+        <button type="button" class="company-db__toggle" (click)="createDbOpen = !createDbOpen">
+          <i class="fas" [class.fa-chevron-right]="!createDbOpen" [class.fa-chevron-down]="createDbOpen"></i>
+          <span class="company-db__title">Veritabanı bağlantısı</span>
+          @if(!createDbOpen){
+          <span class="ak-tag ak-tag--brand">otomatik</span>
+          }
+        </button>
+
+        @if(createDbOpen){
+        <div class="company-db__panel">
+          <p class="company-db__hint">
+            Her firmanın kasa ve banka kayıtları kendi veritabanında tutulur. Bu
+            alanları boş bırakırsanız veritabanı, uygulamanın kendi sunucusunda
+            firma adıyla oluşturulur ve kaydettiğiniz anda hazır olur. Yalnızca
+            <strong>başka bir SQL Server</strong> kullanacaksanız doldurun.
+          </p>
+
+          <div class="ak-form-grid">
+            <div class="ak-field">
+              <label class="ak-label">Sunucu</label>
+              <input
+                type="text"
+                [(ngModel)]="createModel.database.server"
+                class="ak-input"
+                name="databaseServer"
+                placeholder="ornek.sunucu.com,1433"
+              />
+            </div>
+
+            <div class="ak-field">
+              <label class="ak-label">Veritabanı Adı</label>
+              <input
+                type="text"
+                [(ngModel)]="createModel.database.databaseName"
+                class="ak-input"
+                name="databaseName"
+                placeholder="Firma adından türetilir"
+              />
+            </div>
+
+            <div class="ak-field">
+              <label class="ak-label">Kullanıcı Adı</label>
+              <input
+                type="text"
+                [(ngModel)]="createModel.database.username"
+                class="ak-input"
+                name="databaseUserName"
+              />
+            </div>
+
+            <div class="ak-field">
+              <label class="ak-label">Parola</label>
+              <input
+                type="password"
+                [(ngModel)]="createModel.database.password"
+                class="ak-input"
+                name="databasePassword"
+              />
+            </div>
+          </div>
+
+          <p class="company-db__hint">
+            Kullanıcı adı boş bırakılırsa bağlantı Windows kimlik doğrulaması ile kurulur.
+          </p>
+        </div>
+        }
+      </div>
     </div>
 
     <div class="ak-modal__foot">
@@ -237,90 +252,111 @@
             minlength="3"
             [(ngModel)]="updateModel.name"
             class="ak-input"
-            name="updateName"
+            name="updatename"
           />
           <div class="invalid-feedback"></div>
         </div>
 
         <div class="ak-field ak-form-grid--full">
-          <label class="ak-label">Adres</label>
+          <label class="ak-label">Adres <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="updateModel.address"
             class="ak-input"
-            name="updateAddress"
+            name="updateaddress"
           />
-          <div class="invalid-feedback"></div>
         </div>
 
         <div class="ak-field">
-          <label class="ak-label">Vergi Dairesi</label>
+          <label class="ak-label">Vergi Dairesi <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="updateModel.taxDepartment"
             class="ak-input"
-            name="updateTaxDepartment"
+            name="updatetaxDepartment"
           />
-          <div class="invalid-feedback"></div>
         </div>
 
         <div class="ak-field">
-          <label class="ak-label">Vergi No</label>
+          <label class="ak-label">Vergi No <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="updateModel.taxNumber"
             class="ak-input"
-            name="updateTaxNumber"
+            name="updatetaxNumber"
           />
-          <div class="invalid-feedback"></div>
         </div>
+      </div>
 
-        <div class="ak-field">
-          <label class="ak-label">Sunucu</label>
-          <input
-            type="text"
-            required
-            [(ngModel)]="updateModel.database.server"
-            class="ak-input"
-            name="updateDatabaseServer"
-          />
-          <div class="invalid-feedback"></div>
-        </div>
+      <!-- Veritabanı ayarları nadiren gerekiyor: varsayılan olarak kapalı duruyor
+           ve neye yaradığı açıkça yazıyor. -->
+      <div class="company-db">
+        <button type="button" class="company-db__toggle" (click)="updateDbOpen = !updateDbOpen">
+          <i class="fas" [class.fa-chevron-right]="!updateDbOpen" [class.fa-chevron-down]="updateDbOpen"></i>
+          <span class="company-db__title">Veritabanı bağlantısı</span>
+          @if(!updateDbOpen){
+          <span class="ak-tag ak-tag--brand">otomatik</span>
+          }
+        </button>
 
-        <div class="ak-field">
-          <label class="ak-label">Veritabanı Adı</label>
-          <input
-            type="text"
-            required
-            [(ngModel)]="updateModel.database.databaseName"
-            class="ak-input"
-            name="updateDatabaseName"
-          />
-          <div class="invalid-feedback"></div>
-        </div>
+        @if(updateDbOpen){
+        <div class="company-db__panel">
+          <p class="company-db__hint">
+            Her firmanın kasa ve banka kayıtları kendi veritabanında tutulur. Bu
+            alanları boş bırakırsanız veritabanı, uygulamanın kendi sunucusunda
+            firma adıyla oluşturulur ve kaydettiğiniz anda hazır olur. Yalnızca
+            <strong>başka bir SQL Server</strong> kullanacaksanız doldurun.
+          </p>
 
-        <div class="ak-field">
-          <label class="ak-label">Kullanıcı Adı</label>
-          <input
-            type="text"
-            [(ngModel)]="updateModel.database.username"
-            class="ak-input"
-            name="updateDatabaseUserName"
-          />
-        </div>
+          <div class="ak-form-grid">
+            <div class="ak-field">
+              <label class="ak-label">Sunucu</label>
+              <input
+                type="text"
+                [(ngModel)]="updateModel.database.server"
+                class="ak-input"
+                name="updatedatabaseServer"
+                placeholder="ornek.sunucu.com,1433"
+              />
+            </div>
 
-        <div class="ak-field">
-          <label class="ak-label">Parola</label>
-          <input
-            type="password"
-            [(ngModel)]="updateModel.database.password"
-            class="ak-input"
-            name="updateDatabasePassword"
-          />
+            <div class="ak-field">
+              <label class="ak-label">Veritabanı Adı</label>
+              <input
+                type="text"
+                [(ngModel)]="updateModel.database.databaseName"
+                class="ak-input"
+                name="updatedatabaseName"
+                placeholder="Firma adından türetilir"
+              />
+            </div>
+
+            <div class="ak-field">
+              <label class="ak-label">Kullanıcı Adı</label>
+              <input
+                type="text"
+                [(ngModel)]="updateModel.database.username"
+                class="ak-input"
+                name="updatedatabaseUserName"
+              />
+            </div>
+
+            <div class="ak-field">
+              <label class="ak-label">Parola</label>
+              <input
+                type="password"
+                [(ngModel)]="updateModel.database.password"
+                class="ak-input"
+                name="updatedatabasePassword"
+              />
+            </div>
+          </div>
+
+          <p class="company-db__hint">
+            Kullanıcı adı boş bırakılırsa bağlantı Windows kimlik doğrulaması ile kurulur.
+          </p>
         </div>
+        }
       </div>
     </div>
 

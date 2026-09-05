@@ -1,0 +1,58 @@
+
+
+/* --- veritabanı bölümü ----------------------------------------------------- */
+
+.company-db {
+  margin-top: 4px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+  overflow: hidden;
+}
+
+.company-db__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ak-ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.company-db__toggle:hover {
+  background: var(--ak-surface-3);
+}
+
+.company-db__toggle > i {
+  width: 12px;
+  color: var(--ak-muted);
+  font-size: 0.72rem;
+}
+
+.company-db__title {
+  flex: 1;
+  font-weight: 600;
+}
+
+.company-db__panel {
+  padding: 4px 14px 14px;
+  border-top: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+}
+
+.company-db__hint {
+  margin: 12px 0;
+  color: var(--ak-muted);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.company-db__hint strong {
+  color: var(--ak-gray);
+}

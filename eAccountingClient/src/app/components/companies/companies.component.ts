@@ -19,6 +19,10 @@ export class CompaniesComponent {
 
   createOpen = false;
   updateOpen = false;
+  
+  /** Veritabanı bölümü varsayılan olarak kapalı; çoğu firma için gerekmiyor. */
+  createDbOpen = false;
+  updateDbOpen = false;
 
   createModel: CompanyModel = new CompanyModel();
   updateModel: CompanyModel = new CompanyModel();
@@ -27,11 +31,13 @@ export class CompaniesComponent {
 
   openCreate() {
     this.createModel = new CompanyModel();
+    this.createDbOpen = false;
     this.createOpen = true;
   }
 
   openUpdate(model: CompanyModel) {
     this.get(model);
+    this.updateDbOpen = false;
     this.updateOpen = true;
   }
 

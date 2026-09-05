@@ -31,10 +31,16 @@ public sealed class CreateCompanyCommandHandler(
 
     public async Task<Result<string>> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
     {
-        bool isTaxNumberExist = await companyRepository.AnyAsync(p => p.TaxNumber == request.TaxNumber, cancellationToken);
+        // Vergi numarası zorunlu değil; boş bırakılmışsa tekillik aranmıyor, aksi
+        // hâlde numarası olmayan ikinci firma "zaten kayıtlı" diye reddedilirdi.
+        if (!string.IsNullOrWhiteSpace(request.TaxNumber))
+        {
+            bool isTaxNumberExist = await companyRepository
+                .AnyAsync(p => p.TaxNumber == request.TaxNumber, cancellationToken);
 
-        if (isTaxNumberExist)
-            return Result<string>.Failure("Bu vergi numarası zaten kayıtlı.");
+            if (isTaxNumberExist)
+                return Result<string>.Failure("Bu vergi numarası zaten kayıtlı.");
+        }
 
         Company company = request.Adapt<Company>();
 

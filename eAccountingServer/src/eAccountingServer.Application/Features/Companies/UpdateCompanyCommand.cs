@@ -31,7 +31,12 @@ internal sealed class UpdateCompanyCommandHandler(
         if (company is null)
             return Result<string>.Failure("Firma bulunamadı.");
 
-        bool isTaxNumberExist = await companyRepository.AnyAsync(p => p.TaxNumber == request.TaxNumber && p.Id != request.Id, cancellationToken);
+        // Boş vergi numarası tekillik aramaz; yoksa numarası olmayan ikinci firma
+        // kendi kaydını güncelleyemezdi.
+        bool isTaxNumberExist =
+            !string.IsNullOrWhiteSpace(request.TaxNumber)
+            && await companyRepository.AnyAsync(
+                p => p.TaxNumber == request.TaxNumber && p.Id != request.Id, cancellationToken);
 
         if (isTaxNumberExist)
             return Result<string>.Failure("Bu vergi numarası zaten kayıtlı.");
