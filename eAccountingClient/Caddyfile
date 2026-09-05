@@ -1,3 +1,12 @@
+# Caddy 2.7'den beri güvenilmeyen bir kaynaktan gelen X-Forwarded-For'u ezer.
+# Önümüzde Coolify'ın Traefik'i duruyor ve o konteyner ağından geliyor; onu
+# tanıtmazsak uygulamaya ziyaretçinin adresi değil Docker ağının adresi ulaşır.
+{
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
 # SITE_ADDRESS is the domain in production (Caddy then provisions a Let's Encrypt
 # certificate on its own) and ":80" for a local run, where TLS is neither possible
 # nor wanted.
