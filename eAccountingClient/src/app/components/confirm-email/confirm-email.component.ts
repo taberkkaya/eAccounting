@@ -45,13 +45,13 @@ import { HttpService } from '../../services/http.service';
   ],
 })
 export class ConfirmEmailComponent {
-  email: string | undefined = '';
+  userId: string | undefined = '';
   token: string | undefined = '';
   response: string = 'E-posta doğrulanıyor...';
 
   constructor(private route: ActivatedRoute, private http: HttpService) {
     this.route.params.subscribe(() => {
-      this.email = this.route.snapshot.queryParamMap.get('email')?.toString();
+      this.userId = this.route.snapshot.queryParamMap.get('user')?.toString();
       this.token = this.route.snapshot.queryParamMap.get('token')?.toString();
       this.confirm();
     });
@@ -60,7 +60,7 @@ export class ConfirmEmailComponent {
   confirm() {
     this.http.post<string>(
       'Auth/ConfirmEmail',
-      { email: this.email, token: this.token },
+      { userId: this.userId, token: this.token },
       (res) => {
         this.response = res;
       },

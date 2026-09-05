@@ -7,7 +7,7 @@ using ResultKit;
 
 namespace eAccountingServer.Application.Auth;
 public sealed record ConfirmEmailCommand(
-    string Email,
+    Guid UserId,
     string Token) : IRequest<Result<string>>;
 
 internal sealed class ConfirmEmailCommandHandler(
@@ -16,7 +16,7 @@ internal sealed class ConfirmEmailCommandHandler(
 {
     public async Task<Result<string>> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
     {
-        AppUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Email == request.Email, cancellationToken);
+        AppUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Id == request.UserId, cancellationToken);
         if (user is null)
             return Result<string>.Failure("Kullanıcı bulunamadı.");
 

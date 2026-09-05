@@ -23,9 +23,12 @@ public sealed class SendConfirmEmailEvent(
 
         // Bağlantı uygulamanın yayınlandığı adrese kurulmalı; sabit localhost
         // alıcının kendi makinesini gösterirdi.
+        // Adresin bağlantıda taşınmasına gerek yok: kimlik zaten kullanıcıyı buluyor.
+        // Adres URL'de görününce hem tarayıcı geçmişine ve sunucu kayıtlarına
+        // düşüyor, hem de "adres + uzun jeton" kalıbı kimlik avı filtrelerinin
+        // aradığı şeye benziyor.
         string baseUrl = mailOptions.Value.ClientBaseUrl.TrimEnd('/');
-        string confirmUrl =
-            $"{baseUrl}/confirm-email?email={Uri.EscapeDataString(user.Email ?? string.Empty)}&token={token}";
+        string confirmUrl = $"{baseUrl}/confirm-email?user={user.Id}&token={token}";
 
         await fluentEmail
             .To(user.Email)
