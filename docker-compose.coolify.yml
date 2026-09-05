@@ -103,6 +103,12 @@ services:
       # iştahı sınırlı, VPS'te yer dar.
       MSSQL_PID: Express
       MSSQL_MEMORY_LIMIT_MB: "1024"
+    ports:
+      # Yalnızca sunucunun kendi localhost'una bağlı: dışarıdan doğrudan
+      # erişilemez. Kendi bilgisayarından bağlanmak için SSH tüneli kuruluyor:
+      #   ssh -N -L 1433:localhost:1433 root@<sunucu>
+      # SQL Server'ı internete açmak sa hesabı yüzünden kabul edilebilir değil.
+      - "127.0.0.1:1433:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
     healthcheck:
