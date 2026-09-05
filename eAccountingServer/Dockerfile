@@ -15,9 +15,9 @@ RUN dotnet publish eAccountingServer.WebApi/eAccountingServer.WebApi.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 
 # PDF üretimi Skia üzerinden yazı tiplerine erişiyor; bu kütüphaneler olmadan
-# rapor uçları çalışma anında hata veriyor.
+# rapor uçları çalışma anında hata veriyor. curl ise sağlık kontrolü için.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libfontconfig1 libfreetype6 \
+    && apt-get install -y --no-install-recommends libfontconfig1 libfreetype6 curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

@@ -103,6 +103,11 @@ app.MapScalarApiReference();
 
 app.MapDefaultEndpoints();
 
+// Konteynerin hazır olduğunu söyleyen uç. /api altında değil, yani öndeki vekil
+// bunu dışarı taşımıyor: yalnızca Docker ağından, sağlık kontrolünden görülür.
+// Dağıtım sırasında yeni konteynerin ne zaman trafik alabileceği buradan anlaşılıyor.
+app.MapGet("/health", () => Results.Text("Healthy")).AllowAnonymous();
+
 // A container that only listens on HTTP would redirect every request into a dead end.
 if (app.Configuration.GetValue("UseHttpsRedirection", true))
     app.UseHttpsRedirection();

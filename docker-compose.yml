@@ -42,13 +42,24 @@ services:
       Demo__RequireEmailVerification: ${DEMO_REQUIRE_EMAIL:-true}
       # Empty by default: Caddy serves the client on the same origin as the API.
       Cors__AllowedOrigins__0: ${CORS_ORIGIN:-}
+    healthcheck:
+      # Coolify dağıtımda yeni konteynere ne zaman geçeceğini buradan anlıyor;
+      # bu olmadan eski konteyner kapanıp yenisi hazır olana kadar açık bir
+      # sayfadan gelen istek boşluğa düşüyordu.
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      # Migration ve demo havuzunun hazırlanması birkaç saniye sürüyor.
+      start_period: 30s
     restart: unless-stopped
 
   client:
     build:
       context: ./eAccountingClient
     depends_on:
-      - api
+      api:
+        condition: service_healthy
     environment:
       # A bare domain makes Caddy provision a certificate; ":80" keeps a local run
       # on plain HTTP.
@@ -62,6 +73,14 @@ services:
       # after a few redeploys.
       - caddy-data:/data
       - caddy-config:/config
+    healthcheck:
+      # Caddy'nin kendi yönetim ucu; site bloğu alan adına bağlı olduğu için
+      # localhost üzerinden içerik istemek doğru cevabı vermez.
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:2019/config/"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
     restart: unless-stopped
 
 volumes:
