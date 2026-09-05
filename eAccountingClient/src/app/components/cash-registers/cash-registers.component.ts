@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { SharedModule } from '../../modules/shared.module';
 import { CashRegisterModel } from '../../models/cashRegister.model';
 import { SwalService } from '../../services/swal.service';
@@ -7,15 +7,19 @@ import { NgForm } from '@angular/forms';
 import { CashRegisterPipe } from '../../pipes/cash-register.pipe';
 import { CurrencyTypes } from '../../models/currencyType.model';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 
 @Component({
   selector: 'app-cash-registers',
   standalone: true,
-  imports: [SharedModule, CashRegisterPipe, RouterLink],
+  imports: [SharedModule, CashRegisterPipe, RouterLink, NoCompanyComponent],
   templateUrl: './cash-registers.component.html',
   styleUrl: './cash-registers.component.css',
 })
 export class CashRegistersComponent {
+  readonly auth = inject(AuthService);
+
   cashRegisters: CashRegisterModel[] = [];
   search: string = '';
 
@@ -44,6 +48,13 @@ export class CashRegistersComponent {
   }
 
   getAll() {
+
+
+    // Firma yoksa bağlanılacak veritabanı da yok.
+
+
+    if (!this.auth.hasCompany) return;
+
     this.http.post<CashRegisterModel[]>('CashRegisters/GetAll', {}, (res) => {
       this.cashRegisters = res;
     });

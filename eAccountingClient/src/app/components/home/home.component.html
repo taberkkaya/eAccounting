@@ -1,5 +1,7 @@
 <app-blank pageName="Genel Bakış">
-  @if(loading()){
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else if(loading()){
   <div class="ak-panel">
     <div class="ak-empty">
       <i class="fas fa-circle-notch ak-spin"></i>

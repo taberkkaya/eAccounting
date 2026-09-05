@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { SharedModule } from '../../modules/shared.module';
 import { BankPipe } from '../../pipes/bank.pipe';
 import { CurrencyTypes } from '../../models/currencyType.model';
@@ -6,15 +6,19 @@ import { BankModel } from '../../models/bank.model';
 import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
 import { NgForm } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 
 @Component({
   selector: 'app-banks',
   standalone: true,
-  imports: [SharedModule, BankPipe],
+  imports: [SharedModule, BankPipe, NoCompanyComponent],
   templateUrl: './banks.component.html',
   styleUrl: './banks.component.css',
 })
 export class BanksComponent {
+  readonly auth = inject(AuthService);
+
   banks: BankModel[] = [];
   search: string = '';
 
@@ -43,6 +47,13 @@ export class BanksComponent {
   }
 
   getAll() {
+
+
+    // Firma yoksa bağlanılacak veritabanı da yok.
+
+
+    if (!this.auth.hasCompany) return;
+
     this.http.post<BankModel[]>('Banks/GetAll', {}, (res) => {
       this.banks = res;
     });

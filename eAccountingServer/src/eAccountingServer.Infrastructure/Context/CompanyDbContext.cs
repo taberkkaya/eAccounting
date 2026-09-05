@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using eAccountingServer.Domain.Abstractions;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Enums;
@@ -23,6 +23,11 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        // Bağlantı kurulamadıysa sebebini burada söylemek gerekiyor: aksi hâlde
+        // sorgu anında sürücünün anlamsız hatası kullanıcıya kadar gidiyor.
+        if (string.IsNullOrEmpty(connectionString))
+            throw new CompanyNotSelectedException();
+
         optionsBuilder.UseSqlServer(connectionString);
     }
 

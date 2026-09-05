@@ -1,4 +1,7 @@
 <app-blank pageName="Kasalar" [routes]="['Kayıtlar', 'Kasalar']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
   <app-section>
     <div class="ak-toolbar">
       <button
@@ -114,6 +117,7 @@
       </table>
     </div>
   </app-section>
+  }
 </app-blank>
 
 <!-- Kasa ekleme -->

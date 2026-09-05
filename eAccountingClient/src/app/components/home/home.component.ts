@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
 import { CashRegisterModel } from '../../models/cashRegister.model';
 import { BankModel } from '../../models/bank.model';
+import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 
 type AccountKind = 'Kasa' | 'Banka';
 
@@ -32,7 +33,7 @@ const DONUT_CIRCUMFERENCE = 2 * Math.PI * 54;
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, NoCompanyComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -48,6 +49,13 @@ export class HomeComponent implements OnInit {
   readonly donutCircumference = DONUT_CIRCUMFERENCE;
 
   ngOnInit(): void {
+    // Firma yoksa bağlanılacak veritabanı da yok; istek atmak yalnızca hata
+    // bildirimi üretirdi.
+    if (!this.auth.hasCompany) {
+      this.loading.set(false);
+      return;
+    }
+
     this.load();
   }
 

@@ -38,6 +38,14 @@ export class AuthService {
     return true;
   }
 
+  /**
+   * Kullanıcının bağlı olduğu bir firma var mı. Yoksa firma veritabanına
+   * bağlanılamaz; ekranlar istek atmadan önce buna bakıyor.
+   */
+  get hasCompany(): boolean {
+    return (this.user.companies?.length ?? 0) > 0;
+  }
+
   /** Yönetim ekranları için: giriş yapılmış olmak yetmez, yönetici olmak gerekir. */
   isAdmin() {
     if (!this.isAuthenticated()) return false;
