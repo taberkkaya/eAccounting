@@ -12,7 +12,8 @@ public sealed record CreateCashRegisterDetailCommand(
     decimal Amount,
     Guid? OppositeCashRegisterId,
     decimal OppositeAmount,
-    string Description
+    string Description,
+    Guid? CategoryId
     ) : IRequest<Result<string>>;
 
 internal sealed class CreateCashRegisterDetailCommandHandler(
@@ -36,6 +37,7 @@ internal sealed class CreateCashRegisterDetailCommandHandler(
             DepositAmount = request.Type == 0 ? request.Amount : 0,
             WithdrawalAmount = request.Type == 1 ? request.Amount : 0,
             Description = request.Description,
+            CategoryId = request.CategoryId,
             CashRegisterId = request.CashRegisterId
         };
 

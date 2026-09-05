@@ -22,6 +22,7 @@
   <!-- Hareket girmek için kasa/banka ayrımını bilmek gerekmesin -->
   <app-quick-entry
     [accounts]="quickAccounts()"
+    [categories]="categories()"
     (saved)="reload()"
   ></app-quick-entry>
 
@@ -66,124 +67,74 @@
     }
   </div>
 
-  <!-- Grafikler -->
-  <div class="dash-charts">
-    <section class="ak-panel dash-chart">
-      <div class="ak-panel__head">
-        <h2 class="ak-panel__title">Hesap Bakiyeleri</h2>
+  <!-- Kasa/banka dağılımı. Çubuklu bakiye grafiği kaldırıldı: aynı rakamları
+       iki kez göstermenin bir faydası yoktu. -->
+  <section class="ak-panel dash-chart">
+    <div class="ak-panel__head">
+      <h2 class="ak-panel__title">Kasa / Banka Dağılımı</h2>
 
-        <div class="dash-filters">
-          @for(summary of summaries(); track summary.currency){
-          <button
-            type="button"
-            class="dash-filter"
-            [class.is-active]="summary.currency === selectedCurrency()"
-            (click)="selectCurrency(summary.currency)"
-          >
-            {{ summary.currency }}
-          </button>
-          }
-        </div>
-      </div>
-
-      <div class="ak-panel__body">
-        @for(row of selectedRows(); track row.name){
-        <div class="dash-bar">
-          <div class="dash-bar__head">
-            <span class="dash-bar__name">
-              <i
-                class="dash-bar__icon"
-                [class.fas]="true"
-                [class.fa-cash-register]="row.kind === 'Kasa'"
-                [class.fa-university]="row.kind === 'Banka'"
-              ></i>
-              {{ row.name }}
-            </span>
-            <span
-              class="dash-bar__value"
-              [class.ak-negative]="row.balance < 0"
-            >
-              {{ row.balance | trCurrency : selectedSymbol() : true }}
-            </span>
-          </div>
-
-          <div class="dash-bar__track">
-            <div
-              class="dash-bar__fill"
-              [class.dash-bar__fill--bank]="row.kind === 'Banka'"
-              [class.dash-bar__fill--negative]="row.balance < 0"
-              [style.width.%]="barWidth(row.balance)"
-            ></div>
-          </div>
-        </div>
-        }@empty {
-        <div class="ak-empty">
-          <div class="ak-empty__text">Bu para biriminde hesap yok.</div>
-        </div>
+      <div class="dash-filters">
+        @for(summary of summaries(); track summary.currency){
+        <button
+          type="button"
+          class="dash-filter"
+          [class.is-active]="summary.currency === selectedCurrency()"
+          (click)="selectCurrency(summary.currency)"
+        >
+          {{ summary.currency }}
+        </button>
         }
       </div>
-    </section>
+    </div>
 
-    <section class="ak-panel dash-chart">
-      <div class="ak-panel__head">
-        <h2 class="ak-panel__title">Kasa / Banka Dağılımı</h2>
-      </div>
+    <div class="ak-panel__body dash-donut">
+      <svg viewBox="0 0 140 140" class="dash-donut__svg" role="img"
+           aria-label="Kasa ve banka bakiyelerinin dağılımı">
+        <!-- Tam halka banka payını temsil eder, üstüne kasa dilimi çizilir. -->
+        <circle cx="70" cy="70" r="54" fill="none" stroke="#0ea5e9" stroke-width="16" />
+        <circle
+          cx="70"
+          cy="70"
+          r="54"
+          fill="none"
+          stroke="#2563eb"
+          stroke-width="16"
+          [attr.stroke-dasharray]="cashDash()"
+          transform="rotate(-90 70 70)"
+        />
+      </svg>
 
-      <div class="ak-panel__body dash-donut">
-        <svg viewBox="0 0 140 140" class="dash-donut__svg" role="img"
-             aria-label="Kasa ve banka bakiyelerinin dağılımı">
-          <!-- Tam halka banka payını temsil eder, üstüne kasa dilimi çizilir. -->
-          <circle
-            cx="70"
-            cy="70"
-            r="54"
-            fill="none"
-            stroke="#0ea5e9"
-            stroke-width="16"
-          />
-          <circle
-            cx="70"
-            cy="70"
-            r="54"
-            fill="none"
-            stroke="#2563eb"
-            stroke-width="16"
-            [attr.stroke-dasharray]="cashDash()"
-            transform="rotate(-90 70 70)"
-          />
-        </svg>
-
-        <div class="dash-legend">
-          <div class="dash-legend__row">
-            <span class="dash-legend__dot dash-legend__dot--cash"></span>
-            <span class="dash-legend__name">Kasa</span>
-            <span class="dash-legend__value">
-              {{ split().cash | trCurrency : selectedSymbol() : true }}
-            </span>
-          </div>
-          <div class="dash-legend__row">
-            <span class="dash-legend__dot dash-legend__dot--bank"></span>
-            <span class="dash-legend__name">Banka</span>
-            <span class="dash-legend__value">
-              {{ split().bank | trCurrency : selectedSymbol() : true }}
-            </span>
-          </div>
-          <div class="dash-legend__total">
-            <span>Toplam</span>
-            <strong>
-              {{ split().total | trCurrency : selectedSymbol() : true }}
-            </strong>
-          </div>
+      <div class="dash-legend">
+        <div class="dash-legend__row">
+          <span class="dash-legend__dot dash-legend__dot--cash"></span>
+          <span class="dash-legend__name">Kasa</span>
+          <span class="dash-legend__value">
+            {{ split().cash | trCurrency : selectedSymbol() : true }}
+          </span>
+        </div>
+        <div class="dash-legend__row">
+          <span class="dash-legend__dot dash-legend__dot--bank"></span>
+          <span class="dash-legend__name">Banka</span>
+          <span class="dash-legend__value">
+            {{ split().bank | trCurrency : selectedSymbol() : true }}
+          </span>
+        </div>
+        <div class="dash-legend__total">
+          <span>Toplam</span>
+          <strong>{{ split().total | trCurrency : selectedSymbol() : true }}</strong>
         </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 
   <!-- Son hareketler: hesap hesap dolaşmadan, tabloya girmeden görülsün -->
   <section class="ak-panel dash-recent">
     <div class="ak-panel__head">
       <h2 class="ak-panel__title">Son Hareketler</h2>
-      <span class="ak-tag ak-tag--muted">tümü</span>
+      <a routerLink="/movements" class="ak-btn ak-btn--sm">
+        Tümü
+        <i class="fas fa-arrow-right"></i>
+      </a>
     </div>
 
     <div class="ak-panel__body ak-panel__body--flush">
@@ -228,26 +179,6 @@
     </div>
   </section>
 
-  <!-- Hızlı erişim -->
-  <div class="dash-links">
-    <a class="dash-link" routerLink="/cash-registers">
-      <i class="fas fa-cash-register"></i>
-      <span>Kasalar</span>
-      <i class="fas fa-arrow-right dash-link__go"></i>
-    </a>
-    <a class="dash-link" routerLink="/banks">
-      <i class="fas fa-university"></i>
-      <span>Bankalar</span>
-      <i class="fas fa-arrow-right dash-link__go"></i>
-    </a>
-    @if(auth.user.isAdmin){
-    <a class="dash-link" routerLink="/companies">
-      <i class="fas fa-city"></i>
-      <span>Firmalar</span>
-      <i class="fas fa-arrow-right dash-link__go"></i>
-    </a>
-    }
-  </div>
   }
 
   @if(demo.status()){

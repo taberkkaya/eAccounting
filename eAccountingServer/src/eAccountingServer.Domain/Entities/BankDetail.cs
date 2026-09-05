@@ -10,4 +10,7 @@ public sealed class BankDetail : Entity
     public decimal WithdrawalAmount { get; set; }
     public Guid? BankDetailId { get; set; }
     public BankDetail? BankDetailOpasite { get; set; }
+
+    /// <summary>Bağlı olduğu gelir/gider kalemi. Zorunlu değil.</summary>
+    public Guid? CategoryId { get; set; }
 }

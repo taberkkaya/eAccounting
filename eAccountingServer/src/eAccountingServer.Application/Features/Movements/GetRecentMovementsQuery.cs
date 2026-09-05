@@ -6,11 +6,6 @@ using ResultKit;
 
 namespace eAccountingServer.Application.Features.Movements;
 
-/// <summary>
-/// Bütün kasa ve banka hesaplarının son hareketleri, tek listede.
-/// </summary>
-public sealed record GetRecentMovementsQuery(int Take = 10) : IRequest<Result<List<MovementDto>>>;
-
 public sealed record MovementDto(
     Guid Id,
     Guid AccountId,
@@ -22,89 +17,155 @@ public sealed record MovementDto(
     string Description,
     decimal Deposit,
     decimal Withdrawal,
-    bool IsTransfer);
+    bool IsTransfer,
+    Guid? CategoryId,
+    string? CategoryName);
 
-internal sealed class GetRecentMovementsQueryHandler(
+/// <summary>Ana sayfadaki kısa liste.</summary>
+public sealed record GetRecentMovementsQuery(int Take = 10) : IRequest<Result<List<MovementDto>>>;
+
+/// <summary>
+/// Bütün hesapların hareketleri, filtreli. Kasa ve banka ayrımı burada yok:
+/// para hareketi para hareketidir, hangi hesapta durduğu yalnızca bir sütun.
+/// </summary>
+public sealed record GetMovementsQuery(
+    DateOnly? StartDate = null,
+    DateOnly? EndDate = null,
+    /// <summary>0 giriş, 1 çıkış, null ikisi de.</summary>
+    int? Direction = null,
+    Guid? AccountId = null,
+    Guid? CategoryId = null,
+    string? Search = null,
+    int Take = 500) : IRequest<Result<List<MovementDto>>>;
+
+internal sealed class MovementReader(
     ICashRegisterRepository cashRegisterRepository,
     ICashRegisterDetailRepository cashRegisterDetailRepository,
     IBankRepository bankRepository,
-    IBankDetailRepository bankDetailRepository
-    ) : IRequestHandler<GetRecentMovementsQuery, Result<List<MovementDto>>>
+    IBankDetailRepository bankDetailRepository,
+    ICategoryRepository categoryRepository)
 {
-    public async Task<Result<List<MovementDto>>> Handle(
-        GetRecentMovementsQuery request, CancellationToken cancellationToken)
+    /// <summary>
+    /// İki hareket tablosunu tek listeye indirger. Hesap adı ve para birimi
+    /// hesaplardan, kalem adı kalemlerden ekleniyor: para birimi veritabanında
+    /// sayı olarak durduğu için adı ancak nesne belleğe alınınca ortaya çıkıyor,
+    /// bu yüzden birleştirme SQL'de değil burada yapılıyor.
+    /// </summary>
+    public async Task<List<MovementDto>> ReadAsync(
+        GetMovementsQuery filter, CancellationToken cancellationToken)
     {
-        int take = Math.Clamp(request.Take, 1, 100);
+        int take = Math.Clamp(filter.Take, 1, 2000);
 
-        // Hareket tabloları kendi taraflarında sıralanıp sınırlanıyor, hesap adı
-        // ve para birimi ise hesap listesinden ekleniyor. Tek sorguda birleştirmek
-        // mümkün değil: para birimi veritabanında sayı olarak duruyor ve adı
-        // ancak nesne belleğe alınınca ortaya çıkıyor.
-        List<CashRegister> cashAccounts = await cashRegisterRepository
-            .GetAll().ToListAsync(cancellationToken);
+        Dictionary<Guid, CashRegister> cashAccounts = (await cashRegisterRepository
+            .GetAll().ToListAsync(cancellationToken)).ToDictionary(a => a.Id);
 
-        List<Bank> bankAccounts = await bankRepository
-            .GetAll().ToListAsync(cancellationToken);
+        Dictionary<Guid, Bank> bankAccounts = (await bankRepository
+            .GetAll().ToListAsync(cancellationToken)).ToDictionary(a => a.Id);
 
-        List<CashRegisterDetail> cashDetails = await cashRegisterDetailRepository
-            .GetAll()
-            .OrderByDescending(detail => detail.Date)
-            .ThenByDescending(detail => detail.CreatedAt)
-            .Take(take)
-            .ToListAsync(cancellationToken);
+        Dictionary<Guid, string> categories = (await categoryRepository
+            .GetAll().ToListAsync(cancellationToken)).ToDictionary(c => c.Id, c => c.Name);
 
-        List<BankDetail> bankDetails = await bankDetailRepository
-            .GetAll()
-            .OrderByDescending(detail => detail.Date)
-            .ThenByDescending(detail => detail.CreatedAt)
-            .Take(take)
-            .ToListAsync(cancellationToken);
+        List<MovementDto> movements = [];
 
-        Dictionary<Guid, CashRegister> cashById = cashAccounts.ToDictionary(a => a.Id);
-        Dictionary<Guid, Bank> bankById = bankAccounts.ToDictionary(a => a.Id);
+        bool wantsCash = filter.AccountId is null || cashAccounts.ContainsKey(filter.AccountId.Value);
+        bool wantsBank = filter.AccountId is null || bankAccounts.ContainsKey(filter.AccountId.Value);
 
-        IEnumerable<MovementDto> cash = cashDetails
-            .Where(detail => cashById.ContainsKey(detail.CashRegisterId))
-            .Select(detail =>
-            {
-                CashRegister account = cashById[detail.CashRegisterId];
+        if (wantsCash)
+        {
+            IQueryable<CashRegisterDetail> query = cashRegisterDetailRepository.GetAll();
 
-                return new MovementDto(
-                    detail.Id,
-                    account.Id,
-                    account.Name,
-                    "Kasa",
-                    account.CurrencyType.Name,
-                    detail.Date,
-                    detail.Description,
-                    detail.DepositAmount,
-                    detail.WithdrawalAmount,
-                    detail.CashRegisterDetailId is not null);
-            });
+            if (filter.StartDate is { } start) query = query.Where(d => d.Date >= start);
+            if (filter.EndDate is { } end) query = query.Where(d => d.Date <= end);
+            if (filter.Direction == 0) query = query.Where(d => d.DepositAmount > 0);
+            if (filter.Direction == 1) query = query.Where(d => d.WithdrawalAmount > 0);
+            if (filter.CategoryId is { } category) query = query.Where(d => d.CategoryId == category);
+            if (filter.AccountId is { } account) query = query.Where(d => d.CashRegisterId == account);
 
-        IEnumerable<MovementDto> bank = bankDetails
-            .Where(detail => bankById.ContainsKey(detail.BankId))
-            .Select(detail =>
-            {
-                Bank account = bankById[detail.BankId];
+            List<CashRegisterDetail> details = await query
+                .OrderByDescending(detail => detail.Date)
+                .ThenByDescending(detail => detail.CreatedAt)
+                .Take(take)
+                .ToListAsync(cancellationToken);
 
-                return new MovementDto(
-                    detail.Id,
-                    account.Id,
-                    account.Name,
-                    "Banka",
-                    account.CurrencyType.Name,
-                    detail.Date,
-                    detail.Description,
-                    detail.DepositAmount,
-                    detail.WithdrawalAmount,
-                    detail.BankDetailId is not null);
-            });
+            movements.AddRange(details
+                .Where(detail => cashAccounts.ContainsKey(detail.CashRegisterId))
+                .Select(detail => Map(
+                    detail.Id, cashAccounts[detail.CashRegisterId].Id,
+                    cashAccounts[detail.CashRegisterId].Name, "Kasa",
+                    cashAccounts[detail.CashRegisterId].CurrencyType.Name,
+                    detail.Date, detail.Description, detail.DepositAmount, detail.WithdrawalAmount,
+                    detail.CashRegisterDetailId is not null, detail.CategoryId, categories)));
+        }
 
-        return cash
-            .Concat(bank)
+        if (wantsBank)
+        {
+            IQueryable<BankDetail> query = bankDetailRepository.GetAll();
+
+            if (filter.StartDate is { } start) query = query.Where(d => d.Date >= start);
+            if (filter.EndDate is { } end) query = query.Where(d => d.Date <= end);
+            if (filter.Direction == 0) query = query.Where(d => d.DepositAmount > 0);
+            if (filter.Direction == 1) query = query.Where(d => d.WithdrawalAmount > 0);
+            if (filter.CategoryId is { } category) query = query.Where(d => d.CategoryId == category);
+            if (filter.AccountId is { } account) query = query.Where(d => d.BankId == account);
+
+            List<BankDetail> details = await query
+                .OrderByDescending(detail => detail.Date)
+                .ThenByDescending(detail => detail.CreatedAt)
+                .Take(take)
+                .ToListAsync(cancellationToken);
+
+            movements.AddRange(details
+                .Where(detail => bankAccounts.ContainsKey(detail.BankId))
+                .Select(detail => Map(
+                    detail.Id, bankAccounts[detail.BankId].Id,
+                    bankAccounts[detail.BankId].Name, "Banka",
+                    bankAccounts[detail.BankId].CurrencyType.Name,
+                    detail.Date, detail.Description, detail.DepositAmount, detail.WithdrawalAmount,
+                    detail.BankDetailId is not null, detail.CategoryId, categories)));
+        }
+
+        IEnumerable<MovementDto> result = movements;
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            string term = filter.Search.Trim();
+
+            result = result.Where(movement =>
+                movement.Description.Contains(term, StringComparison.OrdinalIgnoreCase)
+                || movement.AccountName.Contains(term, StringComparison.OrdinalIgnoreCase)
+                || (movement.CategoryName ?? string.Empty)
+                    .Contains(term, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return result
             .OrderByDescending(movement => movement.Date)
             .Take(take)
             .ToList();
     }
+
+    private static MovementDto Map(
+        Guid id, Guid accountId, string accountName, string kind, string currency,
+        DateOnly date, string description, decimal deposit, decimal withdrawal,
+        bool isTransfer, Guid? categoryId, Dictionary<Guid, string> categories) =>
+        new(id, accountId, accountName, kind, currency, date, description,
+            deposit, withdrawal, isTransfer, categoryId,
+            categoryId is { } key && categories.TryGetValue(key, out string? name) ? name : null);
+}
+
+internal sealed class GetRecentMovementsQueryHandler(
+    MovementReader reader
+    ) : IRequestHandler<GetRecentMovementsQuery, Result<List<MovementDto>>>
+{
+    public async Task<Result<List<MovementDto>>> Handle(
+        GetRecentMovementsQuery request, CancellationToken cancellationToken) =>
+        await reader.ReadAsync(new GetMovementsQuery(Take: request.Take), cancellationToken);
+}
+
+internal sealed class GetMovementsQueryHandler(
+    MovementReader reader
+    ) : IRequestHandler<GetMovementsQuery, Result<List<MovementDto>>>
+{
+    public async Task<Result<List<MovementDto>>> Handle(
+        GetMovementsQuery request, CancellationToken cancellationToken) =>
+        await reader.ReadAsync(request, cancellationToken);
 }

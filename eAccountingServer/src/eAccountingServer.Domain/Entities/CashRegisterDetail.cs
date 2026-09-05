@@ -10,4 +10,7 @@ public sealed class CashRegisterDetail : Entity
     public decimal WithdrawalAmount { get; set; }
     public Guid? CashRegisterDetailId { get; set; }
     public CashRegisterDetail? CashRegisterDetailOpasite { get; set; }
+
+    /// <summary>Bağlı olduğu gelir/gider kalemi. Zorunlu değil.</summary>
+    public Guid? CategoryId { get; set; }
 }

@@ -10,4 +10,6 @@ export class MovementModel {
   deposit: number = 0;
   withdrawal: number = 0;
   isTransfer: boolean = false;
+  categoryId: string | null = null;
+  categoryName: string | null = null;
 }

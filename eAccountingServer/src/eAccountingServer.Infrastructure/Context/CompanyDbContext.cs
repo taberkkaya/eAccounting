@@ -35,6 +35,7 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
     public DbSet<CashRegisterDetail> CashRegisterDetails { get; set; }
     public DbSet<Bank> Banks { get; set; }
     public DbSet<BankDetail> BankDetails { get; set; }
+    public DbSet<Category> Categories { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         #region CashRegister
@@ -61,6 +62,11 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
             .HasConversion(type => type.Value, value => CurrencyTypeEnum.FromValue(value));
         modelBuilder.Entity<Bank>().HasMany(p => p.Details).WithOne().HasForeignKey(p => p.BankId);
         modelBuilder.Entity<Bank>().HasQueryFilter(p => !p.IsDeleted);
+        #endregion
+
+        #region Category
+        modelBuilder.Entity<Category>().Property(p => p.Name).HasMaxLength(80).IsRequired();
+        modelBuilder.Entity<Category>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
 
         #region BankDetail

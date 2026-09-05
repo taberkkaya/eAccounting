@@ -1,0 +1,158 @@
+<app-blank pageName="Hareketler" [routes]="['Kayıtlar', 'Hareketler']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+  <app-section>
+    <div class="ak-toolbar">
+      <input
+        type="date"
+        class="ak-input"
+        [(ngModel)]="startDate"
+        aria-label="Başlangıç tarihi"
+      />
+      <input
+        type="date"
+        class="ak-input"
+        [(ngModel)]="endDate"
+        aria-label="Bitiş tarihi"
+      />
+
+      <select class="ak-select" [(ngModel)]="direction" aria-label="Yön">
+        <option value="">Giren ve çıkan</option>
+        <option value="0">Yalnızca giren</option>
+        <option value="1">Yalnızca çıkan</option>
+      </select>
+
+      <select class="ak-select" [(ngModel)]="accountId" aria-label="Hesap">
+        <option value="">Tüm hesaplar</option>
+        @for(account of accounts; track account.id){
+        <option [value]="account.id">{{ account.name }} ({{ account.kind }})</option>
+        }
+      </select>
+
+      <select class="ak-select" [(ngModel)]="categoryId" aria-label="Kalem">
+        <option value="">Tüm kalemler</option>
+        @for(category of categories; track category.id){
+        <option [value]="category.id">
+          {{ category.name }} ({{ category.direction === 0 ? "gelir" : "gider" }})
+        </option>
+        }
+      </select>
+
+      <input
+        [(ngModel)]="search"
+        type="search"
+        class="ak-input"
+        placeholder="Açıklamada ara"
+      />
+
+      <button type="button" class="ak-btn ak-btn--primary" (click)="getAll()">
+        <i class="fas fa-filter"></i>
+        Listele
+      </button>
+
+      <button type="button" class="ak-btn" (click)="clear()" title="Filtreleri temizle">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Seçili aralığın toplamı: filtreyi daralttıkça değişiyor. -->
+    @if(totals.length > 0){
+    <div class="mv-totals">
+      @for(total of totals; track total.currency){
+      <div class="mv-total">
+        <span class="mv-total__currency">{{ total.currency }}</span>
+        <span class="mv-total__in">
+          <i class="fas fa-arrow-down"></i>
+          {{ total.deposit | trCurrency : symbolFor(total.currency) : true }}
+        </span>
+        <span class="mv-total__out">
+          <i class="fas fa-arrow-up"></i>
+          {{ total.withdrawal | trCurrency : symbolFor(total.currency) : true }}
+        </span>
+        <span class="mv-total__net">
+          Net:
+          <strong [class.ak-negative]="total.deposit - total.withdrawal < 0">
+            {{ total.deposit - total.withdrawal | trCurrency : symbolFor(total.currency) : true }}
+          </strong>
+        </span>
+      </div>
+      }
+    </div>
+    }
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>Tarih</th>
+            <th>Açıklama</th>
+            <th>Kalem</th>
+            <th>Hesap</th>
+            <th class="ak-table__amount">Giren</th>
+            <th class="ak-table__amount">Çıkan</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(movement of movements; track movement.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td>{{ movement.date | date : "dd.MM.yyyy" }}</td>
+            <td class="ak-table__strong">
+              {{ movement.description }}
+              @if(movement.isTransfer){
+              <span class="ak-tag ak-tag--muted">virman</span>
+              }
+            </td>
+            <td>
+              @if(movement.categoryName){
+              <span class="ak-tag">{{ movement.categoryName }}</span>
+              }@else {
+              <span class="ak-muted">—</span>
+              }
+            </td>
+            <td>
+              <a class="mv-account" [routerLink]="movementLink(movement)">
+                <i
+                  class="fas"
+                  [class.fa-cash-register]="movement.accountKind === 'Kasa'"
+                  [class.fa-university]="movement.accountKind === 'Banka'"
+                ></i>
+                {{ movement.accountName }}
+              </a>
+            </td>
+            <td class="ak-table__amount ak-positive">
+              @if(movement.deposit > 0){
+              {{ movement.deposit | trCurrency : symbolFor(movement.currencyName) : true }}
+              }@else { — }
+            </td>
+            <td class="ak-table__amount ak-negative">
+              @if(movement.withdrawal > 0){
+              {{ movement.withdrawal | trCurrency : symbolFor(movement.currencyName) : true }}
+              }@else { — }
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="7">
+              <div class="ak-empty">
+                @if(loading){
+                <i class="fas fa-circle-notch ak-spin"></i>
+                <div class="ak-empty__text">Yükleniyor...</div>
+                }@else {
+                <i class="far fa-file-alt"></i>
+                <div class="ak-empty__text">
+                  Bu filtrelerle hareket bulunamadı.
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+  }
+</app-blank>

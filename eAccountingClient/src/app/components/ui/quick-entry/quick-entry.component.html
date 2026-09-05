@@ -73,7 +73,25 @@
       }
     </div>
 
-    <!-- 3. Açıklama ve tarih -->
+    <!-- 3. Kalem -->
+    @if(availableCategories.length > 0){
+    <label class="entry__label" for="quickCategory">
+      {{ direction === 0 ? "Gelir kalemi" : "Gider kalemi" }}
+    </label>
+    <select
+      id="quickCategory"
+      class="ak-select entry__input"
+      name="quickCategory"
+      [(ngModel)]="categoryId"
+    >
+      <option value="">Seçilmedi</option>
+      @for(category of availableCategories; track category.id){
+      <option [value]="category.id">{{ category.name }}</option>
+      }
+    </select>
+    }
+
+    <!-- 4. Açıklama ve tarih -->
     <label class="entry__label" for="quickDescription">Açıklama</label>
     <input
       id="quickDescription"

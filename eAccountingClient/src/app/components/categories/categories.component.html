@@ -1,0 +1,175 @@
+<app-blank pageName="Gelir/Gider Kalemleri" [routes]="['Kayıtlar', 'Kalemler']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+  <div class="ak-form-grid">
+    <!-- Gelir ve gider yan yana: bir kalemin hangisi olduğu listede aranmasın -->
+    <app-section sectionTitle="Gelir Kalemleri">
+      <div class="ak-toolbar">
+        <button type="button" class="ak-btn ak-btn--primary" (click)="openCreate(0)">
+          <i class="fas fa-plus"></i>
+          Gelir Kalemi Ekle
+        </button>
+      </div>
+
+      <div class="ak-table-wrap">
+        <table class="ak-table">
+          <tbody>
+            @for(category of income; track category.id){
+            <tr>
+              <td class="ak-table__strong">{{ category.name }}</td>
+              <td>
+                <div class="ak-table__actions">
+                  <button
+                    type="button"
+                    class="ak-btn ak-btn--sm ak-btn--icon"
+                    (click)="openUpdate(category)"
+                    title="Düzenle"
+                  >
+                    <i class="fas fa-pen"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
+                    (click)="deleteById(category)"
+                    title="Sil"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }@empty {
+            <tr>
+              <td colspan="2">
+                <div class="ak-empty">
+                  <div class="ak-empty__text">Gelir kalemi yok.</div>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section>
+
+    <app-section sectionTitle="Gider Kalemleri">
+      <div class="ak-toolbar">
+        <button type="button" class="ak-btn ak-btn--primary" (click)="openCreate(1)">
+          <i class="fas fa-plus"></i>
+          Gider Kalemi Ekle
+        </button>
+      </div>
+
+      <div class="ak-table-wrap">
+        <table class="ak-table">
+          <tbody>
+            @for(category of expense; track category.id){
+            <tr>
+              <td class="ak-table__strong">{{ category.name }}</td>
+              <td>
+                <div class="ak-table__actions">
+                  <button
+                    type="button"
+                    class="ak-btn ak-btn--sm ak-btn--icon"
+                    (click)="openUpdate(category)"
+                    title="Düzenle"
+                  >
+                    <i class="fas fa-pen"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
+                    (click)="deleteById(category)"
+                    title="Sil"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }@empty {
+            <tr>
+              <td colspan="2">
+                <div class="ak-empty">
+                  <div class="ak-empty__text">Gider kalemi yok.</div>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section>
+  </div>
+  }
+</app-blank>
+
+<!-- Kalem ekleme -->
+<app-modal
+  [open]="createOpen"
+  [title]="createModel.direction === 0 ? 'Yeni Gelir Kalemi' : 'Yeni Gider Kalemi'"
+  (closed)="createOpen = false"
+>
+  <form formValidate #createForm="ngForm" autocomplete="off" (ngSubmit)="create(createForm)">
+    <div class="ak-modal__body">
+      <div class="ak-field">
+        <label class="ak-label">Kalem Adı</label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="createModel.name"
+          class="ak-input"
+          name="name"
+          placeholder="Örn. Kira"
+        />
+        <div class="invalid-feedback"></div>
+      </div>
+
+      <div class="ak-field" style="margin-bottom: 0">
+        <label class="ak-label">Türü</label>
+        <select class="ak-select" name="direction" [(ngModel)]="createModel.direction">
+          <option [value]="0">Gelir</option>
+          <option [value]="1">Gider</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="createOpen = false">Vazgeç</button>
+      <button type="submit" class="ak-btn ak-btn--primary">Kaydet</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Kalem düzenleme -->
+<app-modal [open]="updateOpen" title="Kalemi Düzenle" (closed)="updateOpen = false">
+  <form formValidate #updateForm="ngForm" autocomplete="off" (ngSubmit)="update(updateForm)">
+    <div class="ak-modal__body">
+      <div class="ak-field">
+        <label class="ak-label">Kalem Adı</label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="updateModel.name"
+          class="ak-input"
+          name="updateName"
+        />
+        <div class="invalid-feedback"></div>
+      </div>
+
+      <div class="ak-field" style="margin-bottom: 0">
+        <label class="ak-label">Türü</label>
+        <select class="ak-select" name="updateDirection" [(ngModel)]="updateModel.direction">
+          <option [value]="0">Gelir</option>
+          <option [value]="1">Gider</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="updateOpen = false">Vazgeç</button>
+      <button type="submit" class="ak-btn ak-btn--primary">Güncelle</button>
+    </div>
+  </form>
+</app-modal>

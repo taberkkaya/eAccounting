@@ -1,4 +1,4 @@
-using eAccountingServer.Application.Features.Movements;
+﻿using eAccountingServer.Application.Features.Movements;
 using eAccountingServer.WebApi.Abstractions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +10,13 @@ public class MovementsController : ApiController
 {
     public MovementsController(IMediator mediator) : base(mediator)
     {
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GetAll(GetMovementsQuery request, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+        return StatusCode(response.StatusCode, response);
     }
 
     [HttpPost]

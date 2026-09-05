@@ -35,6 +35,9 @@ namespace eAccountingServer.Application
 
             services.AddValidatorsFromAssembly(typeof(ApplicationRegistrar).Assembly);
 
+            // İki hareket tablosunu birleştiren okuyucu; iki sorgu da onu kullanıyor.
+            services.AddScoped<Features.Movements.MovementReader>();
+
             return services;
         }
 

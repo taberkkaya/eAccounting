@@ -1,0 +1,89 @@
+/* --- dönem toplamı ---------------------------------------------------------- */
+
+.mv-totals {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ak-line);
+  background: var(--ak-surface-2);
+}
+
+.mv-total {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.mv-total__currency {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.mv-total__in {
+  color: var(--ak-success);
+}
+
+.mv-total__out {
+  color: var(--ak-danger);
+}
+
+.mv-total__in i,
+.mv-total__out i {
+  margin-right: 4px;
+  font-size: 0.7rem;
+}
+
+.mv-total__net {
+  color: var(--ak-muted);
+}
+
+.mv-total__net strong {
+  color: var(--ak-ink);
+  margin-left: 4px;
+}
+
+/* --- hesap bağlantısı ------------------------------------------------------- */
+
+.mv-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ak-gray);
+  white-space: nowrap;
+}
+
+.mv-account i {
+  color: var(--ak-muted);
+  font-size: 0.78rem;
+}
+
+.mv-account:hover {
+  color: var(--ak-brand);
+}
+
+.mv-account:hover i {
+  color: var(--ak-brand);
+}
+
+@media (max-width: 640px) {
+  .mv-totals {
+    padding: 12px 13px;
+  }
+
+  .mv-total {
+    width: 100%;
+    gap: 10px;
+  }
+}

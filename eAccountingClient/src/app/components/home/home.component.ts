@@ -9,6 +9,7 @@ import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { QuickEntryComponent } from '../ui/quick-entry/quick-entry.component';
 import { QuickAccount } from '../ui/quick-entry/quick-entry.model';
 import { MovementModel } from '../../models/movement.model';
+import { CategoryModel } from '../../models/category.model';
 
 type AccountKind = 'Kasa' | 'Banka';
 
@@ -52,6 +53,7 @@ export class HomeComponent implements OnInit {
 
   /** Ana sayfadan görülebilsin diye bütün hesapların son hareketleri. */
   readonly movements = signal<MovementModel[]>([]);
+  readonly categories = signal<CategoryModel[]>([]);
 
   readonly donutCircumference = DONUT_CIRCUMFERENCE;
 
@@ -69,15 +71,25 @@ export class HomeComponent implements OnInit {
   private loadMovements(): void {
     this.http.post<MovementModel[]>(
       'Movements/GetRecent',
-      { take: 12 },
+      { take: 10 },
       (res) => this.movements.set(res),
       () => this.movements.set([])
+    );
+  }
+
+  private loadCategories(): void {
+    this.http.post<CategoryModel[]>(
+      'Categories/GetAll',
+      {},
+      (res) => this.categories.set(res),
+      () => this.categories.set([])
     );
   }
 
   /** Kasa ve banka listeleri tek bir hesap listesine indirgeniyor. */
   private load(): void {
     this.loadMovements();
+    this.loadCategories();
 
     let pending = 2;
     let cashRegisters: CashRegisterModel[] = [];

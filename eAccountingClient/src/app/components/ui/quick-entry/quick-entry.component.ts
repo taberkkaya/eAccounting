@@ -5,6 +5,7 @@ import { HttpService } from '../../../services/http.service';
 import { SwalService } from '../../../services/swal.service';
 import { ModalComponent } from '../modal/modal.component';
 import { QuickAccount } from './quick-entry.model';
+import { CategoryModel } from '../../../models/category.model';
 
 /** 0 = para girişi, 1 = para çıkışı. Sunucudaki Type alanıyla aynı. */
 type Direction = 0 | 1;
@@ -27,6 +28,7 @@ type Direction = 0 | 1;
 })
 export class QuickEntryComponent {
   @Input() accounts: QuickAccount[] = [];
+  @Input() categories: CategoryModel[] = [];
   @Output() saved = new EventEmitter<void>();
 
   private readonly http = inject(HttpService);
@@ -41,9 +43,15 @@ export class QuickEntryComponent {
   accountId = '';
   description = '';
   entryDate = '';
+  categoryId = '';
 
   get title(): string {
     return this.direction === 0 ? 'Para Girişi' : 'Para Çıkışı';
+  }
+
+  /** Yalnızca seçilen yöne ait kalemler; gelir girerken gider kalemi çıkmasın. */
+  get availableCategories(): CategoryModel[] {
+    return this.categories.filter((c) => c.direction === this.direction);
   }
 
   get selected(): QuickAccount | undefined {
@@ -63,6 +71,7 @@ export class QuickEntryComponent {
     this.direction = direction;
     this.amountText = '';
     this.description = '';
+    this.categoryId = '';
     this.entryDate = this.date.transform(new Date(), 'yyyy-MM-dd') ?? '';
 
     // Tek hesap varsa seçtirmenin anlamı yok.
@@ -94,6 +103,7 @@ export class QuickEntryComponent {
       recordType: 0,
       oppositeAmount: 0,
       description: this.description.trim() || this.title,
+      categoryId: this.categoryId || null,
     };
 
     if (isCash) {
