@@ -1,0 +1,24 @@
+<button
+  #trigger
+  type="button"
+  class="menu__trigger"
+  [class.is-open]="open"
+  [attr.aria-label]="label"
+  [attr.aria-expanded]="open"
+  [title]="label"
+  (click)="toggle($event)"
+>
+  <i class="fas fa-ellipsis-v"></i>
+</button>
+
+@if(open){
+<div
+  class="menu__panel"
+  role="menu"
+  [style.top.px]="top"
+  [style.left.px]="left"
+  (click)="onPanelClick()"
+>
+  <ng-content></ng-content>
+</div>
+}

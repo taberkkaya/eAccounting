@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { CategoryModel } from '../../models/category.model';
 import { ModalComponent } from '../ui/modal/modal.component';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
+import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 /**
  * Gelir ve gider kalemleri. Hareketler bunlarla etiketlenince "bu ay kiraya ne
@@ -15,7 +16,7 @@ import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [SharedModule, ModalComponent, NoCompanyComponent],
+  imports: [SharedModule, ModalComponent, NoCompanyComponent, ActionMenuComponent],
   templateUrl: './categories.component.html',
 })
 export class CategoriesComponent implements OnInit {

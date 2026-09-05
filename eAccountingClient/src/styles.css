@@ -705,20 +705,43 @@ app-footer {
   box-shadow: 0 0 0 3px var(--ak-brand-ring);
 }
 
+/* Açılır kutu metin kutusuyla aynı görünmemeli: hafif bir zemin ve okun kendi
+   ayrılmış alanı, tıklanınca bir liste açılacağını baştan söylüyor. */
 .ak-select {
   appearance: none;
-  padding-right: 34px;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2394a3b8' stroke-width='1.6'%3E%3Cpath d='M4 6.5 8 10.5 12 6.5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 11px center;
-  background-size: 15px;
+  padding-right: 40px;
+  background-color: var(--ak-surface-2);
+  background-image:
+    url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2364748b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 6.75 8 10.25 11.5 6.75'/%3E%3C/svg%3E"),
+    linear-gradient(var(--ak-line), var(--ak-line));
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 12px center, right 34px center;
+  background-size: 15px, 1px 60%;
+  font-weight: 500;
   cursor: pointer;
+  /* Yerel açılır listenin de açık temada çizilmesi için. */
+  color-scheme: light;
+}
+
+.ak-select:hover:not(:disabled) {
+  border-color: #cbd5e1;
+  background-color: var(--ak-surface-3);
+}
+
+.ak-select:focus {
+  background-color: var(--ak-surface);
+}
+
+.ak-select:disabled {
+  color: var(--ak-muted);
+  cursor: not-allowed;
 }
 
 .ak-select[multiple] {
   height: auto;
   min-height: 118px;
   padding: 8px;
+  background-color: var(--ak-surface);
   background-image: none;
 }
 

@@ -1,0 +1,90 @@
+:host {
+  display: inline-block;
+}
+
+.menu__trigger {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: var(--ak-radius-sm);
+  background: transparent;
+  color: var(--ak-muted);
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s, border-color 0.13s;
+}
+
+.menu__trigger:hover,
+.menu__trigger.is-open {
+  border-color: var(--ak-line);
+  background: var(--ak-surface-3);
+  color: var(--ak-ink);
+}
+
+/* Sabit konum: tablonun taşma kutusu bunu kırpamaz. */
+.menu__panel {
+  position: fixed;
+  z-index: 900;
+  min-width: 190px;
+  padding: 5px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius);
+  background: var(--ak-surface);
+  box-shadow: var(--ak-shadow-lg);
+  animation: menu-in 0.11s ease-out;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* İçerik dışarıdan geliyor; öğeler bu sınıfları kullanıyor. */
+:host ::ng-deep .menu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: var(--ak-radius-sm);
+  background: transparent;
+  color: var(--ak-ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+:host ::ng-deep .menu__item i {
+  width: 15px;
+  color: var(--ak-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+:host ::ng-deep .menu__item:hover {
+  background: var(--ak-surface-3);
+}
+
+:host ::ng-deep .menu__item--danger {
+  color: var(--ak-danger);
+}
+
+:host ::ng-deep .menu__item--danger i {
+  color: var(--ak-danger);
+}
+
+:host ::ng-deep .menu__item--danger:hover {
+  background: var(--ak-danger-soft);
+}
+
+:host ::ng-deep .menu__separator {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--ak-line);
+}

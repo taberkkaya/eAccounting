@@ -9,6 +9,7 @@ import { CashRegisterModel } from '../../models/cashRegister.model';
 import { BankModel } from '../../models/bank.model';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { AccountEndpoints, AccountKind, AccountModel } from './account.model';
+import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 /**
  * Kasalar ve bankalar tek listede.
@@ -24,7 +25,7 @@ import { AccountEndpoints, AccountKind, AccountModel } from './account.model';
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  imports: [SharedModule, NoCompanyComponent],
+  imports: [SharedModule, NoCompanyComponent, ActionMenuComponent],
   templateUrl: './accounts.component.html',
   styleUrl: './accounts.component.css',
 })

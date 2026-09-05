@@ -8,6 +8,7 @@ import { SharedModule } from '../../modules/shared.module';
 import { ActivatedRoute } from '@angular/router';
 import { CashRegisterDetailPipe } from '../../pipes/cash-register-detail.pipe';
 import { DatePipe } from '@angular/common';
+import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 /** Opening range for the movement list, in days back from today. */
 const DEFAULT_RANGE_DAYS = 90;
@@ -15,7 +16,7 @@ const DEFAULT_RANGE_DAYS = 90;
 @Component({
   selector: 'app-cash-register-details',
   standalone: true,
-  imports: [SharedModule, CashRegisterDetailPipe],
+  imports: [SharedModule, CashRegisterDetailPipe, ActionMenuComponent],
   templateUrl: './cash-register-details.component.html',
   styleUrl: './cash-register-details.component.css',
   providers: [DatePipe],

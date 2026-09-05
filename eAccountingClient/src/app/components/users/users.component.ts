@@ -6,11 +6,12 @@ import { NgForm } from '@angular/forms';
 import { SharedModule } from '../../modules/shared.module';
 import { UserPipe } from '../../pipes/user.pipe';
 import { CompanyModel } from '../../models/company.model';
+import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [SharedModule, UserPipe],
+  imports: [SharedModule, UserPipe, ActionMenuComponent],
   templateUrl: './users.component.html',
   styleUrl: './users.component.css',
 })

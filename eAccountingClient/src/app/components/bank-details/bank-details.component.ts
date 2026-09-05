@@ -8,6 +8,7 @@ import { SharedModule } from '../../modules/shared.module';
 import { ActivatedRoute } from '@angular/router';
 import { BankDetailPipe } from '../../pipes/bank-detail.pipe';
 import { DatePipe } from '@angular/common';
+import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 /** Opening range for the movement list, in days back from today. */
 const DEFAULT_RANGE_DAYS = 90;
@@ -15,7 +16,7 @@ const DEFAULT_RANGE_DAYS = 90;
 @Component({
   selector: 'app-bank-details',
   standalone: true,
-  imports: [SharedModule, BankDetailPipe],
+  imports: [SharedModule, BankDetailPipe, ActionMenuComponent],
   templateUrl: './bank-details.component.html',
   styleUrl: './bank-details.component.css',
   providers: [DatePipe],

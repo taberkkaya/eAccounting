@@ -5,11 +5,12 @@ import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
 import { NgForm } from '@angular/forms';
 import { CompanyPipe } from '../../pipes/company.pipe';
+import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 @Component({
   selector: 'app-companies',
   standalone: true,
-  imports: [SharedModule, CompanyPipe],
+  imports: [SharedModule, CompanyPipe, ActionMenuComponent],
   templateUrl: './companies.component.html',
   styleUrl: './companies.component.css',
 })

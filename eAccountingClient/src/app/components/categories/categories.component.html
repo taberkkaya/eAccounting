@@ -19,24 +19,15 @@
             <tr>
               <td class="ak-table__strong">{{ category.name }}</td>
               <td>
-                <div class="ak-table__actions">
-                  <button
-                    type="button"
-                    class="ak-btn ak-btn--sm ak-btn--icon"
-                    (click)="openUpdate(category)"
-                    title="Düzenle"
-                  >
-                    <i class="fas fa-pen"></i>
+                <app-action-menu>
+                  <button type="button" class="menu__item" (click)="openUpdate(category)">
+                    <i class="fas fa-pen"></i> Düzenle
                   </button>
-                  <button
-                    type="button"
-                    class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
-                    (click)="deleteById(category)"
-                    title="Sil"
-                  >
-                    <i class="fas fa-trash"></i>
+                  <div class="menu__separator"></div>
+                  <button type="button" class="menu__item menu__item--danger" (click)="deleteById(category)">
+                    <i class="fas fa-trash"></i> Sil
                   </button>
-                </div>
+                </app-action-menu>
               </td>
             </tr>
             }@empty {
@@ -68,24 +59,15 @@
             <tr>
               <td class="ak-table__strong">{{ category.name }}</td>
               <td>
-                <div class="ak-table__actions">
-                  <button
-                    type="button"
-                    class="ak-btn ak-btn--sm ak-btn--icon"
-                    (click)="openUpdate(category)"
-                    title="Düzenle"
-                  >
-                    <i class="fas fa-pen"></i>
+                <app-action-menu>
+                  <button type="button" class="menu__item" (click)="openUpdate(category)">
+                    <i class="fas fa-pen"></i> Düzenle
                   </button>
-                  <button
-                    type="button"
-                    class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
-                    (click)="deleteById(category)"
-                    title="Sil"
-                  >
-                    <i class="fas fa-trash"></i>
+                  <div class="menu__separator"></div>
+                  <button type="button" class="menu__item menu__item--danger" (click)="deleteById(category)">
+                    <i class="fas fa-trash"></i> Sil
                   </button>
-                </div>
+                </app-action-menu>
               </td>
             </tr>
             }@empty {
