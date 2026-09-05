@@ -1,11 +1,25 @@
-<div class="ak-shell">
+<div class="ak-shell" [class.is-collapsed]="sidebarCollapsed()">
   <app-main-sidebar
     [open]="sidebarOpen()"
+    [collapsed]="sidebarCollapsed()"
     (navigated)="closeSidebar()"
   ></app-main-sidebar>
 
+  <!-- Yalnızca dar ekranda çekmece açıkken görünür. -->
+  <button
+    type="button"
+    class="ak-backdrop"
+    [class.is-open]="sidebarOpen()"
+    (click)="closeSidebar()"
+    aria-label="Menüyü kapat"
+    tabindex="-1"
+  ></button>
+
   <div class="ak-main">
-    <app-navbar (menuToggled)="toggleSidebar()"></app-navbar>
+    <app-navbar
+      [sidebarCollapsed]="sidebarCollapsed()"
+      (menuToggled)="toggleSidebar()"
+    ></app-navbar>
 
     <main class="ak-content">
       <router-outlet></router-outlet>

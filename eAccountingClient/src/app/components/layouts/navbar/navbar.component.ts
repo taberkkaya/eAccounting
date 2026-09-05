@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
@@ -15,6 +15,7 @@ import { DemoService } from '../../../services/demo.service';
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  @Input() sidebarCollapsed = false;
   @Output() menuToggled = new EventEmitter<void>();
 
   constructor(

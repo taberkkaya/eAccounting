@@ -3,7 +3,8 @@
     type="button"
     class="ak-topbar__toggle"
     (click)="menuToggled.emit()"
-    aria-label="Menüyü aç"
+    [title]="sidebarCollapsed ? 'Menüyü genişlet' : 'Menüyü daralt'"
+    aria-label="Menüyü aç veya kapat"
   >
     <i class="fas fa-bars"></i>
   </button>
@@ -11,8 +12,7 @@
   @if(auth.user.companies.length > 0){
   <select
     (change)="changeCompany()"
-    class="ak-select"
-    style="width: auto; min-width: 190px"
+    class="ak-select ak-topbar__company"
     [(ngModel)]="auth.user.companyId"
     aria-label="Firma seçimi"
   >

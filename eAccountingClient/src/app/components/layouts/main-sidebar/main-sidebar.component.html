@@ -1,5 +1,5 @@
 <aside class="ak-sidebar" [class.is-open]="open">
-  <a routerLink="/" class="ak-brand" (click)="navigated.emit()">
+  <a routerLink="/" class="ak-brand" title="AK e-Muhasebe" (click)="navigated.emit()">
     <img src="assets/ak-logo.png" alt="AK" class="ak-brand__mark" />
     <span class="ak-brand__text">AK <span>e-Muhasebe</span></span>
   </a>
@@ -32,6 +32,7 @@
       routerLinkActive="active"
       [routerLinkActiveOptions]="{ exact: menu.url === '/' }"
       class="ak-nav__link"
+      [title]="collapsed ? menu.name : ''"
       (click)="navigated.emit()"
     >
       <i class="{{ menu.icon }}"></i>

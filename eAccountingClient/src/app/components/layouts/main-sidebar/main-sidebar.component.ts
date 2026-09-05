@@ -14,6 +14,10 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class MainSidebarComponent {
   @Input() open = false;
+
+  /** Şerit görünümünde yazılar gizlendiği için ikonlara ipucu ekleniyor. */
+  @Input() collapsed = false;
+
   @Output() navigated = new EventEmitter<void>();
 
   search: string = '';
