@@ -1,0 +1,262 @@
+<app-blank pageName="Hesaplar" [routes]="['Kayıtlar', 'Hesaplar']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+  <app-section>
+    <div class="ak-toolbar">
+      <button type="button" class="ak-btn ak-btn--primary" (click)="openCreate('Kasa')">
+        <i class="fas fa-cash-register"></i>
+        Kasa Ekle
+      </button>
+      <button type="button" class="ak-btn ak-btn--primary" (click)="openCreate('Banka')">
+        <i class="fas fa-university"></i>
+        Banka Ekle
+      </button>
+
+      <div class="ak-toolbar__spacer"></div>
+
+      <!-- Tür bir filtre; ayrı sayfa olmasına gerek yok. -->
+      <div class="acc-filters">
+        <button
+          type="button"
+          class="acc-filter"
+          [class.is-active]="kindFilter === ''"
+          (click)="kindFilter = ''"
+        >
+          Tümü <span>{{ counts.all }}</span>
+        </button>
+        <button
+          type="button"
+          class="acc-filter"
+          [class.is-active]="kindFilter === 'Kasa'"
+          (click)="kindFilter = 'Kasa'"
+        >
+          Kasa <span>{{ counts.cash }}</span>
+        </button>
+        <button
+          type="button"
+          class="acc-filter"
+          [class.is-active]="kindFilter === 'Banka'"
+          (click)="kindFilter = 'Banka'"
+        >
+          Banka <span>{{ counts.bank }}</span>
+        </button>
+      </div>
+
+      <input
+        [(ngModel)]="search"
+        type="search"
+        class="ak-input"
+        placeholder="Hesap adı veya IBAN ara"
+      />
+    </div>
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>Hesap</th>
+            <th>Tür</th>
+            <th>Para Birimi</th>
+            <th class="ak-table__amount">Giren</th>
+            <th class="ak-table__amount">Çıkan</th>
+            <th class="ak-table__amount">Bakiye</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(account of filtered; track account.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td>
+              <div class="acc-name">
+                <span class="acc-name__icon">
+                  <i [class]="endpoints[account.kind].icon"></i>
+                </span>
+                <span class="acc-name__text">
+                  <strong>{{ account.name }}</strong>
+                  @if(account.iban){
+                  <small>{{ account.iban }}</small>
+                  }
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="ak-tag" [class.ak-tag--brand]="account.kind === 'Banka'">
+                {{ account.kind }}
+              </span>
+            </td>
+            <td><span class="ak-tag ak-tag--muted">{{ account.currencyType.name }}</span></td>
+            <td class="ak-table__amount ak-positive">
+              {{ account.depositAmount | trCurrency : symbolFor(account.currencyType.name) : true }}
+            </td>
+            <td class="ak-table__amount ak-negative">
+              {{ account.withdrawalAmount | trCurrency : symbolFor(account.currencyType.name) : true }}
+            </td>
+            <td
+              class="ak-table__amount"
+              [class.ak-negative]="account.depositAmount - account.withdrawalAmount < 0"
+            >
+              {{
+                account.depositAmount - account.withdrawalAmount
+                  | trCurrency : symbolFor(account.currencyType.name) : true
+              }}
+            </td>
+            <td>
+              <div class="ak-table__actions">
+                <a class="ak-btn ak-btn--sm" [routerLink]="detailsLink(account)">
+                  <i class="far fa-file-alt"></i>
+                  Hareketler
+                </a>
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon"
+                  (click)="openUpdate(account)"
+                  title="Düzenle"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
+                  (click)="deleteById(account)"
+                  title="Sil"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="8">
+              <div class="ak-empty">
+                @if(loading){
+                <i class="fas fa-circle-notch ak-spin"></i>
+                <div class="ak-empty__text">Yükleniyor...</div>
+                }@else {
+                <i class="fas fa-wallet"></i>
+                <div class="ak-empty__text">
+                  @if(search || kindFilter){ Bu filtreyle hesap bulunamadı. }@else {
+                  Henüz hesap yok. Yukarıdan bir kasa ya da banka ekleyin. }
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+  }
+</app-blank>
+
+<!-- Hesap ekleme. Tür düğmeyle seçildiği için formda tekrar sorulmuyor; IBAN
+     yalnızca bankada var, çünkü kasada böyle bir şey yok. -->
+<app-modal
+  [open]="createOpen"
+  [title]="createModel.kind === 'Kasa' ? 'Yeni Kasa' : 'Yeni Banka Hesabı'"
+  (closed)="createOpen = false"
+>
+  <form formValidate #createForm="ngForm" autocomplete="off" (ngSubmit)="create(createForm)">
+    <div class="ak-modal__body">
+      <div class="ak-field">
+        <label class="ak-label">Hesap Adı</label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="createModel.name"
+          class="ak-input"
+          name="name"
+          [placeholder]="createModel.kind === 'Kasa' ? 'Örn. Merkez Kasa' : 'Örn. Ziraat - Vadesiz TL'"
+        />
+        <div class="invalid-feedback"></div>
+      </div>
+
+      @if(createModel.kind === 'Banka'){
+      <div class="ak-field">
+        <label class="ak-label">IBAN</label>
+        <input
+          type="text"
+          [(ngModel)]="createModel.iban"
+          class="ak-input"
+          name="iban"
+          placeholder="TR.."
+        />
+      </div>
+      }
+
+      <div class="ak-field" style="margin-bottom: 0">
+        <label class="ak-label">Para Birimi</label>
+        <select
+          class="ak-select"
+          name="currencyTypeValue"
+          [(ngModel)]="createModel.currencyTypeValue"
+          required
+        >
+          @for(currency of currencyTypes; track currency.value){
+          <option [value]="currency.value">{{ currency.name }}</option>
+          }
+        </select>
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="createOpen = false">Vazgeç</button>
+      <button type="submit" class="ak-btn ak-btn--primary">Kaydet</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Hesap düzenleme -->
+<app-modal
+  [open]="updateOpen"
+  [title]="updateModel.kind === 'Kasa' ? 'Kasayı Düzenle' : 'Banka Hesabını Düzenle'"
+  (closed)="updateOpen = false"
+>
+  <form formValidate #updateForm="ngForm" autocomplete="off" (ngSubmit)="update(updateForm)">
+    <div class="ak-modal__body">
+      <div class="ak-field">
+        <label class="ak-label">Hesap Adı</label>
+        <input
+          type="text"
+          required
+          [(ngModel)]="updateModel.name"
+          class="ak-input"
+          name="updateName"
+        />
+        <div class="invalid-feedback"></div>
+      </div>
+
+      @if(updateModel.kind === 'Banka'){
+      <div class="ak-field">
+        <label class="ak-label">IBAN</label>
+        <input type="text" [(ngModel)]="updateModel.iban" class="ak-input" name="updateIban" />
+      </div>
+      }
+
+      <div class="ak-field" style="margin-bottom: 0">
+        <label class="ak-label">Para Birimi</label>
+        <select
+          class="ak-select"
+          name="updateCurrencyTypeValue"
+          [(ngModel)]="updateModel.currencyTypeValue"
+          required
+        >
+          @for(currency of currencyTypes; track currency.value){
+          <option [value]="currency.value">{{ currency.name }}</option>
+          }
+        </select>
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="updateOpen = false">Vazgeç</button>
+      <button type="submit" class="ak-btn ak-btn--primary">Güncelle</button>
+    </div>
+  </form>
+</app-modal>

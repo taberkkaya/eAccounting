@@ -9,10 +9,9 @@ import { ConfirmEmailComponent } from './components/confirm-email/confirm-email.
 import { CompaniesComponent } from './components/companies/companies.component';
 import { DemoVisitorsComponent } from './components/demo-visitors/demo-visitors.component';
 import { MovementsComponent } from './components/movements/movements.component';
+import { AccountsComponent } from './components/accounts/accounts.component';
 import { CategoriesComponent } from './components/categories/categories.component';
-import { CashRegistersComponent } from './components/cash-registers/cash-registers.component';
 import { CashRegisterDetailsComponent } from './components/cash-register-details/cash-register-details.component';
-import { BanksComponent } from './components/banks/banks.component';
 import { BankDetailsComponent } from './components/bank-details/bank-details.component';
 
 export const routes: Routes = [
@@ -58,11 +57,17 @@ export const routes: Routes = [
         component: CategoriesComponent,
       },
       {
+        path: 'accounts',
+        component: AccountsComponent,
+      },
+      {
         path: 'cash-registers',
         children: [
           {
+            // Liste artık tek yerde; eski adres kırılmasın diye yönlendiriliyor.
             path: '',
-            component: CashRegistersComponent,
+            redirectTo: '/accounts',
+            pathMatch: 'full',
           },
           {
             path: 'details/:id',
@@ -75,7 +80,8 @@ export const routes: Routes = [
         children: [
           {
             path: '',
-            component: BanksComponent,
+            redirectTo: '/accounts',
+            pathMatch: 'full',
           },
           {
             path: 'details/:id',
