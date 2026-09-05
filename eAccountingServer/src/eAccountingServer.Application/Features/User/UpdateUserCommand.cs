@@ -39,15 +39,27 @@ internal sealed class UpdateUserCommandHandler(
             .FirstOrDefaultAsync(cancellationToken);
 
         if (user is null)
-            return Result<string>.Failure("User not found!");
+            return Result<string>.Failure("Kullanıcı bulunamadı.");
 
         bool isEmailExist = await userManager.Users.AnyAsync(p => p.Email == request.Email && p.Id != request.Id);
         if (isEmailExist)
-            return Result<string>.Failure("Email already exists!");
+            return Result<string>.Failure("Bu e-posta adresi zaten kayıtlı.");
 
         bool isUserNameExist = await userManager.Users.AnyAsync(p => p.UserName == request.UserName && p.Id != request.Id);
         if (isUserNameExist)
-            return Result<string>.Failure("UserName already exists!");
+            return Result<string>.Failure("Bu kullanıcı adı zaten kullanılıyor.");
+
+        // Demoting the last administrator locks user management just as surely as
+        // deleting the account does.
+        if (user.IsAdmin && !request.IsAdmin)
+        {
+            bool anotherAdminExists =
+                await userManager.Users.AnyAsync(p => p.IsAdmin && p.Id != user.Id, cancellationToken);
+
+            if (!anotherAdminExists)
+                return Result<string>.Failure(
+                    "Sistemdeki son yöneticinin yetkisi kaldırılamaz. Önce başka bir yönetici oluşturun.");
+        }
 
         bool isMailChanged = user.Email != request.Email;
 
@@ -90,7 +102,7 @@ internal sealed class UpdateUserCommandHandler(
         }
 
 
-        return "User updated successfully!";
+        return "Kullanıcı güncellendi.";
     }
 }
 

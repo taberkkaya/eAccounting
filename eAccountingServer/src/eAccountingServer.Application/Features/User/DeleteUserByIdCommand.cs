@@ -2,6 +2,7 @@
 using eAccountingServer.Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ResultKit;
 
 namespace eAccountingServer.Application.Features.User;
@@ -17,7 +18,13 @@ internal sealed class DeleteUserByIdCommandHandler(
     {
         AppUser? user = await userManager.FindByIdAsync(request.Id.ToString());
         if (user is null)
-            return Result<string>.Failure("User not found!");
+            return Result<string>.Failure("Kullanıcı bulunamadı.");
+
+        // Losing the last administrator locks everyone out of user management with no
+        // way back in, so the account has to be replaced before it can be removed.
+        if (user.IsAdmin && !await AnotherAdminExistsAsync(user.Id, cancellationToken))
+            return Result<string>.Failure(
+                "Sistemdeki son yönetici silinemez. Önce başka bir yönetici oluşturun.");
 
         user.IsDeleted = true;
         IdentityResult result = await userManager.UpdateAsync(user);
@@ -26,6 +33,9 @@ internal sealed class DeleteUserByIdCommandHandler(
 
         cacheService.Remove("users");
 
-        return "User deleted successfully!";
+        return "Kullanıcı silindi.";
     }
+
+    private Task<bool> AnotherAdminExistsAsync(Guid userId, CancellationToken cancellationToken) =>
+        userManager.Users.AnyAsync(p => p.IsAdmin && p.Id != userId, cancellationToken);
 }
