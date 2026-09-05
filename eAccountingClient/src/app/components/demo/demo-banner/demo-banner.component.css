@@ -2,26 +2,31 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 5px 10px;
+  padding: 4px 10px 4px 5px;
   border: 1px solid var(--ak-line);
+  border-radius: 99px;
   background: var(--ak-surface-2);
   font-size: 0.76rem;
   white-space: nowrap;
 }
 
 .demo-banner--warning {
-  border-color: rgba(251, 191, 36, 0.4);
-  background: rgba(251, 191, 36, 0.08);
+  border-color: #fde68a;
+  background: var(--ak-warning-soft);
 }
 
 .demo-banner__tag {
-  padding: 2px 7px;
-  background: var(--ak-acid);
-  color: var(--ak-black);
-  font-family: var(--ak-font-display);
+  padding: 3px 9px;
+  border-radius: 99px;
+  background: var(--ak-brand);
+  color: #fff;
   font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.demo-banner--warning .demo-banner__tag {
+  background: var(--ak-warning);
 }
 
 .demo-banner__metric {
@@ -31,10 +36,11 @@
 
 .demo-banner__metric i {
   margin-right: 4px;
-  opacity: 0.55;
+  color: var(--ak-muted);
 }
 
-.demo-banner--warning .demo-banner__metric {
+.demo-banner--warning .demo-banner__metric,
+.demo-banner--warning .demo-banner__metric i {
   color: var(--ak-warning);
 }
 
@@ -42,20 +48,21 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 9px;
+  padding: 4px 10px;
   border: 1px solid var(--ak-line);
-  background: transparent;
+  border-radius: 99px;
+  background: var(--ak-surface);
   color: var(--ak-gray);
   font-family: var(--ak-font-body);
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  transition: color 0.13s, border-color 0.13s, background 0.13s;
 }
 
 .demo-banner__button:hover:not(:disabled) {
   background: var(--ak-surface-3);
-  color: var(--ak-paper);
+  color: var(--ak-ink);
 }
 
 .demo-banner__button:disabled {
@@ -64,18 +71,31 @@
 }
 
 .demo-banner__button--accent {
-  border-color: rgba(216, 255, 54, 0.4);
-  color: var(--ak-acid);
+  border-color: #bfdbfe;
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
 }
 
-.demo-banner__button--accent:hover {
-  background: rgba(216, 255, 54, 0.1);
-  color: var(--ak-acid);
+.demo-banner__button--accent:hover:not(:disabled) {
+  border-color: var(--ak-brand);
+  background: #dbeafe;
+  color: var(--ak-brand-dark);
 }
 
+/* Üst çubuk daraldıkça önce sayaçlar, sonra buton yazıları düşer. */
 @media (max-width: 1100px) {
   .demo-banner__button span,
   .demo-banner__metric {
     display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .demo-banner {
+    padding: 4px;
+  }
+
+  .demo-banner__button {
+    padding: 4px 8px;
   }
 }

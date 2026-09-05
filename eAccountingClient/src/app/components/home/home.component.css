@@ -3,14 +3,16 @@
 .dash-tiles {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .dash-tile {
   padding: 20px;
   border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius);
   background: var(--ak-surface);
+  box-shadow: var(--ak-shadow);
 }
 
 .dash-tile__head {
@@ -22,33 +24,35 @@
 }
 
 .dash-tile__currency {
-  font-family: var(--ak-font-display);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--ak-acid);
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 6px;
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .dash-tile__value {
-  font-family: var(--ak-font-display);
   font-size: 1.55rem;
-  font-weight: 800;
-  line-height: 1.1;
+  font-weight: 680;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
 .dash-tile__label {
-  margin-top: 4px;
+  margin-top: 3px;
   color: var(--ak-muted);
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.75rem;
 }
 
 .dash-tile__flows {
   display: grid;
-  gap: 7px;
+  gap: 8px;
   margin-top: 16px;
   padding-top: 14px;
   border-top: 1px solid var(--ak-line-soft);
@@ -59,20 +63,21 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
 .dash-flow__label {
-  color: var(--ak-muted);
+  color: var(--ak-gray);
 }
 
 .dash-flow__label i {
-  margin-right: 5px;
+  margin-right: 6px;
   font-size: 0.7rem;
 }
 
 .dash-flow__value {
-  color: var(--ak-gray);
+  color: var(--ak-ink);
+  font-weight: 550;
   font-variant-numeric: tabular-nums;
 }
 
@@ -81,8 +86,8 @@
 .dash-charts {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 @media (max-width: 1000px) {
@@ -100,29 +105,32 @@
 .dash-filters {
   display: flex;
   gap: 5px;
+  flex-wrap: wrap;
 }
 
 .dash-filter {
-  padding: 4px 11px;
+  height: 28px;
+  padding: 0 12px;
   border: 1px solid var(--ak-line);
-  background: transparent;
-  color: var(--ak-muted);
+  border-radius: 99px;
+  background: var(--ak-surface);
+  color: var(--ak-gray);
   font-family: var(--ak-font-body);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  transition: color 0.13s, border-color 0.13s, background 0.13s;
 }
 
 .dash-filter:hover {
-  color: var(--ak-paper);
+  background: var(--ak-surface-3);
+  color: var(--ak-ink);
 }
 
 .dash-filter.is-active {
-  border-color: var(--ak-acid);
-  background: rgba(216, 255, 54, 0.1);
-  color: var(--ak-acid);
+  border-color: var(--ak-brand);
+  background: var(--ak-brand);
+  color: #fff;
 }
 
 /* --- yatay çubuklar -------------------------------------------------------- */
@@ -142,42 +150,46 @@
 .dash-bar__name {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
+  min-width: 0;
   font-size: 0.85rem;
   font-weight: 500;
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .dash-bar__icon {
+  flex: none;
   color: var(--ak-muted);
   font-size: 0.75rem;
-  flex: none;
 }
 
 .dash-bar__value {
-  color: var(--ak-gray);
+  color: var(--ak-ink);
   font-size: 0.82rem;
+  font-weight: 550;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 .dash-bar__track {
   height: 8px;
+  border-radius: 99px;
   background: var(--ak-surface-3);
+  overflow: hidden;
 }
 
 .dash-bar__fill {
   height: 100%;
-  background: var(--ak-acid);
+  border-radius: 99px;
+  background: var(--ak-brand);
   transition: width 0.35s ease-out;
 }
 
-/* Banka satırları aynı ailede ama daha sakin bir tonda. */
+/* Banka satırları aynı ailede ama daha açık bir tonda. */
 .dash-bar__fill--bank {
-  background: #7fae2a;
+  background: #0ea5e9;
 }
 
 .dash-bar__fill--negative {
@@ -189,13 +201,13 @@
 .dash-donut {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 24px;
   flex-wrap: wrap;
 }
 
 .dash-donut__svg {
-  width: 130px;
-  height: 130px;
+  width: 132px;
+  height: 132px;
   flex: none;
 }
 
@@ -207,23 +219,24 @@
 .dash-legend__row {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   padding: 7px 0;
-  font-size: 0.83rem;
+  font-size: 0.84rem;
 }
 
 .dash-legend__dot {
   width: 10px;
   height: 10px;
   flex: none;
+  border-radius: 3px;
 }
 
 .dash-legend__dot--cash {
-  background: var(--ak-acid);
+  background: var(--ak-brand);
 }
 
 .dash-legend__dot--bank {
-  background: #2f6f4a;
+  background: #0ea5e9;
 }
 
 .dash-legend__name {
@@ -232,6 +245,7 @@
 }
 
 .dash-legend__value {
+  font-weight: 550;
   font-variant-numeric: tabular-nums;
 }
 
@@ -244,18 +258,14 @@
   padding-top: 11px;
   border-top: 1px solid var(--ak-line-soft);
   color: var(--ak-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
 }
 
 .dash-legend__total strong {
-  color: var(--ak-paper);
-  font-size: 0.9rem;
+  color: var(--ak-ink);
+  font-size: 0.95rem;
+  font-weight: 680;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0;
-  text-transform: none;
 }
 
 /* --- hızlı erişim ---------------------------------------------------------- */
@@ -263,23 +273,33 @@
 .dash-links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
 .dash-link {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 13px;
   padding: 16px 18px;
   border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius);
   background: var(--ak-surface);
+  box-shadow: var(--ak-shadow);
   font-size: 0.88rem;
   font-weight: 600;
-  transition: border-color 0.14s;
+  transition: border-color 0.14s, box-shadow 0.14s;
 }
 
 .dash-link > i:first-child {
-  color: var(--ak-acid);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 8px;
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand);
+  font-size: 0.9rem;
 }
 
 .dash-link span {
@@ -293,22 +313,24 @@
 }
 
 .dash-link:hover {
-  border-color: var(--ak-acid);
+  border-color: #bfdbfe;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.12);
 }
 
 .dash-link:hover .dash-link__go {
-  color: var(--ak-acid);
+  color: var(--ak-brand);
   transform: translateX(3px);
 }
 
 /* --- demo kutusu ----------------------------------------------------------- */
 
 .home-demo {
-  margin-top: 14px;
+  margin-top: 16px;
   padding: 22px 24px;
-  border: 1px solid rgba(216, 255, 54, 0.28);
-  border-left: 3px solid var(--ak-acid);
-  background: rgba(216, 255, 54, 0.045);
+  border: 1px solid #bfdbfe;
+  border-left: 3px solid var(--ak-brand);
+  border-radius: var(--ak-radius);
+  background: var(--ak-brand-soft);
 }
 
 .home-demo__head {
@@ -316,13 +338,12 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 10px;
-  color: var(--ak-acid);
+  color: var(--ak-brand);
 }
 
 .home-demo__title {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  color: var(--ak-paper);
+  font-size: 0.98rem;
+  color: var(--ak-ink);
 }
 
 .home-demo__text {
@@ -330,4 +351,22 @@
   color: var(--ak-gray);
   font-size: 0.88rem;
   line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .dash-tiles,
+  .dash-charts,
+  .dash-links {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .dash-donut {
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .home-demo {
+    padding: 18px;
+  }
 }

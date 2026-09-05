@@ -2,84 +2,100 @@
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
   min-height: 100vh;
+  background: var(--ak-surface);
 }
 
 /* --- marka tarafı --------------------------------------------------------- */
 
+/* Koyu taraf uygulamanın kenar çubuğuyla aynı lacivert; giriş ekranı ile
+   uygulamanın içi arasında görsel bir süreklilik kuruyor. */
 .login__brand {
   display: flex;
   align-items: center;
   padding: 56px;
-  border-right: 1px solid var(--ak-line);
-  background: var(--ak-surface);
-  /* Asit yeşili hafif bir aydınlanma, düz siyahı kırıyor. */
+  background: var(--ak-sidebar-bg);
   background-image: radial-gradient(
-    circle at 20% 25%,
-    rgba(216, 255, 54, 0.07),
-    transparent 55%
-  );
+      circle at 12% 18%,
+      rgba(37, 99, 235, 0.35),
+      transparent 52%
+    ),
+    radial-gradient(circle at 85% 88%, rgba(37, 99, 235, 0.16), transparent 45%);
+  color: #e2e8f0;
 }
 
 .login__brand-inner {
-  max-width: 460px;
+  max-width: 470px;
 }
 
 .login__logo {
-  width: 62px;
-  height: 62px;
+  width: 56px;
+  height: 56px;
   margin-bottom: 26px;
+  border-radius: 12px;
+  background: #fff;
+  object-fit: cover;
 }
 
 .login__headline {
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.05;
-  text-transform: uppercase;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
+  color: #fff;
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
 }
 
 .login__lead {
-  color: var(--ak-gray);
-  font-size: 0.95rem;
+  margin-bottom: 26px;
+  color: #94a3b8;
+  font-size: 0.94rem;
   line-height: 1.65;
-  margin-bottom: 24px;
 }
 
 .login__points {
   list-style: none;
-  margin: 0 0 30px;
+  margin: 0 0 32px;
   padding: 0;
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .login__points li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--ak-gray);
-  font-size: 0.87rem;
+  gap: 11px;
+  color: #cbd5e1;
+  font-size: 0.88rem;
 }
 
 .login__points i {
-  color: var(--ak-acid);
-  font-size: 0.72rem;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.22);
+  color: #93c5fd;
+  font-size: 0.6rem;
 }
 
 .login__site {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding-top: 20px;
-  border-top: 1px solid var(--ak-line);
-  color: var(--ak-muted);
+  gap: 8px;
+  padding-top: 22px;
+  border-top: 1px solid var(--ak-sidebar-line);
+  color: var(--ak-sidebar-muted);
   font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  transition: color 0.13s;
 }
 
 .login__site:hover {
-  color: var(--ak-acid);
+  color: #93c5fd;
 }
 
 /* --- form tarafı ---------------------------------------------------------- */
@@ -89,6 +105,7 @@
   align-items: center;
   justify-content: center;
   padding: 48px 32px;
+  background: var(--ak-surface);
 }
 
 .login__form {
@@ -97,10 +114,11 @@
 }
 
 .login__demo {
-  padding: 20px;
-  border: 1px solid rgba(216, 255, 54, 0.25);
-  background: rgba(216, 255, 54, 0.04);
   margin-bottom: 26px;
+  padding: 20px;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--ak-radius);
+  background: var(--ak-brand-soft);
 }
 
 .login__demo-text {
@@ -125,7 +143,7 @@
   color: var(--ak-muted);
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -150,16 +168,26 @@
   }
 
   .login__brand {
-    padding: 40px 24px 32px;
-    border-right: none;
-    border-bottom: 1px solid var(--ak-line);
+    padding: 38px 24px 30px;
   }
 
-  .login__points {
+  .login__points,
+  .login__site {
     display: none;
   }
 
+  .login__lead {
+    margin-bottom: 0;
+    font-size: 0.88rem;
+  }
+
+  .login__logo {
+    width: 46px;
+    height: 46px;
+    margin-bottom: 18px;
+  }
+
   .login__panel {
-    padding: 32px 24px 48px;
+    padding: 30px 22px 46px;
   }
 }
