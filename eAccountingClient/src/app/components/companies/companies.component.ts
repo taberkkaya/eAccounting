@@ -95,14 +95,14 @@ export class CompaniesComponent {
 
   migrateAll() {
     this.swal.callSwal(
-      'Migrate All Company Db',
-      'Do you want to update all company databases?',
+      'Veritabanlarını güncelle',
+      'Tüm firma veritabanları en son sürüme getirilecek. Devam edilsin mi?',
       () => {
         this.http.post<string>('Companies/MigrateAll', {}, (res) => {
           this.swal.callToast(res);
         });
       },
-      'Migrate'
+      'Güncelle'
     );
   }
 }
