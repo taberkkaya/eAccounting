@@ -33,8 +33,9 @@ services:
       Demo__SlotCount: ${DEMO_SLOT_COUNT:-3}
       Demo__WriteLimit: "40"
       Demo__NudgeAfterWrites: "15"
-      Demo__IdleTimeoutMinutes: "15"
-      Demo__AbsoluteTimeoutMinutes: "45"
+      Demo__IdleTimeoutMinutes: ${DEMO_IDLE_MINUTES:-5}
+      # Oturum ömrü. Havuz üç sandbox, uzun oturum sıradakini bekletiyor.
+      Demo__AbsoluteTimeoutMinutes: ${DEMO_SESSION_MINUTES:-10}
       Demo__MemoryThresholdMegabytes: ${DEMO_MEMORY_MB:-768}
       Demo__ContactUrl: ${CONTACT_URL:-https://ataberkkaya.com}
       # Demoya girmeden önce e-posta doğrulaması. Mail ayarları boşken kod

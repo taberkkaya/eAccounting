@@ -2,22 +2,22 @@
 <div class="demo-banner" [class.demo-banner--warning]="isRunningOut()">
   <span class="demo-banner__tag">DEMO</span>
 
-  <span class="demo-banner__metric" title="Bu oturumda kalan işlem hakkı">
+  <span class="demo-banner__metric demo-banner__metric--writes" title="Bu oturumda kalan işlem hakkı">
     <i class="fas fa-edit"></i>
     {{ demo.writesLeft() }} işlem
   </span>
 
-  <span class="demo-banner__metric" title="Oturumun kalan süresi">
+  <span class="demo-banner__metric demo-banner__metric--time" title="Oturumun kalan süresi">
     <i class="fas fa-clock"></i>
     {{ timeLeft() }}
   </span>
 
   <button type="button" class="demo-banner__button" (click)="resetSandbox()" [disabled]="demo.starting()">
-    <i class="fas fa-sync-alt"></i> Sıfırla
+    <i class="fas fa-sync-alt"></i> <span>Sıfırla</span>
   </button>
 
   <button type="button" class="demo-banner__button demo-banner__button--accent" (click)="contact()">
-    <i class="fas fa-envelope"></i> İletişim
+    <i class="fas fa-envelope"></i> <span>İletişim</span>
   </button>
 </div>
 }

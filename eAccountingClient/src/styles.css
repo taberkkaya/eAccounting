@@ -1149,8 +1149,18 @@ app-footer {
   }
 
   .ak-topbar {
-    gap: 9px;
-    padding: 0 13px;
+    gap: 7px;
+    padding: 0 11px;
+  }
+
+  /* Dar ekranda firma seçimi yer açmak için kısalıyor; demo sayacı ile çıkış
+     butonunun dışarı taşmaması buradan önemli. */
+  .ak-topbar__company {
+    flex: 0 1 104px;
+    min-width: 62px;
+    padding-right: 26px;
+    background-position: right 7px center;
+    font-size: 0.78rem;
   }
 
   /* Üst çubukta yalnızca menü, firma seçimi ve çıkış kalsın. */

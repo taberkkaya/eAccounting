@@ -33,9 +33,14 @@ public sealed class DemoOptions
     /// <summary>Writes after which the client is nudged towards the contact page, without ending the session.</summary>
     public int NudgeAfterWrites { get; set; } = 15;
 
-    public int IdleTimeoutMinutes { get; set; } = 15;
+    /// <summary>Ziyaretçi bu kadar süre hiçbir şey yapmazsa sandbox geri alınır.</summary>
+    public int IdleTimeoutMinutes { get; set; } = 5;
 
-    public int AbsoluteTimeoutMinutes { get; set; } = 45;
+    /// <summary>
+    /// Bir oturumun toplam ömrü. Havuzda az sayıda sandbox olduğu için kısa
+    /// tutuluyor: uzun oturum, sırada bekleyen ziyaretçiyi dışarıda bırakıyor.
+    /// </summary>
+    public int AbsoluteTimeoutMinutes { get; set; } = 10;
 
     /// <summary>
     /// Working set ceiling. Above it the janitor evicts the least recently used sessions,
