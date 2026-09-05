@@ -1,4 +1,5 @@
-﻿using eAccountingServer.Application.Services;
+﻿using eAccountingServer.Application.Features.DemoVisitors;
+using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Demo;
 using eAccountingServer.Domain.Repositories;
 using eAccountingServer.Domain.Users;
@@ -108,6 +109,10 @@ namespace eAccountingServer.Infrastructure
             services.Configure<DemoOptions>(configuration.GetSection(DemoOptions.SectionName));
 
             services.AddScoped<IDemoContext, DemoContext>();
+
+            // Demo ad alanı Scrutor taramasının dışında bırakıldığı için elle.
+            services.AddScoped<IDemoVerificationService, DemoVerificationService>();
+            services.AddScoped<IDemoVisitorReader, DemoVisitorReader>();
 
             // One pool of sandbox tenants for the whole process.
             services.AddSingleton<DemoSessionService>();

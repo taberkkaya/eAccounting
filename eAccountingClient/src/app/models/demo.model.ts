@@ -17,6 +17,12 @@ export interface DemoStartModel {
   status: DemoStatusModel;
 }
 
+/** Girişten önce e-posta doğrulaması istenip istenmediği. */
+export interface DemoConfigModel {
+  enabled: boolean;
+  emailVerificationRequired: boolean;
+}
+
 /** Why the demo prompt is on screen. */
 export type DemoPromptKind = 'nudge' | 'ended';
 

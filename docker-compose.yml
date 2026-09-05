@@ -37,6 +37,9 @@ services:
       Demo__AbsoluteTimeoutMinutes: "45"
       Demo__MemoryThresholdMegabytes: ${DEMO_MEMORY_MB:-768}
       Demo__ContactUrl: ${CONTACT_URL:-https://ataberkkaya.com}
+      # Demoya girmeden önce e-posta doğrulaması. Mail ayarları boşken kod
+      # gönderilemeyeceği için doğrulama kendiliğinden devre dışı kalır.
+      Demo__RequireEmailVerification: ${DEMO_REQUIRE_EMAIL:-true}
       # Empty by default: Caddy serves the client on the same origin as the API.
       Cors__AllowedOrigins__0: ${CORS_ORIGIN:-}
     restart: unless-stopped

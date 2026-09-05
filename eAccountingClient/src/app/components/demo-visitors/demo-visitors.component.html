@@ -1,0 +1,84 @@
+<app-blank pageName="Demo Kayıtları" [routes]="['Yönetim', 'Demo Kayıtları']">
+  <app-section>
+    <div class="ak-toolbar">
+      <span class="ak-tag ak-tag--brand">{{ visitors.length }} adres</span>
+      <span class="ak-tag">{{ verifiedCount }} doğrulanmış</span>
+      <span class="ak-tag">{{ sessionTotal }} oturum</span>
+
+      <div class="ak-toolbar__spacer"></div>
+
+      <input
+        [(ngModel)]="search"
+        type="search"
+        class="ak-input"
+        placeholder="E-posta veya IP ara"
+      />
+
+      <button type="button" class="ak-btn" (click)="getAll()" title="Yenile">
+        <i class="fas fa-sync-alt"></i>
+        Yenile
+      </button>
+    </div>
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>E-posta</th>
+            <th>Durum</th>
+            <th class="ak-table__amount">Kod</th>
+            <th class="ak-table__amount">Oturum</th>
+            <th>Son Oturum</th>
+            <th>İlk Talep</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(data of filtered; track data.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td class="ak-table__strong">{{ data.email }}</td>
+            <td>
+              @if(data.isVerified){
+              <span class="ak-tag ak-tag--success">
+                <i class="fas fa-check"></i>
+                Doğrulandı
+              </span>
+              }@else {
+              <span class="ak-tag ak-tag--muted">Bekliyor</span>
+              }
+            </td>
+            <td class="ak-table__amount ak-muted">{{ data.codesSent }}</td>
+            <td class="ak-table__amount">{{ data.sessionCount }}</td>
+            <td class="ak-muted">
+              {{ data.lastSessionAt ? (data.lastSessionAt | date : "dd.MM.yyyy HH:mm") : "—" }}
+            </td>
+            <td class="ak-muted">{{ data.firstSeenAt | date : "dd.MM.yyyy HH:mm" }}</td>
+            <td class="ak-muted" [title]="data.userAgent ?? ''">
+              {{ data.ipAddress ?? "—" }}
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="8">
+              <div class="ak-empty">
+                @if(loading){
+                <i class="fas fa-circle-notch ak-spin"></i>
+                <div class="ak-empty__text">Yükleniyor...</div>
+                }@else {
+                <i class="fas fa-envelope-open-text"></i>
+                <div class="ak-empty__text">
+                  @if(search){ Aramanızla eşleşen kayıt bulunamadı. }@else { Henüz
+                  demo için e-posta doğrulayan olmadı. }
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+</app-blank>

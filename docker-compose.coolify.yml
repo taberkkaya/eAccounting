@@ -36,6 +36,9 @@ services:
       Demo__AbsoluteTimeoutMinutes: "45"
       Demo__MemoryThresholdMegabytes: ${DEMO_MEMORY_MB}
       Demo__ContactUrl: ${CONTACT_URL}
+      # Demoya girmeden önce e-posta doğrulaması. Mail ayarları boşken kod
+      # gönderilemeyeceği için doğrulama kendiliğinden devre dışı kalır.
+      Demo__RequireEmailVerification: "true"
       # The client reaches the API through Caddy on the same origin, so no CORS entry.
       Cors__AllowedOrigins__0: ""
     restart: unless-stopped

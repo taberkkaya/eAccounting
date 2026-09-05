@@ -1,4 +1,5 @@
-using eAccountingServer.Domain.Abstractions;
+﻿using eAccountingServer.Domain.Abstractions;
+using eAccountingServer.Domain.Demo;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Users;
 using GenericRepository;
@@ -17,6 +18,7 @@ namespace eAccountingServer.Infrastructure.Context
 
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyUser> CompanyUsers { get; set; }
+        public DbSet<DemoVisitor> DemoVisitors { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

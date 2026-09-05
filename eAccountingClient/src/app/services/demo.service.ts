@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { api } from '../constants';
 import {
+  DemoConfigModel,
   DemoErrorCode,
   DemoPromptKind,
   DemoStartModel,
@@ -42,11 +43,25 @@ export class DemoService {
     return localStorage.getItem(DEMO_FLAG_KEY) === 'true';
   }
 
-  start(): Observable<ResultModel<DemoStartModel>> {
+  /** Girişte e-posta doğrulaması isteniyor mu; giriş ekranı buna göre akış kurar. */
+  config(): Observable<ResultModel<DemoConfigModel>> {
+    return this.http.get<ResultModel<DemoConfigModel>>(`${api()}/demo/config`);
+  }
+
+  /** Ziyaretçinin adresine tek kullanımlık kod gönderir. */
+  requestCode(email: string): Observable<ResultModel<string>> {
+    return this.http.post<ResultModel<string>>(`${api()}/demo/request-code`, { email });
+  }
+
+  /**
+   * Demoyu başlatır. Doğrulama açıkken adres ve kod zorunlu; kapalıyken ikisi de
+   * boş gönderilir ve sunucu bunları yok sayar.
+   */
+  start(email = '', code = ''): Observable<ResultModel<DemoStartModel>> {
     this.starting.set(true);
 
     return this.http
-      .post<ResultModel<DemoStartModel>>(`${api()}/demo/start`, {})
+      .post<ResultModel<DemoStartModel>>(`${api()}/demo/start`, { email, code })
       .pipe(tap({
         next: (res) => {
           this.starting.set(false);

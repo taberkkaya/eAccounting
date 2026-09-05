@@ -51,6 +51,18 @@ builder.Services.AddRateLimiter(options =>
             PermitLimit = 30,
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
         }));
+
+    // Kod gönderen uç mail üretiyor: genel sınır burada fazla cömert kalırdı ve
+    // adres sahibinin kutusunu doldurmak için kullanılabilirdi.
+    options.AddPolicy("demo-code", httpContext => RateLimitPartition.GetFixedWindowLimiter(
+        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        factory: _ => new FixedWindowRateLimiterOptions
+        {
+            QueueLimit = 0,
+            Window = TimeSpan.FromMinutes(15),
+            PermitLimit = 6,
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+        }));
 });
 
 builder.Services.AddExceptionHandler<ExceptionHandler>().AddProblemDetails();

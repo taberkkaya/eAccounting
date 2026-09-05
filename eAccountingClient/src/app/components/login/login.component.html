@@ -130,3 +130,95 @@
     </button>
   </div>
 </app-modal>
+
+<!-- Demoya giriş: adres doğrulaması -->
+<app-modal
+  [open]="demoOpen"
+  title="Demoyu Başlat"
+  (closed)="demoOpen = false"
+>
+  <div class="ak-modal__body">
+    @if(demoStep === 'email'){
+    <p class="login__demo-text" style="margin-top: 0">
+      Demoyu başlatmak için e-posta adresinizi doğrulayın. Adresinize tek
+      kullanımlık bir kod göndereceğiz.
+    </p>
+
+    <div class="ak-field" style="margin-bottom: 0">
+      <label class="ak-label">E-posta Adresi</label>
+      <input
+        type="email"
+        class="ak-input"
+        name="demoEmail"
+        placeholder="ornek@eposta.com"
+        [(ngModel)]="demoEmail"
+        (keyup.enter)="sendDemoCode()"
+      />
+    </div>
+    }@else {
+    <p class="login__demo-text" style="margin-top: 0">
+      {{ demoNote }}
+    </p>
+
+    <div class="ak-field" style="margin-bottom: 0">
+      <label class="ak-label">Doğrulama Kodu</label>
+      <input
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        class="ak-input login__code"
+        name="demoCode"
+        placeholder="000000"
+        maxlength="6"
+        [(ngModel)]="demoCode"
+        (keyup.enter)="verifyAndStart()"
+      />
+      <button
+        type="button"
+        class="ak-btn ak-btn--ghost ak-btn--sm"
+        style="margin-top: 10px"
+        (click)="backToEmail()"
+      >
+        <i class="fas fa-arrow-left"></i>
+        Adresi değiştir
+      </button>
+    </div>
+    }
+  </div>
+
+  <div class="ak-modal__foot">
+    <button type="button" class="ak-btn" (click)="demoOpen = false">Vazgeç</button>
+
+    @if(demoStep === 'email'){
+    <button
+      type="button"
+      class="ak-btn ak-btn--primary"
+      [disabled]="isDemoLoading"
+      (click)="sendDemoCode()"
+    >
+      @if(isDemoLoading){
+      <i class="fas fa-circle-notch ak-spin"></i>
+      Gönderiliyor...
+      }@else {
+      <i class="fas fa-paper-plane"></i>
+      Kod Gönder
+      }
+    </button>
+    }@else {
+    <button
+      type="button"
+      class="ak-btn ak-btn--primary"
+      [disabled]="isDemoLoading"
+      (click)="verifyAndStart()"
+    >
+      @if(isDemoLoading){
+      <i class="fas fa-circle-notch ak-spin"></i>
+      Doğrulanıyor...
+      }@else {
+      <i class="fas fa-check"></i>
+      Doğrula ve Başlat
+      }
+    </button>
+    }
+  </div>
+</app-modal>

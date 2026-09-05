@@ -41,6 +41,14 @@ export const Menus: MenuModel[] = [
     showThisMenuJustAdmin: true,
   },
   {
+    name: 'Demo Kayıtları',
+    icon: 'fas fa-envelope-open-text',
+    url: '/demo-visitors',
+    isTitle: false,
+    subMenus: [],
+    showThisMenuJustAdmin: true,
+  },
+  {
     name: 'Kayıtlar',
     icon: '',
     url: '',

@@ -1,4 +1,4 @@
-namespace eAccountingServer.Domain.Demo;
+﻿namespace eAccountingServer.Domain.Demo;
 
 /// <summary>Bound from the "Demo" configuration section.</summary>
 public sealed class DemoOptions
@@ -53,4 +53,21 @@ public sealed class DemoOptions
     public string UserName { get; set; } = "demo";
 
     public string Email { get; set; } = "demo@ataberkkaya.com";
+
+    /// <summary>
+    /// Demoya girmeden önce ziyaretçinin e-posta adresine kod gönderilip
+    /// doğrulanmasını ister. Mail sunucusu yapılandırılmamışsa kod gönderilemeyeceği
+    /// için doğrulama kendiliğinden devre dışı kalır; aksi hâlde demo hiç açılmazdı.
+    /// </summary>
+    public bool RequireEmailVerification { get; set; } = true;
+
+    public int CodeLength { get; set; } = 6;
+
+    public int CodeLifetimeMinutes { get; set; } = 10;
+
+    /// <summary>Aynı adrese iki kod arasında beklenmesi gereken süre.</summary>
+    public int CodeResendSeconds { get; set; } = 60;
+
+    /// <summary>Bir kod için tanınan yanlış deneme hakkı.</summary>
+    public int MaxCodeAttempts { get; set; } = 5;
 }
