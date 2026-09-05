@@ -107,30 +107,26 @@ internal sealed class DemoVerificationService(
             $"Doğrulama kodu {display} adresine gönderildi. Kod {_demo.CodeLifetimeMinutes} dakika geçerli.");
     }
 
-    private Task SendMailAsync(string email, string code, CancellationToken cancellationToken) =>
-        fluentEmail
+    private Task SendMailAsync(string email, string code, CancellationToken cancellationToken)
+    {
+        string body = MailTemplate.Wrap(
+            "Demo doğrulama kodunuz",
+            MailTemplate.Paragraph(
+                "Defter demosunu başlatmak için aşağıdaki kodu uygulamaya girin.")
+            + MailTemplate.Code(code)
+            + MailTemplate.Paragraph(
+                $"Kod <strong style=\"color:#0f172a\">{_demo.CodeLifetimeMinutes} dakika</strong> geçerlidir "
+                + "ve yalnızca bir kez kullanılabilir.")
+            + MailTemplate.Note(
+                "Bu isteği siz yapmadıysanız bu maili yok sayabilirsiniz; kod kullanılmadan geçersiz olur."),
+            string.IsNullOrWhiteSpace(_mail.ClientBaseUrl) ? "https://ataberkkaya.com" : _mail.ClientBaseUrl);
+
+        return fluentEmail
             .To(email)
             .Subject($"Defter demo doğrulama kodunuz: {code}")
-            .Body(
-                $"""
-                <div style="font-family:Inter,Arial,Helvetica,sans-serif;font-size:15px;color:#0f172a">
-                  <h2 style="margin:0 0 12px;font-size:20px">Defter demo kodunuz</h2>
-                  <p style="color:#475569">
-                    Demoyu başlatmak için aşağıdaki kodu uygulamaya girin.
-                  </p>
-                  <p style="margin:22px 0">
-                    <span style="display:inline-block;background:#eff6ff;border:1px solid #bfdbfe;
-                                 border-radius:10px;padding:14px 22px;font-size:28px;font-weight:700;
-                                 letter-spacing:.35em;color:#1d4ed8">{code}</span>
-                  </p>
-                  <p style="color:#64748b;font-size:13px">
-                    Kod {_demo.CodeLifetimeMinutes} dakika geçerlidir. Bu isteği siz yapmadıysanız
-                    bu maili yok sayabilirsiniz.
-                  </p>
-                </div>
-                """,
-                isHtml: true)
+            .Body(body, isHtml: true)
             .SendAsync(cancellationToken);
+    }
 
     // --- doğrulama ----------------------------------------------------------
 
