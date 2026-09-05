@@ -1,17 +1,18 @@
 import { Component, inject } from '@angular/core';
 import { SharedModule } from '../../modules/shared.module';
-import { RouterLink } from '@angular/router';
 import { DemoService } from '../../services/demo.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule, RouterLink],
+  imports: [SharedModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
   readonly demo = inject(DemoService);
+  readonly auth = inject(AuthService);
 
   readonly stack: string[] = [
     '.NET 9 Web API',
@@ -21,7 +22,7 @@ export class HomeComponent {
     'EF Core',
     'SQL Server',
     'JWT',
-    'Veritabanı başına firma',
+    'Docker',
   ];
 
   contact(): void {

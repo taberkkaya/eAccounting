@@ -1,75 +1,94 @@
-<app-blank pageName="Users" [routes]="['Admin', 'Users']">
-  <app-section sectionTitle="User List">
-    <div class="form-group row">
-      <div class="col-9">
-        <button
-          class="btn btn-dark"
-          data-toggle="modal"
-          data-target="#createModal"
-        >
-          <i class="fa-solid fa-plus me-1"></i>
-          Add User
-        </button>
-      </div>
+<app-blank pageName="Kullanıcılar" [routes]="['Yönetim', 'Kullanıcılar']">
+  <app-section>
+    <div class="ak-toolbar">
+      <button
+        type="button"
+        class="ak-btn ak-btn--primary"
+        (click)="openCreate()"
+      >
+        <i class="fas fa-plus"></i>
+        Kullanıcı Ekle
+      </button>
 
-      <div class="col-3">
-        <input
-          [(ngModel)]="search"
-          type="search"
-          class="form-control"
-          placeholder="Search"
-        />
-      </div>
+      <div class="ak-toolbar__spacer"></div>
+
+      <input
+        [(ngModel)]="search"
+        type="search"
+        class="ak-input"
+        style="width: 240px"
+        placeholder="Ad veya e-posta ara"
+      />
     </div>
 
-    <div class="form-group mt-2">
-      <table class="table table-hover">
+    <div class="ak-table-wrap">
+      <table class="ak-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Companies</th>
-            <th>Is Admin</th>
-            <th>Operations</th>
+            <th class="ak-table__num">#</th>
+            <th>Ad Soyad</th>
+            <th>Kullanıcı Adı</th>
+            <th>E-posta</th>
+            <th>Firmalar</th>
+            <th>Yetki</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
-          @for(data of users | user: search ;track data){
+          @for(data of users | user : search; track data.id){
           <tr>
-            <td>{{ $index + 1 }}</td>
-            <td>{{ data.fullName }}</td>
-            <td>{{ data.email }}</td>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td class="ak-table__strong">{{ data.fullName }}</td>
+            <td class="ak-muted">{{ data.userName }}</td>
+            <td class="ak-muted">{{ data.email }}</td>
             <td>
-              <ul>
-                @for(companyUser of data.companyUsers; track companyUser){
-                <li>{{ companyUser.company.name }}</li>
-                }
-              </ul>
+              @for(companyUser of data.companyUsers; track companyUser)
+              {
+              <span class="ak-tag" style="margin-right: 4px">{{
+                companyUser.company.name
+              }}</span>
+              }@empty {
+              <span class="ak-muted">—</span>
+              }
             </td>
             <td>
               @if(data.isAdmin){
-              <span class="text-success">Yes</span>
+              <span class="ak-tag ak-tag--acid">Yönetici</span>
               }@else {
-              <span class="text-danger">No</span>
+              <span class="ak-tag ak-tag--muted">Kullanıcı</span>
               }
             </td>
-
             <td>
-              <button
-                data-toggle="modal"
-                data-target="#updateModal"
-                (click)="get(data)"
-                class="btn btn-outline-primary btn-sm me-1"
-              >
-                <i class="fa-solid fa-edit"></i>
-              </button>
-              <button
-                (click)="deleteById(data)"
-                class="btn btn-outline-danger btn-sm"
-              >
-                <i class="fa-solid fa-trash"></i>
-              </button>
+              <div class="ak-table__actions">
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon"
+                  (click)="openUpdate(data)"
+                  title="Düzenle"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
+                  (click)="deleteById(data)"
+                  title="Sil"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="7">
+              <div class="ak-empty">
+                <i class="fas fa-users"></i>
+                <div class="ak-empty__text">
+                  @if(search){ Aramanızla eşleşen kullanıcı bulunamadı. }@else {
+                  Henüz kullanıcı eklenmemiş. }
+                </div>
+              </div>
             </td>
           </tr>
           }
@@ -79,253 +98,228 @@
   </app-section>
 </app-blank>
 
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Add User</h1>
-        <button
-          type="button"
-          #createModalCloseBtn
-          class="btn btn-outline-danger"
-          data-dismiss="modal"
-        >
-          <i class="fa-solid fa-x"></i>
-        </button>
+<!-- Kullanıcı ekleme -->
+<app-modal
+  [open]="createOpen"
+  title="Yeni Kullanıcı"
+  [wide]="true"
+  (closed)="createOpen = false"
+>
+  <form
+    formValidate
+    #createForm="ngForm"
+    autocomplete="off"
+    (ngSubmit)="create(createForm)"
+  >
+    <div class="ak-modal__body">
+      <div class="ak-form-grid">
+        <div class="ak-field">
+          <label class="ak-label">Ad</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.firstName"
+            class="ak-input"
+            name="firstName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Soyad</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.lastName"
+            class="ak-input"
+            name="lastName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kullanıcı Adı</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.userName"
+            class="ak-input"
+            name="userName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">E-posta</label>
+          <input
+            type="email"
+            required
+            [(ngModel)]="createModel.email"
+            class="ak-input"
+            name="email"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Parola</label>
+          <input
+            type="password"
+            required
+            [(ngModel)]="createModel.password"
+            class="ak-input"
+            name="password"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Firmalar</label>
+          <select
+            class="ak-select"
+            multiple
+            name="companyIds"
+            [(ngModel)]="createModel.companyIds"
+          >
+            @for(company of companies; track company.id){
+            <option [value]="company.id">{{ company.name }}</option>
+            }
+          </select>
+          <p class="ak-muted" style="margin: 6px 0 0; font-size: 0.76rem">
+            Birden fazla seçmek için Ctrl tuşuna basılı tutun.
+          </p>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-check">
+            <input
+              type="checkbox"
+              name="isAdmin"
+              [(ngModel)]="createModel.isAdmin"
+            />
+            <span>Yönetici yetkisi ver</span>
+          </label>
+        </div>
       </div>
-      <form
-        formValidate
-        #createForm="ngForm"
-        autocomplete="off"
-        (ngSubmit)="create(createForm)"
-      >
-        <div class="modal-body">
-          <div class="form-group">
-            <label>First Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.firstName"
-              class="form-control"
-              name="firstName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>Last Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.lastName"
-              class="form-control"
-              name="lastName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>User Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.userName"
-              class="form-control"
-              name="userName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>Email</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.email"
-              class="form-control"
-              name="email"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>Password</label>
-            <input
-              type="password"
-              required
-              [(ngModel)]="createModel.password"
-              class="form-control"
-              name="password"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>Companies</label>
-            <select
-              name="companyIds"
-              [(ngModel)]="createModel.companyIds"
-              class="form-control"
-              multiple
-              required
-            >
-              @for(company of companies; track company){
-              <option [value]="company.id">
-                {{ company.name }}
-              </option>
-              }
-            </select>
-            <div class="invalid-feedback"></div>
-          </div>
-          <div class="form-group mt-2">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="isAdminCheck"
-                name="isAdmin"
-                [(ngModel)]="createModel.isAdmin"
-              />
-              <label class="form-check-label" for="isAdminCheck">
-                Is Admin?
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-dark w-100">Kaydet</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
 
-<!-- Update Modal -->
-<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Example Güncelleme Formu</h1>
-        <button
-          type="button"
-          #updateModalCloseBtn
-          class="btn btn-outline-danger"
-          data-dismiss="modal"
-        >
-          <i class="fa-solid fa-x"></i>
-        </button>
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="createOpen = false">
+        Vazgeç
+      </button>
+      <button type="submit" class="ak-btn ak-btn--primary">Kaydet</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Kullanıcı düzenleme -->
+<app-modal
+  [open]="updateOpen"
+  title="Kullanıcıyı Düzenle"
+  [wide]="true"
+  (closed)="updateOpen = false"
+>
+  <form
+    formValidate
+    #updateForm="ngForm"
+    autocomplete="off"
+    (ngSubmit)="update(updateForm)"
+  >
+    <div class="ak-modal__body">
+      <div class="ak-form-grid">
+        <div class="ak-field">
+          <label class="ak-label">Ad</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.firstName"
+            class="ak-input"
+            name="updateFirstName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Soyad</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.lastName"
+            class="ak-input"
+            name="updateLastName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kullanıcı Adı</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.userName"
+            class="ak-input"
+            name="updateUserName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">E-posta</label>
+          <input
+            type="email"
+            required
+            [(ngModel)]="updateModel.email"
+            class="ak-input"
+            name="updateEmail"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Yeni Parola</label>
+          <input
+            type="password"
+            [(ngModel)]="updateModel.password"
+            class="ak-input"
+            name="updatePassword"
+          />
+          <p class="ak-muted" style="margin: 6px 0 0; font-size: 0.76rem">
+            Boş bırakılırsa mevcut parola korunur.
+          </p>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Firmalar</label>
+          <select
+            class="ak-select"
+            multiple
+            name="updateCompanyIds"
+            [(ngModel)]="updateModel.companyIds"
+          >
+            @for(company of companies; track company.id){
+            <option [value]="company.id">{{ company.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-check">
+            <input
+              type="checkbox"
+              name="updateIsAdmin"
+              [(ngModel)]="updateModel.isAdmin"
+            />
+            <span>Yönetici yetkisi ver</span>
+          </label>
+        </div>
       </div>
-      <form
-        formValidate
-        #updateForm="ngForm"
-        autocomplete="off"
-        (ngSubmit)="update(updateForm)"
-      >
-        <div class="modal-body">
-          <div class="form-group">
-            <label>First Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.firstName"
-              class="form-control"
-              name="updateFirstName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group">
-            <label>Last Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.lastName"
-              class="form-control"
-              name="updateLastName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group">
-            <label>User Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.userName"
-              class="form-control"
-              name="updateUserName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>Email</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.email"
-              class="form-control"
-              name="updateEmail"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              [(ngModel)]="updateModel.password"
-              class="form-control"
-              name="updatePassword"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-          <div class="form-group mt-2">
-            <label>Companies</label>
-            <select
-              name="updateCompanyIds"
-              [(ngModel)]="updateModel.companyIds"
-              class="form-control"
-              multiple
-              required
-            >
-              @for(company of companies; track company){
-              <option [value]="company.id">
-                {{ company.name }}
-              </option>
-              }
-            </select>
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                [(ngModel)]="updateModel.isAdmin"
-                name="isAdmin"
-                id="isAdminCheck"
-              />
-              <label class="form-check-label" for="isAdminCheck">
-                Is Admin?
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary w-100">Güncelle</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="updateOpen = false">
+        Vazgeç
+      </button>
+      <button type="submit" class="ak-btn ak-btn--primary">Güncelle</button>
+    </div>
+  </form>
+</app-modal>

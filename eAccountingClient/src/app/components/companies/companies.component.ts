@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { SharedModule } from '../../modules/shared.module';
 import { CompanyModel } from '../../models/company.model';
 import { HttpService } from '../../services/http.service';
@@ -17,17 +17,23 @@ export class CompaniesComponent {
   companies: CompanyModel[] = [];
   search: string = '';
 
-  @ViewChild('createModalCloseBtn') createModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
-  @ViewChild('updateModalCloseBtn') updateModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
+  createOpen = false;
+  updateOpen = false;
 
   createModel: CompanyModel = new CompanyModel();
   updateModel: CompanyModel = new CompanyModel();
 
   constructor(private http: HttpService, private swal: SwalService) {}
+
+  openCreate() {
+    this.createModel = new CompanyModel();
+    this.createOpen = true;
+  }
+
+  openUpdate(model: CompanyModel) {
+    this.get(model);
+    this.updateOpen = true;
+  }
 
   ngOnInit(): void {
     this.getAll();
@@ -44,7 +50,7 @@ export class CompaniesComponent {
       this.http.post<string>('Companies/Create', this.createModel, (res) => {
         this.swal.callToast(res);
         this.createModel = new CompanyModel();
-        this.createModalCloseBtn?.nativeElement.click();
+        this.createOpen = false;
         this.getAll();
       });
     }
@@ -52,8 +58,8 @@ export class CompaniesComponent {
 
   deleteById(model: CompanyModel) {
     this.swal.callSwal(
-      'Veriyi Sil?',
-      `${model.name} verisini silmek istiyor musunuz?`,
+      'Firmayı sil',
+      `${model.name} kaydını silmek istediğinize emin misiniz?`,
       () => {
         this.http.post<string>(
           'Companies/DeleteById',
@@ -75,7 +81,7 @@ export class CompaniesComponent {
     if (form.valid) {
       this.http.post<string>('Companies/Update', this.updateModel, (res) => {
         this.swal.callToast(res, 'info');
-        this.updateModalCloseBtn?.nativeElement.click();
+        this.updateOpen = false;
         this.getAll();
       });
     }

@@ -1,71 +1,86 @@
-<app-blank pageName="Companies" [routes]="['Admin', 'Companies']">
-  <app-section sectionTitle="Company List">
-    <div class="form-group row">
-      <div class="col-9">
-        <button
-          class="btn btn-dark me-1"
-          data-toggle="modal"
-          data-target="#createModal"
-        >
-          <i class="fa-solid fa-plus me-1"></i>
-          Add Company
-        </button>
+<app-blank pageName="Firmalar" [routes]="['Yönetim', 'Firmalar']">
+  <app-section>
+    <div class="ak-toolbar">
+      <button
+        type="button"
+        class="ak-btn ak-btn--primary"
+        (click)="openCreate()"
+      >
+        <i class="fas fa-plus"></i>
+        Firma Ekle
+      </button>
 
-        <button class="btn btn-dark" (click)="migrateAll()">
-          <i class="fa-solid fa-rotate me-1"></i>
-          Migrate All
-        </button>
-      </div>
+      <button type="button" class="ak-btn" (click)="migrateAll()">
+        <i class="fas fa-database"></i>
+        Veritabanlarını Güncelle
+      </button>
 
-      <div class="col-3">
-        <input
-          [(ngModel)]="search"
-          type="search"
-          class="form-control"
-          placeholder="search"
-        />
-      </div>
+      <div class="ak-toolbar__spacer"></div>
+
+      <input
+        [(ngModel)]="search"
+        type="search"
+        class="ak-input"
+        style="width: 240px"
+        placeholder="Firma adı ara"
+      />
     </div>
 
-    <div class="form-group mt-2">
-      <table class="table table-hover">
+    <div class="ak-table-wrap">
+      <table class="ak-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Company Name</th>
-            <th>Address</th>
-            <th>Tax Number</th>
-            <th>Tax Department</th>
-            <th>Server</th>
-            <th>Database Name</th>
-            <th>Operations</th>
+            <th class="ak-table__num">#</th>
+            <th>Firma Adı</th>
+            <th>Adres</th>
+            <th>Vergi No</th>
+            <th>Vergi Dairesi</th>
+            <th>Sunucu</th>
+            <th>Veritabanı</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
-          @for(data of companies | company: search ;track data){
+          @for(data of companies | company : search; track data.id){
           <tr>
-            <td>{{ $index + 1 }}</td>
-            <td>{{ data.name }}</td>
-            <td>{{ data.address }}</td>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td class="ak-table__strong">{{ data.name }}</td>
+            <td class="ak-muted">{{ data.address }}</td>
             <td>{{ data.taxNumber }}</td>
-            <td>{{ data.taxDepartment }}</td>
-            <td>{{ data.database.server }}</td>
-            <td>{{ data.database.databaseName }}</td>
+            <td class="ak-muted">{{ data.taxDepartment }}</td>
+            <td class="ak-muted">{{ data.database.server || "—" }}</td>
+            <td class="ak-muted">{{ data.database.databaseName || "—" }}</td>
             <td>
-              <button
-                data-toggle="modal"
-                data-target="#updateModal"
-                (click)="get(data)"
-                class="btn btn-outline-primary btn-sm me-1"
-              >
-                <i class="fa-solid fa-edit"></i>
-              </button>
-              <button
-                (click)="deleteById(data)"
-                class="btn btn-outline-danger btn-sm"
-              >
-                <i class="fa-solid fa-trash"></i>
-              </button>
+              <div class="ak-table__actions">
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon"
+                  (click)="openUpdate(data)"
+                  title="Düzenle"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
+                  (click)="deleteById(data)"
+                  title="Sil"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="8">
+              <div class="ak-empty">
+                <i class="fas fa-city"></i>
+                <div class="ak-empty__text">
+                  @if(search){ Aramanızla eşleşen firma bulunamadı. }@else {
+                  Henüz firma eklenmemiş. }
+                </div>
+              </div>
             </td>
           </tr>
           }
@@ -75,292 +90,245 @@
   </app-section>
 </app-blank>
 
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Add Company Form</h1>
-        <button
-          type="button"
-          #createModalCloseBtn
-          class="btn btn-outline-danger"
-          data-dismiss="modal"
-        >
-          <i class="fa-solid fa-x"></i>
-        </button>
+<!-- Firma ekleme -->
+<app-modal
+  [open]="createOpen"
+  title="Yeni Firma"
+  [wide]="true"
+  (closed)="createOpen = false"
+>
+  <form
+    formValidate
+    #createForm="ngForm"
+    autocomplete="off"
+    (ngSubmit)="create(createForm)"
+  >
+    <div class="ak-modal__body">
+      <div class="ak-form-grid">
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Firma Adı</label>
+          <input
+            type="text"
+            required
+            minlength="3"
+            [(ngModel)]="createModel.name"
+            class="ak-input"
+            name="name"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Adres</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.address"
+            class="ak-input"
+            name="address"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Vergi Dairesi</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.taxDepartment"
+            class="ak-input"
+            name="taxDepartment"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Vergi No</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.taxNumber"
+            class="ak-input"
+            name="taxNumber"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Sunucu</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.database.server"
+            class="ak-input"
+            name="databaseServer"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Veritabanı Adı</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.database.databaseName"
+            class="ak-input"
+            name="databaseDatabaseName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kullanıcı Adı</label>
+          <input
+            type="text"
+            [(ngModel)]="createModel.database.username"
+            class="ak-input"
+            name="databaseUserName"
+          />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Parola</label>
+          <input
+            type="password"
+            [(ngModel)]="createModel.database.password"
+            class="ak-input"
+            name="databasePassword"
+          />
+        </div>
       </div>
-      <form
-        formValidate
-        #createForm="ngForm"
-        autocomplete="off"
-        (ngSubmit)="create(createForm)"
-      >
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.name"
-              class="form-control"
-              name="name"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
 
-          <div class="form-group mt-2">
-            <label>Address</label>
-            <textarea
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.address"
-              class="form-control"
-              name="address"
-            ></textarea>
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group row mt-2">
-            <div class="col-6">
-              <div class="form-group">
-                <label>Tax Department</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="createModel.taxDepartment"
-                  class="form-control"
-                  name="taxDepartment"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-group">
-                <label>Tax Number</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="createModel.taxNumber"
-                  class="form-control"
-                  name="taxNumber"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mt-2">
-            <div class="col-6">
-              <div class="form-group">
-                <label>Server</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="createModel.database.server"
-                  class="form-control"
-                  name="databaseServer"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-group">
-                <label>Database Name</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="createModel.database.databaseName"
-                  class="form-control"
-                  name="databaseDatabaseName"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mt-2">
-            <div class="col-6">
-              <div class="form-group">
-                <label>User Name</label>
-                <input
-                  type="text"
-                  [(ngModel)]="createModel.database.username"
-                  class="form-control"
-                  name="databaseUserName"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-group">
-                <label>Password</label>
-                <input
-                  type="text"
-                  [(ngModel)]="createModel.database.password"
-                  class="form-control"
-                  name="databasePassword"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-dark w-100">Kaydet</button>
-        </div>
-      </form>
+      <p class="ak-muted" style="margin: 4px 0 0; font-size: 0.78rem">
+        Kullanıcı adı boş bırakılırsa bağlantı Windows kimlik doğrulaması ile
+        kurulur.
+      </p>
     </div>
-  </div>
-</div>
 
-<!-- Update Modal -->
-<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Update Company Form</h1>
-        <button
-          type="button"
-          #updateModalCloseBtn
-          class="btn btn-outline-danger"
-          data-dismiss="modal"
-        >
-          <i class="fa-solid fa-x"></i>
-        </button>
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="createOpen = false">
+        Vazgeç
+      </button>
+      <button type="submit" class="ak-btn ak-btn--primary">Kaydet</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Firma düzenleme -->
+<app-modal
+  [open]="updateOpen"
+  title="Firmayı Düzenle"
+  [wide]="true"
+  (closed)="updateOpen = false"
+>
+  <form
+    formValidate
+    #updateForm="ngForm"
+    autocomplete="off"
+    (ngSubmit)="update(updateForm)"
+  >
+    <div class="ak-modal__body">
+      <div class="ak-form-grid">
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Firma Adı</label>
+          <input
+            type="text"
+            required
+            minlength="3"
+            [(ngModel)]="updateModel.name"
+            class="ak-input"
+            name="updateName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field ak-form-grid--full">
+          <label class="ak-label">Adres</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.address"
+            class="ak-input"
+            name="updateAddress"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Vergi Dairesi</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.taxDepartment"
+            class="ak-input"
+            name="updateTaxDepartment"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Vergi No</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.taxNumber"
+            class="ak-input"
+            name="updateTaxNumber"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Sunucu</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.database.server"
+            class="ak-input"
+            name="updateDatabaseServer"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Veritabanı Adı</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.database.databaseName"
+            class="ak-input"
+            name="updateDatabaseName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kullanıcı Adı</label>
+          <input
+            type="text"
+            [(ngModel)]="updateModel.database.username"
+            class="ak-input"
+            name="updateDatabaseUserName"
+          />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Parola</label>
+          <input
+            type="password"
+            [(ngModel)]="updateModel.database.password"
+            class="ak-input"
+            name="updateDatabasePassword"
+          />
+        </div>
       </div>
-      <form
-        formValidate
-        #updateForm="ngForm"
-        autocomplete="off"
-        (ngSubmit)="update(updateForm)"
-      >
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.name"
-              class="form-control"
-              name="updateName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group mt-2">
-            <label>Address</label>
-            <textarea
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.address"
-              class="form-control"
-              name="updateAddress"
-            ></textarea>
-            <div class="invalid-feedback"></div>
-          </div>
-
-          <div class="form-group row mt-2">
-            <div class="col-6">
-              <div class="form-group">
-                <label>Tax Department</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="updateModel.taxDepartment"
-                  class="form-control"
-                  name="updateTaxDepartment"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-group">
-                <label>Tax Number</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="updateModel.taxNumber"
-                  class="form-control"
-                  name="updateTaxNumber"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mt-2">
-            <div class="col-6">
-              <div class="form-group">
-                <label>Server</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="updateModel.database.server"
-                  class="form-control"
-                  name="updateDatabase.server"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-group">
-                <label>Database Name</label>
-                <input
-                  type="text"
-                  required
-                  minlength="3"
-                  [(ngModel)]="updateModel.database.databaseName"
-                  class="form-control"
-                  name="updateDatabaseDatabaseName"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group row mt-2">
-            <div class="col-6">
-              <div class="form-group">
-                <label>User Name</label>
-                <input
-                  type="text"
-                  [(ngModel)]="updateModel.database.username"
-                  class="form-control"
-                  name="updateDatabaseUserName"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="form-group">
-                <label>Password</label>
-                <input
-                  type="text"
-                  [(ngModel)]="updateModel.database.password"
-                  class="form-control"
-                  name="updateDatabasePassword"
-                />
-                <div class="invalid-feedback"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary w-100">Güncelle</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="updateOpen = false">
+        Vazgeç
+      </button>
+      <button type="submit" class="ak-btn ak-btn--primary">Güncelle</button>
+    </div>
+  </form>
+</app-modal>

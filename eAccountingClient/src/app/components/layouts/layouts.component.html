@@ -1,20 +1,18 @@
-<div class="wrapper">
-    <!-- Navbar -->
-    <app-navbar></app-navbar>
-    <!-- /.navbar -->
-  
-    <!-- Main Sidebar Container -->
-    <app-main-sidebar></app-main-sidebar>    
-  
-    <!-- Content Wrapper. Contains page content -->    
-    <router-outlet></router-outlet>
-    <!-- /.content-wrapper -->
-  
-    <app-footer></app-footer>    
-  
-    <!-- Control Sidebar -->
-    <app-control-sidebar></app-control-sidebar>
-    <!-- /.control-sidebar -->
+<div class="ak-shell">
+  <app-main-sidebar
+    [open]="sidebarOpen()"
+    (navigated)="closeSidebar()"
+  ></app-main-sidebar>
 
-    <app-demo-prompt></app-demo-prompt>
+  <div class="ak-main">
+    <app-navbar (menuToggled)="toggleSidebar()"></app-navbar>
+
+    <main class="ak-content">
+      <router-outlet></router-outlet>
+    </main>
+
+    <app-footer></app-footer>
   </div>
+</div>
+
+<app-demo-prompt></app-demo-prompt>

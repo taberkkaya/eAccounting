@@ -1,7 +1,6 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { SharedModule } from '../../modules/shared.module';
 import { BankPipe } from '../../pipes/bank.pipe';
-import { RouterLink } from '@angular/router';
 import { CurrencyTypes } from '../../models/currencyType.model';
 import { BankModel } from '../../models/bank.model';
 import { HttpService } from '../../services/http.service';
@@ -11,7 +10,7 @@ import { NgForm } from '@angular/forms';
 @Component({
   selector: 'app-banks',
   standalone: true,
-  imports: [SharedModule, BankPipe, RouterLink],
+  imports: [SharedModule, BankPipe],
   templateUrl: './banks.component.html',
   styleUrl: './banks.component.css',
 })
@@ -21,17 +20,23 @@ export class BanksComponent {
 
   currencyTypes = CurrencyTypes;
 
-  @ViewChild('createModalCloseBtn') createModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
-  @ViewChild('updateModalCloseBtn') updateModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
+  createOpen = false;
+  updateOpen = false;
 
   createModel: BankModel = new BankModel();
   updateModel: BankModel = new BankModel();
 
   constructor(private http: HttpService, private swal: SwalService) {}
+
+  openCreate() {
+    this.createModel = new BankModel();
+    this.createOpen = true;
+  }
+
+  openUpdate(model: BankModel) {
+    this.get(model);
+    this.updateOpen = true;
+  }
 
   ngOnInit(): void {
     this.getAll();
@@ -48,7 +53,7 @@ export class BanksComponent {
       this.http.post<string>('Banks/Create', this.createModel, (res) => {
         this.swal.callToast(res);
         this.createModel = new BankModel();
-        this.createModalCloseBtn?.nativeElement.click();
+        this.createOpen = false;
         this.getAll();
       });
     }
@@ -56,8 +61,8 @@ export class BanksComponent {
 
   deleteById(model: BankModel) {
     this.swal.callSwal(
-      'Veriyi Sil?',
-      `${model.name} verisini silmek istiyor musunuz?`,
+      'Bankayı sil',
+      `${model.name} kaydını silmek istediğinize emin misiniz?`,
       () => {
         this.http.post<string>('Banks/DeleteById', { id: model.id }, (res) => {
           this.getAll();
@@ -76,7 +81,7 @@ export class BanksComponent {
     if (form.valid) {
       this.http.post<string>('Banks/Update', this.updateModel, (res) => {
         this.swal.callToast(res, 'info');
-        this.updateModalCloseBtn?.nativeElement.click();
+        this.updateOpen = false;
         this.getAll();
       });
     }

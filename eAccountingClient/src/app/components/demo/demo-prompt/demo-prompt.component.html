@@ -10,13 +10,13 @@
 
     <div class="demo-prompt__actions">
       <button type="button" class="demo-prompt__action demo-prompt__action--primary" (click)="contact()">
-        <i class="fas fa-arrow-up-right-from-square"></i>
+        <i class="fas fa-external-link-alt"></i>
         İletişime geç
       </button>
 
       @if (promptKind === 'ended') {
       <button type="button" class="demo-prompt__action" (click)="startFresh()" [disabled]="demo.starting()">
-        <i class="fas fa-rotate"></i>
+        <i class="fas fa-sync-alt"></i>
         Yeni oturum başlat
       </button>
       <button type="button" class="demo-prompt__action demo-prompt__action--quiet" (click)="leave()">

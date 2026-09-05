@@ -1,96 +1,44 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
-  <a routerLink="/" class="brand-link">
-    <img
-      src="/assets/logo.jpg"
-      alt="AdminLTE Logo"
-      class="brand-image elevation-3"
-      style="opacity: 0.8"
-    />
-    <span class="brand-text font-weight-light">AK e-Accounting</span>
+<aside class="ak-sidebar" [class.is-open]="open">
+  <a routerLink="/" class="ak-brand" (click)="navigated.emit()">
+    <img src="assets/ak-logo.png" alt="AK" class="ak-brand__mark" />
+    <span class="ak-brand__text">AK <span>e-Muhasebe</span></span>
   </a>
 
-  <div class="sidebar">
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-      <div class="image">
-        <img
-          src="https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png"
-          class="img-circle elevation-2"
-          alt="User Image"
-          style="background-color: white"
-        />
-      </div>
-      <div class="info">
-        <a href="#" class="d-block">{{ auth.user.name }}</a>
+  <div class="ak-sidebar__user">
+    <div class="ak-avatar">{{ initials }}</div>
+    <div style="min-width: 0">
+      <div class="ak-sidebar__user-name">{{ auth.user.name }}</div>
+      <div class="ak-sidebar__user-role">
+        {{ auth.user.isAdmin ? "Yönetici" : "Kullanıcı" }}
       </div>
     </div>
-
-    <!-- SidebarSearch Form -->
-    <div class="form-inline">
-      <div class="input-group">
-        <input
-          class="form-control form-control-sidebar"
-          [(ngModel)]="search"
-          type="search"
-          placeholder="Search"
-        />
-        <div class="input-group-append">
-          <button class="btn btn-sidebar">
-            <i class="fas fa-search fa-fw"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <nav class="mt-2">
-      <ul
-        class="nav nav-pills nav-sidebar flex-column"
-        data-widget="treeview"
-        role="menu"
-        data-accordion="false"
-      >
-        @for(menu of menus |menu:search; track menu){ @if(menu.isTitle){
-        <li class="nav-header">{{ menu.name }}</li>
-        }@else if(menu.subMenus.length > 0){
-        <li class="nav-item">
-          <a class="nav-link">
-            <i class="nav-icon {{ menu.icon }}"></i>
-            <p>
-              {{ menu.name }}
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
-          <ul class="nav nav-treeview">
-            @for(subMenu of menu.subMenus; track subMenu){
-            <li class="nav-item">
-              <a
-                [routerLink]="subMenu.url"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: true }"
-                class="nav-link"
-              >
-                <i class="{{ subMenu.icon }} me-2"></i>
-                <p>{{ subMenu.name }}</p>
-              </a>
-            </li>
-            }
-          </ul>
-        </li>
-        }@else {
-        <li class="nav-item">
-          <a
-            [routerLink]="menu.url"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="nav-link"
-          >
-            <i class="nav-icon {{ menu.icon }}"></i>
-            <p>
-              {{ menu.name }}
-            </p>
-          </a>
-        </li>
-        } }
-      </ul>
-    </nav>
   </div>
+
+  <div class="ak-sidebar__search">
+    <input
+      [(ngModel)]="search"
+      type="search"
+      class="ak-input"
+      placeholder="Menüde ara"
+    />
+  </div>
+
+  <nav class="ak-nav">
+    @for(menu of menus | menu: search; track menu.name){ @if(menu.isTitle){
+    <div class="ak-nav__title">{{ menu.name }}</div>
+    }@else {
+    <a
+      [routerLink]="menu.url"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: menu.url === '/' }"
+      class="ak-nav__link"
+      (click)="navigated.emit()"
+    >
+      <i class="{{ menu.icon }}"></i>
+      <span>{{ menu.name }}</span>
+    </a>
+    } }@empty {
+    <div class="ak-nav__empty">Eşleşen menü yok.</div>
+    }
+  </nav>
 </aside>

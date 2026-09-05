@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { BankModel } from '../../models/bank.model';
 import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
@@ -29,12 +29,8 @@ export class BankDetailsComponent {
 
   search: string = '';
 
-  @ViewChild('createModalCloseBtn') createModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
-  @ViewChild('updateModalCloseBtn') updateModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
+  createOpen = false;
+  updateOpen = false;
 
   createModel: BankDetailModel = new BankDetailModel();
   updateModel: BankDetailModel = new BankDetailModel();
@@ -62,6 +58,18 @@ export class BankDetailsComponent {
       this.getAll();
       this.getAllBanks();
     });
+  }
+
+  openCreate() {
+    this.createModel = new BankDetailModel();
+    this.createModel.date = this.format(new Date());
+    this.createModel.bankId = this.bankId;
+    this.createOpen = true;
+  }
+
+  openUpdate(model: BankDetailModel) {
+    this.get(model);
+    this.updateOpen = true;
   }
 
   getAllBanks() {
@@ -98,7 +106,7 @@ export class BankDetailsComponent {
         this.createModel = new BankDetailModel();
         this.createModel.date = this.format(new Date());
         this.createModel.bankId = this.bankId;
-        this.createModalCloseBtn?.nativeElement.click();
+        this.createOpen = false;
         this.getAll();
       });
     }
@@ -106,8 +114,8 @@ export class BankDetailsComponent {
 
   deleteById(model: BankDetailModel) {
     this.swal.callSwal(
-      'Veriyi Sil?',
-      `${model.date} - ${model.description} verisini silmek istiyor musunuz?`,
+      'Hareketi sil',
+      `${model.date} - ${model.description} kaydını silmek istediğinize emin misiniz?`,
       () => {
         this.http.post<string>(
           'BankDetails/DeleteById',
@@ -132,7 +140,7 @@ export class BankDetailsComponent {
     if (form.valid) {
       this.http.post<string>('BankDetails/Update', this.updateModel, (res) => {
         this.swal.callToast(res, 'info');
-        this.updateModalCloseBtn?.nativeElement.click();
+        this.updateOpen = false;
         this.getAll();
       });
     }

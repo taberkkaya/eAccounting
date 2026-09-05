@@ -1,56 +1,78 @@
 <app-blank pageName="Ana Sayfa">
-  <app-section sectionTitle="e-Accounting">
-    <p class="home-intro">
-      Çok kiracılı (multi-tenant) bir ön muhasebe uygulaması. Her firmanın verisi
-      <strong>kendi veritabanında</strong> tutulur; oturum açan kullanıcının firması JWT
-      üzerinden çözülerek bağlantı çalışma zamanında kurulur.
-    </p>
-
-    <div class="home-stack">
-      @for(item of stack; track item){
-      <span class="home-stack__chip">{{ item }}</span>
-      }
-    </div>
-
-    <div class="home-cards">
-      <a class="home-card" routerLink="/cash-registers">
-        <i class="fa-solid fa-cash-register home-card__icon"></i>
-        <span class="home-card__title">Kasalar</span>
-        <span class="home-card__text">
-          TL, USD ve EUR kasaları; tahsilat, ödeme ve kasalar arası virman.
-        </span>
-      </a>
-
-      <a class="home-card" routerLink="/banks">
-        <i class="fa-solid fa-building-columns home-card__icon"></i>
-        <span class="home-card__title">Bankalar</span>
-        <span class="home-card__text">
-          IBAN bazlı banka hesapları, hesap hareketleri ve bakiye takibi.
-        </span>
-      </a>
-
-      <a class="home-card" routerLink="/companies">
-        <i class="fa-solid fa-city home-card__icon"></i>
-        <span class="home-card__title">Firmalar</span>
-        <span class="home-card__text">
-          Firma tanımları ve her firma için ayrı veritabanı migrasyonu.
-        </span>
-      </a>
-    </div>
-
-    @if(demo.status(); as status){
-    <div class="home-demo">
-      <h4 class="home-demo__title">Demo oturumundasınız</h4>
-      <p class="home-demo__text">
-        Size özel, izole bir veritabanı ayrıldı. Kayıt ekleyip silebilirsiniz; bu oturum
-        için <strong>{{ demo.writesLeft() }} işlem hakkınız</strong> kaldı. Oturum
-        bittiğinde veriler otomatik sıfırlanır ve sandbox bir sonraki ziyaretçiye hazırlanır.
+  <div class="home-hero">
+    <div class="home-hero__body">
+      <span class="ak-tag ak-tag--acid">Çok kiracılı mimari</span>
+      <h2 class="home-hero__title">
+        Ön muhasebe, <span class="ak-acid">firma başına ayrı veritabanı</span>
+        ile
+      </h2>
+      <p class="home-hero__text">
+        Her firmanın verisi kendi veritabanında tutulur. Oturum açan kullanıcının
+        firması JWT üzerinden çözülür ve veritabanı bağlantısı çalışma zamanında
+        kurulur — uygulama tek, veri katmanı firma sayısı kadardır.
       </p>
-      <button type="button" class="btn btn-primary btn-sm" (click)="contact()">
-        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i>
-        Proje hakkında iletişime geç
-      </button>
+
+      <div class="home-stack">
+        @for(item of stack; track item){
+        <span class="home-stack__chip">{{ item }}</span>
+        }
+      </div>
     </div>
+  </div>
+
+  <div class="home-cards">
+    <a class="home-card" routerLink="/cash-registers">
+      <i class="fas fa-cash-register home-card__icon"></i>
+      <span class="home-card__title">Kasalar</span>
+      <span class="home-card__text">
+        TL, USD ve EUR kasaları; tahsilat, ödeme ve kasalar arası virman.
+      </span>
+      <span class="home-card__go">
+        Aç <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
+
+    <a class="home-card" routerLink="/banks">
+      <i class="fas fa-university home-card__icon"></i>
+      <span class="home-card__title">Bankalar</span>
+      <span class="home-card__text">
+        IBAN bazlı banka hesapları, hesap hareketleri ve bakiye takibi.
+      </span>
+      <span class="home-card__go">
+        Aç <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
+
+    @if(auth.user.isAdmin){
+    <a class="home-card" routerLink="/companies">
+      <i class="fas fa-city home-card__icon"></i>
+      <span class="home-card__title">Firmalar</span>
+      <span class="home-card__text">
+        Firma tanımları ve her firma için ayrı veritabanı migrasyonu.
+      </span>
+      <span class="home-card__go">
+        Aç <i class="fas fa-arrow-right"></i>
+      </span>
+    </a>
     }
-  </app-section>
+  </div>
+
+  @if(demo.status(); as status){
+  <div class="home-demo">
+    <div class="home-demo__head">
+      <i class="fas fa-flask"></i>
+      <h3 class="home-demo__title">Demo oturumundasınız</h3>
+    </div>
+    <p class="home-demo__text">
+      Size özel, izole bir veritabanı ayrıldı. Kayıt ekleyip silebilirsiniz; bu
+      oturum için <strong class="ak-acid">{{ demo.writesLeft() }} işlem</strong>
+      hakkınız kaldı. Oturum bittiğinde veriler sıfırlanır ve sandbox bir sonraki
+      ziyaretçiye hazırlanır.
+    </p>
+    <button type="button" class="ak-btn ak-btn--primary" (click)="contact()">
+      <i class="fas fa-external-link-alt"></i>
+      Proje hakkında iletişime geç
+    </button>
+  </div>
+  }
 </app-blank>

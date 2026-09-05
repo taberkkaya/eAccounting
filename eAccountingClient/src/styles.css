@@ -1,11 +1,869 @@
-a{
-    cursor: pointer;
+/* ============================================================================
+   AK e-Muhasebe — tasarım sistemi
+   Renkler, tipografi ve keskin köşeli çizgi dili ataberkkaya.com ile aynı.
+   ========================================================================= */
+
+:root {
+  --ak-black: #050505;
+  --ak-surface: #0d0d0d;
+  --ak-surface-2: #141414;
+  --ak-surface-3: #1c1c1c;
+  --ak-line: #292929;
+  --ak-line-soft: #1f1f1f;
+  --ak-paper: #f3f1eb;
+  --ak-gray: #a5a5a5;
+  --ak-muted: #6f6f6f;
+  --ak-acid: #d8ff36;
+  --ak-acid-dim: #b8dd1f;
+  --ak-danger: #ff5c5c;
+  --ak-success: #4ade80;
+  --ak-warning: #fbbf24;
+
+  --ak-sidebar-width: 250px;
+  --ak-topbar-height: 60px;
+
+  --ak-font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ak-font-display: "Manrope", var(--ak-font-body);
 }
 
-.me-1{
-    margin-right: 4px;
+/* --- temel ---------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.me-2{
-    margin-right: 7px;
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ak-black);
+  color: var(--ak-paper);
+  font-family: var(--ak-font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  font-family: var(--ak-font-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 0.9rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: var(--ak-acid);
+  color: var(--ak-black);
+}
+
+/* İnce, koyu kaydırma çubuğu — açık gri varsayılan bu temada göze batıyor. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ak-line) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--ak-line);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* --- uygulama iskeleti ---------------------------------------------------- */
+
+.ak-shell {
+  display: grid;
+  grid-template-columns: var(--ak-sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.ak-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ak-content {
+  flex: 1;
+  padding: 26px 30px 40px;
+}
+
+/* --- kenar çubuğu --------------------------------------------------------- */
+
+.ak-sidebar {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.ak-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: var(--ak-topbar-height);
+  padding: 0 18px;
+  border-bottom: 1px solid var(--ak-line);
+  flex: none;
+}
+
+.ak-brand__mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+
+.ak-brand__text {
+  font-family: var(--ak-font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ak-brand__text span {
+  color: var(--ak-acid);
+}
+
+.ak-sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--ak-line-soft);
+  flex: none;
+}
+
+.ak-avatar {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--ak-line);
+  color: var(--ak-acid);
+  font-family: var(--ak-font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ak-sidebar__user-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ak-sidebar__user-role {
+  color: var(--ak-muted);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ak-sidebar__search {
+  padding: 14px 18px;
+  flex: none;
+}
+
+.ak-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 12px 20px;
+}
+
+.ak-nav__title {
+  padding: 18px 6px 7px;
+  color: var(--ak-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ak-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  color: var(--ak-gray);
+  font-size: 0.88rem;
+  font-weight: 500;
+  border-left: 2px solid transparent;
+  transition: color 0.12s, background 0.12s;
+}
+
+.ak-nav__link i {
+  width: 17px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.ak-nav__link:hover {
+  background: var(--ak-surface-2);
+  color: var(--ak-paper);
+}
+
+.ak-nav__link.active {
+  background: var(--ak-surface-2);
+  border-left-color: var(--ak-acid);
+  color: var(--ak-paper);
+  font-weight: 600;
+}
+
+.ak-nav__link.active i {
+  color: var(--ak-acid);
+}
+
+.ak-nav__empty {
+  padding: 14px 12px;
+  color: var(--ak-muted);
+  font-size: 0.8rem;
+}
+
+/* --- üst çubuk ------------------------------------------------------------ */
+
+.ak-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: var(--ak-topbar-height);
+  padding: 0 22px 0 30px;
+  border-bottom: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.ak-topbar__spacer {
+  flex: 1;
+}
+
+.ak-topbar__toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--ak-line);
+  color: var(--ak-paper);
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
+
+/* --- sayfa başlığı -------------------------------------------------------- */
+
+.ak-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.ak-page-title {
+  font-size: 1.7rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.ak-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ak-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ak-breadcrumb a:hover {
+  color: var(--ak-acid);
+}
+
+.ak-breadcrumb__sep {
+  opacity: 0.45;
+}
+
+/* --- panel ---------------------------------------------------------------- */
+
+.ak-panel {
+  border: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+}
+
+.ak-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.ak-panel__title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ak-gray);
+}
+
+.ak-panel__body {
+  padding: 20px;
+}
+
+.ak-panel__body--flush {
+  padding: 0;
+}
+
+/* --- araç çubuğu ---------------------------------------------------------- */
+
+.ak-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.ak-toolbar__spacer {
+  flex: 1;
+}
+
+/* --- butonlar ------------------------------------------------------------- */
+
+.ak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border: 1px solid var(--ak-line);
+  background: transparent;
+  color: var(--ak-paper);
+  font-family: var(--ak-font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.ak-btn:hover:not(:disabled) {
+  background: var(--ak-surface-3);
+  border-color: #3a3a3a;
+}
+
+.ak-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ak-btn--primary {
+  background: var(--ak-acid);
+  border-color: var(--ak-acid);
+  color: var(--ak-black);
+  font-weight: 700;
+}
+
+.ak-btn--primary:hover:not(:disabled) {
+  background: #c7ee2a;
+  border-color: #c7ee2a;
+  color: var(--ak-black);
+}
+
+.ak-btn--danger {
+  border-color: #4a2222;
+  color: var(--ak-danger);
+}
+
+.ak-btn--danger:hover:not(:disabled) {
+  background: #2a1414;
+  border-color: #6a2c2c;
+}
+
+.ak-btn--ghost {
+  border-color: transparent;
+  color: var(--ak-gray);
+}
+
+.ak-btn--ghost:hover:not(:disabled) {
+  background: var(--ak-surface-2);
+  color: var(--ak-paper);
+}
+
+.ak-btn--sm {
+  padding: 6px 10px;
+  font-size: 0.74rem;
+}
+
+.ak-btn--icon {
+  padding: 6px 9px;
+}
+
+.ak-btn--block {
+  width: 100%;
+}
+
+/* --- form ----------------------------------------------------------------- */
+
+.ak-field {
+  margin-bottom: 15px;
+}
+
+.ak-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ak-gray);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ak-input,
+.ak-select,
+.ak-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--ak-line);
+  background: var(--ak-black);
+  color: var(--ak-paper);
+  font-family: var(--ak-font-body);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  transition: border-color 0.12s;
+}
+
+.ak-input::placeholder,
+.ak-textarea::placeholder {
+  color: var(--ak-muted);
+}
+
+.ak-input:focus,
+.ak-select:focus,
+.ak-textarea:focus {
+  outline: none;
+  border-color: var(--ak-acid);
+}
+
+.ak-select {
+  appearance: none;
+  padding-right: 32px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ak-gray) 50%),
+    linear-gradient(135deg, var(--ak-gray) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 52%, calc(100% - 11px) 52%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.ak-select option {
+  background: var(--ak-surface-2);
+  color: var(--ak-paper);
+}
+
+/* Tarih girdisinin takvim ikonu koyu zeminde görünmez kalıyor. */
+.ak-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+/* form-validate-angular geçersiz alanlara is-invalid ekliyor. */
+.ak-input.is-invalid,
+.ak-select.is-invalid,
+.ak-textarea.is-invalid {
+  border-color: var(--ak-danger);
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 5px;
+  color: var(--ak-danger);
+  font-size: 0.74rem;
+}
+
+.ak-form-grid {
+  display: grid;
+  gap: 0 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ak-form-grid--full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+  .ak-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- tablo ---------------------------------------------------------------- */
+
+.ak-table-wrap {
+  overflow-x: auto;
+}
+
+.ak-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.ak-table th {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--ak-line);
+  color: var(--ak-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ak-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--ak-line-soft);
+  vertical-align: middle;
+}
+
+.ak-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ak-table tbody tr:hover td {
+  background: var(--ak-surface-2);
+}
+
+.ak-table__num {
+  color: var(--ak-muted);
+  font-variant-numeric: tabular-nums;
+  width: 1%;
+}
+
+.ak-table__amount {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ak-table__actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.ak-table th:last-child,
+.ak-table td:last-child {
+  text-align: right;
+}
+
+.ak-table__strong {
+  font-weight: 600;
+}
+
+.ak-positive {
+  color: var(--ak-success);
+}
+
+.ak-negative {
+  color: var(--ak-danger);
+}
+
+/* --- rozet / etiket ------------------------------------------------------- */
+
+.ak-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--ak-line);
+  background: var(--ak-surface-2);
+  color: var(--ak-gray);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ak-tag--acid {
+  border-color: rgba(216, 255, 54, 0.35);
+  background: rgba(216, 255, 54, 0.08);
+  color: var(--ak-acid);
+}
+
+.ak-tag--muted {
+  color: var(--ak-muted);
+}
+
+/* --- boş durum ------------------------------------------------------------ */
+
+.ak-empty {
+  padding: 52px 20px;
+  text-align: center;
+  color: var(--ak-muted);
+}
+
+.ak-empty i {
+  font-size: 1.6rem;
+  opacity: 0.4;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.ak-empty__text {
+  font-size: 0.88rem;
+}
+
+/* --- modal ---------------------------------------------------------------- */
+
+.ak-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+}
+
+.ak-modal__box {
+  width: 100%;
+  max-width: 520px;
+  border: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+  animation: ak-modal-in 0.14s ease-out;
+}
+
+.ak-modal__box--wide {
+  max-width: 720px;
+}
+
+@keyframes ak-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.ak-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.ak-modal__title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ak-modal__body {
+  padding: 20px;
+}
+
+.ak-modal__foot {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 16px 20px;
+  border-top: 1px solid var(--ak-line);
+}
+
+/* --- alt bilgi ------------------------------------------------------------ */
+
+.ak-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 30px;
+  border-top: 1px solid var(--ak-line);
+  color: var(--ak-muted);
+  font-size: 0.76rem;
+}
+
+.ak-footer a:hover {
+  color: var(--ak-acid);
+}
+
+/* --- yardımcılar ---------------------------------------------------------- */
+
+.ak-muted {
+  color: var(--ak-muted);
+}
+
+.ak-gray {
+  color: var(--ak-gray);
+}
+
+.ak-acid {
+  color: var(--ak-acid);
+}
+
+.ak-spin {
+  animation: ak-spin 0.9s linear infinite;
+}
+
+@keyframes ak-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- duyarlılık ----------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .ak-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ak-sidebar {
+    position: fixed;
+    z-index: 60;
+    width: var(--ak-sidebar-width);
+    transform: translateX(-100%);
+    transition: transform 0.18s ease-out;
+  }
+
+  .ak-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .ak-topbar__toggle {
+    display: grid;
+    place-items: center;
+  }
+
+  .ak-topbar {
+    padding-left: 16px;
+  }
+
+  .ak-content {
+    padding: 20px 16px 32px;
+  }
+
+  .ak-footer {
+    padding: 16px;
+  }
+}
+
+/* --- flexi-toast koyu temaya uyarlaması ----------------------------------- */
+
+.flexi-toast-container .flexi-toast,
+.flexi-swal-content {
+  border-radius: 0 !important;
+}
+
+/* --- onay kutusu ---------------------------------------------------------- */
+
+.ak-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ak-check input {
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  flex: none;
+  margin: 0;
+  border: 1px solid var(--ak-line);
+  background: var(--ak-black);
+  cursor: pointer;
+  position: relative;
+}
+
+.ak-check input:checked {
+  background: var(--ak-acid);
+  border-color: var(--ak-acid);
+}
+
+.ak-check input:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid var(--ak-black);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.ak-check input:focus-visible {
+  outline: 1px solid var(--ak-acid);
+  outline-offset: 2px;
+}
+
+.ak-check span {
+  font-size: 0.86rem;
+}
+
+/* Çoklu seçim listesi, normal select'in ok işaretine ihtiyaç duymaz. */
+select.ak-select[multiple] {
+  height: auto;
+  min-height: 120px;
+  padding: 8px;
+  background-image: none;
+}
+
+select.ak-select[multiple] option {
+  padding: 5px 8px;
 }

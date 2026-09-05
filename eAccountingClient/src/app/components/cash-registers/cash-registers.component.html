@@ -1,47 +1,48 @@
-<app-blank pageName="Cash Registers" [routes]="['Entries', 'Cash Registers']">
-  <app-section sectionTitle="Cash Register List">
-    <div class="form-group row">
-      <div class="col-9">
-        <button
-          class="btn btn-dark"
-          data-toggle="modal"
-          data-target="#createModal"
-        >
-          <i class="fa-solid fa-plus me-1"></i>
-          Add Cash Register
-        </button>
-      </div>
+<app-blank pageName="Kasalar" [routes]="['Kayıtlar', 'Kasalar']">
+  <app-section>
+    <div class="ak-toolbar">
+      <button
+        type="button"
+        class="ak-btn ak-btn--primary"
+        (click)="openCreate()"
+      >
+        <i class="fas fa-plus"></i>
+        Kasa Ekle
+      </button>
 
-      <div class="col-3">
-        <input
-          [(ngModel)]="search"
-          type="search"
-          class="form-control"
-          placeholder="search"
-        />
-      </div>
+      <div class="ak-toolbar__spacer"></div>
+
+      <input
+        [(ngModel)]="search"
+        type="search"
+        class="ak-input"
+        style="width: 240px"
+        placeholder="Kasa adı ara"
+      />
     </div>
 
-    <div class="form-group mt-2">
-      <table class="table table-hover">
+    <div class="ak-table-wrap">
+      <table class="ak-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Currency Type</th>
-            <th>Deposit Amount</th>
-            <th>Withdrawal Amount</th>
-            <th>Balance Amount</th>
-            <th>Operations</th>
+            <th class="ak-table__num">#</th>
+            <th>Kasa</th>
+            <th>Para Birimi</th>
+            <th>Giren</th>
+            <th>Çıkan</th>
+            <th>Bakiye</th>
+            <th>İşlemler</th>
           </tr>
         </thead>
         <tbody>
-          @for(data of cashRegisters | cashRegister: search ;track data){
+          @for(data of cashRegisters | cashRegister : search; track data.id){
           <tr>
-            <td>{{ $index + 1 }}</td>
-            <td>{{ data.name }}</td>
-            <td>{{ data.currencyType.name }}</td>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td class="ak-table__strong">{{ data.name }}</td>
             <td>
+              <span class="ak-tag">{{ data.currencyType.name }}</span>
+            </td>
+            <td class="ak-table__amount">
               {{
                 data.depositAmount
                   | trCurrency
@@ -49,7 +50,7 @@
                     : true
               }}
             </td>
-            <td>
+            <td class="ak-table__amount">
               {{
                 data.withdrawalAmount
                   | trCurrency
@@ -57,43 +58,56 @@
                     : true
               }}
             </td>
-            <td>
-              <span
-                [ngClass]="
-                  data.depositAmount > data.withdrawalAmount
-                    ? 'text-success'
-                    : 'text-danger'
-                "
-              >
-                {{
-                  data.depositAmount - data.withdrawalAmount
-                    | trCurrency
-                      : changeCurrencyNameToSymbol(data.currencyType.name)
-                      : true
-                }}
-              </span>
+            <td
+              class="ak-table__amount"
+              [class.ak-positive]="data.depositAmount >= data.withdrawalAmount"
+              [class.ak-negative]="data.depositAmount < data.withdrawalAmount"
+            >
+              {{
+                data.depositAmount - data.withdrawalAmount
+                  | trCurrency
+                    : changeCurrencyNameToSymbol(data.currencyType.name)
+                    : true
+              }}
             </td>
             <td>
-              <button
-                class="btn btn-dark btn-sm me-1"
-                routerLink="/cash-registers/details/{{ data.id }}"
-              >
-                <i class="fa-regular fa-file-lines me-1"></i>Details
-              </button>
-              <button
-                data-toggle="modal"
-                data-target="#updateModal"
-                (click)="get(data)"
-                class="btn btn-outline-primary btn-sm me-1"
-              >
-                <i class="fa-solid fa-edit"></i>
-              </button>
-              <button
-                (click)="deleteById(data)"
-                class="btn btn-outline-danger btn-sm"
-              >
-                <i class="fa-solid fa-trash"></i>
-              </button>
+              <div class="ak-table__actions">
+                <a
+                  class="ak-btn ak-btn--sm"
+                  routerLink="/cash-registers/details/{{ data.id }}"
+                >
+                  <i class="far fa-file-alt"></i>
+                  Hareketler
+                </a>
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon"
+                  (click)="openUpdate(data)"
+                  title="Düzenle"
+                >
+                  <i class="fas fa-pen"></i>
+                </button>
+                <button
+                  type="button"
+                  class="ak-btn ak-btn--sm ak-btn--icon ak-btn--danger"
+                  (click)="deleteById(data)"
+                  title="Sil"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="7">
+              <div class="ak-empty">
+                <i class="fas fa-cash-register"></i>
+                <div class="ak-empty__text">
+                  @if(search){ Aramanızla eşleşen kasa bulunamadı. }@else {
+                  Henüz kasa eklenmemiş. }
+                </div>
+              </div>
             </td>
           </tr>
           }
@@ -103,115 +117,100 @@
   </app-section>
 </app-blank>
 
-<!-- Create Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Add Cash Register Form</h1>
-        <button
-          type="button"
-          #createModalCloseBtn
-          class="btn btn-outline-danger"
-          data-dismiss="modal"
-        >
-          <i class="fa-solid fa-x"></i>
-        </button>
+<!-- Kasa ekleme -->
+<app-modal [open]="createOpen" title="Yeni Kasa" (closed)="createOpen = false">
+  <form
+    formValidate
+    #createForm="ngForm"
+    autocomplete="off"
+    (ngSubmit)="create(createForm)"
+  >
+    <div class="ak-modal__body">
+      <div class="ak-field">
+        <label class="ak-label">Kasa Adı</label>
+        <input
+          type="text"
+          required
+          minlength="3"
+          [(ngModel)]="createModel.name"
+          class="ak-input"
+          name="name"
+        />
+        <div class="invalid-feedback"></div>
       </div>
-      <form
-        formValidate
-        #createForm="ngForm"
-        autocomplete="off"
-        (ngSubmit)="create(createForm)"
-      >
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="createModel.name"
-              class="form-control"
-              name="name"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-          <div class="form-group mt-2">
-            <label>Currency Type</label>
-            <select
-              class="form-control"
-              name="type"
-              [(ngModel)]="createModel.currencyTypeValue"
-            >
-              @for(type of currencyTypes; track type){
-              <option [value]="type.value">{{ type.name }}</option>
-              }
-            </select>
-            <div class="invalid-feedback"></div>
-          </div>
-        </div>
 
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-dark w-100">Kaydet</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Update Modal -->
-<div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Update Cash Register Form</h1>
-        <button
-          type="button"
-          #updateModalCloseBtn
-          class="btn btn-outline-danger"
-          data-dismiss="modal"
+      <div class="ak-field">
+        <label class="ak-label">Para Birimi</label>
+        <select
+          class="ak-select"
+          name="currencyTypeValue"
+          [(ngModel)]="createModel.currencyTypeValue"
+          required
         >
-          <i class="fa-solid fa-x"></i>
-        </button>
+          @for(currency of currencyTypes; track currency.value){
+          <option [value]="currency.value">{{ currency.name }}</option>
+          }
+        </select>
+        <div class="invalid-feedback"></div>
       </div>
-      <form
-        formValidate
-        #updateForm="ngForm"
-        autocomplete="off"
-        (ngSubmit)="update(updateForm)"
-      >
-        <div class="modal-body">
-          <div class="form-group">
-            <label>Name</label>
-            <input
-              type="text"
-              required
-              minlength="3"
-              [(ngModel)]="updateModel.name"
-              class="form-control"
-              name="updateName"
-            />
-            <div class="invalid-feedback"></div>
-          </div>
-          <div class="form-group mt-2">
-            <label>Currency Type</label>
-            <select
-              class="form-control"
-              name="updateCurrencyType"
-              [(ngModel)]="updateModel.currencyTypeValue"
-            >
-              @for(type of currencyTypes; track type){
-              <option [value]="type.value">{{ type.name }}</option>
-              }
-            </select>
-            <div class="invalid-feedback"></div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary w-100">Güncelle</button>
-        </div>
-      </form>
     </div>
-  </div>
-</div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="createOpen = false">
+        Vazgeç
+      </button>
+      <button type="submit" class="ak-btn ak-btn--primary">Kaydet</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Kasa düzenleme -->
+<app-modal
+  [open]="updateOpen"
+  title="Kasayı Düzenle"
+  (closed)="updateOpen = false"
+>
+  <form
+    formValidate
+    #updateForm="ngForm"
+    autocomplete="off"
+    (ngSubmit)="update(updateForm)"
+  >
+    <div class="ak-modal__body">
+      <div class="ak-field">
+        <label class="ak-label">Kasa Adı</label>
+        <input
+          type="text"
+          required
+          minlength="3"
+          [(ngModel)]="updateModel.name"
+          class="ak-input"
+          name="updateName"
+        />
+        <div class="invalid-feedback"></div>
+      </div>
+
+      <div class="ak-field">
+        <label class="ak-label">Para Birimi</label>
+        <select
+          class="ak-select"
+          name="updateCurrencyTypeValue"
+          [(ngModel)]="updateModel.currencyTypeValue"
+          required
+        >
+          @for(currency of currencyTypes; track currency.value){
+          <option [value]="currency.value">{{ currency.name }}</option>
+          }
+        </select>
+        <div class="invalid-feedback"></div>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="updateOpen = false">
+        Vazgeç
+      </button>
+      <button type="submit" class="ak-btn ak-btn--primary">Güncelle</button>
+    </div>
+  </form>
+</app-modal>

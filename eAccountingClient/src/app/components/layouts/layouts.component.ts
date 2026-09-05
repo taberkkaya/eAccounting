@@ -1,9 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component';
 import { MainSidebarComponent } from './main-sidebar/main-sidebar.component';
 import { FooterComponent } from './footer/footer.component';
-import { ControlSidebarComponent } from './control-sidebar/control-sidebar.component';
 import { DemoPromptComponent } from '../demo/demo-prompt/demo-prompt.component';
 import { DemoService } from '../../services/demo.service';
 
@@ -15,7 +14,6 @@ import { DemoService } from '../../services/demo.service';
     NavbarComponent,
     MainSidebarComponent,
     FooterComponent,
-    ControlSidebarComponent,
     DemoPromptComponent,
   ],
   templateUrl: './layouts.component.html',
@@ -24,9 +22,19 @@ import { DemoService } from '../../services/demo.service';
 export class LayoutsComponent implements OnInit {
   private readonly demo = inject(DemoService);
 
+  /** Yalnızca dar ekranlarda anlamlı; geniş ekranda kenar çubuğu hep açık. */
+  readonly sidebarOpen = signal(false);
+
   ngOnInit(): void {
-    // A reload keeps the token, so the quota has to be picked back up from the API
-    // rather than assumed from what the banner last showed.
+    // Sayfa yenilenince token duruyor ama kota bilgisi gitmiş oluyor.
     this.demo.refreshStatus();
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update((open) => !open);
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen.set(false);
   }
 }

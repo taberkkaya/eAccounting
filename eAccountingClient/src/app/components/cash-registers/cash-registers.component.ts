@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { SharedModule } from '../../modules/shared.module';
 import { CashRegisterModel } from '../../models/cashRegister.model';
 import { SwalService } from '../../services/swal.service';
@@ -21,17 +21,23 @@ export class CashRegistersComponent {
 
   currencyTypes = CurrencyTypes;
 
-  @ViewChild('createModalCloseBtn') createModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
-  @ViewChild('updateModalCloseBtn') updateModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
+  createOpen = false;
+  updateOpen = false;
 
   createModel: CashRegisterModel = new CashRegisterModel();
   updateModel: CashRegisterModel = new CashRegisterModel();
 
   constructor(private http: HttpService, private swal: SwalService) {}
+
+  openCreate() {
+    this.createModel = new CashRegisterModel();
+    this.createOpen = true;
+  }
+
+  openUpdate(model: CashRegisterModel) {
+    this.get(model);
+    this.updateOpen = true;
+  }
 
   ngOnInit(): void {
     this.getAll();
@@ -51,7 +57,7 @@ export class CashRegistersComponent {
         (res) => {
           this.swal.callToast(res);
           this.createModel = new CashRegisterModel();
-          this.createModalCloseBtn?.nativeElement.click();
+          this.createOpen = false;
           this.getAll();
         }
       );
@@ -60,8 +66,8 @@ export class CashRegistersComponent {
 
   deleteById(model: CashRegisterModel) {
     this.swal.callSwal(
-      'Veriyi Sil?',
-      `${model.name} verisini silmek istiyor musunuz?`,
+      'Kasayı sil',
+      `${model.name} kaydını silmek istediğinize emin misiniz?`,
       () => {
         this.http.post<string>(
           'CashRegisters/DeleteById',
@@ -87,7 +93,7 @@ export class CashRegistersComponent {
         this.updateModel,
         (res) => {
           this.swal.callToast(res, 'info');
-          this.updateModalCloseBtn?.nativeElement.click();
+          this.updateOpen = false;
           this.getAll();
         }
       );

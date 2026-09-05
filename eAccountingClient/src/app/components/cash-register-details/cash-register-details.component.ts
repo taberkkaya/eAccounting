@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { CashRegisterModel } from '../../models/cashRegister.model';
 import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
@@ -29,12 +29,8 @@ export class CashRegisterDetailsComponent {
 
   search: string = '';
 
-  @ViewChild('createModalCloseBtn') createModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
-  @ViewChild('updateModalCloseBtn') updateModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
+  createOpen = false;
+  updateOpen = false;
 
   createModel: CashRegisterDetailModel = new CashRegisterDetailModel();
   updateModel: CashRegisterDetailModel = new CashRegisterDetailModel();
@@ -61,6 +57,18 @@ export class CashRegisterDetailsComponent {
       this.getAll();
       this.getAllCashRegisters();
     });
+  }
+
+  openCreate() {
+    this.createModel = new CashRegisterDetailModel();
+    this.createModel.date = this.date.transform(new Date(), 'yyyy-MM-dd') ?? '';
+    this.createModel.cashRegisterId = this.cashRegisterId;
+    this.createOpen = true;
+  }
+
+  openUpdate(model: CashRegisterDetailModel) {
+    this.get(model);
+    this.updateOpen = true;
   }
 
   getAllCashRegisters() {
@@ -101,7 +109,7 @@ export class CashRegisterDetailsComponent {
           this.createModel.date =
             this.date.transform(new Date(), 'yyyy-MM-dd') ?? '';
           this.createModel.cashRegisterId = this.cashRegisterId;
-          this.createModalCloseBtn?.nativeElement.click();
+          this.createOpen = false;
           this.getAll();
         }
       );
@@ -110,8 +118,8 @@ export class CashRegisterDetailsComponent {
 
   deleteById(model: CashRegisterDetailModel) {
     this.swal.callSwal(
-      'Veriyi Sil?',
-      `${model.date} - ${model.description} verisini silmek istiyor musunuz?`,
+      'Hareketi sil',
+      `${model.date} - ${model.description} kaydını silmek istediğinize emin misiniz?`,
       () => {
         this.http.post<string>(
           'CashRegisterDetails/DeleteById',
@@ -139,7 +147,7 @@ export class CashRegisterDetailsComponent {
         this.updateModel,
         (res) => {
           this.swal.callToast(res, 'info');
-          this.updateModalCloseBtn?.nativeElement.click();
+          this.updateOpen = false;
           this.getAll();
         }
       );

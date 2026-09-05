@@ -1,124 +1,134 @@
-<div class="hold-transition login-div">
-  <div class="row login-row">
-    <div class="col-md-8 login-part-1">
-      <img
-        src="/assets/logo.jpg"
-        style="width: 100%; height: 100%; object-fit: cover"
-      />
-    </div>
-    <div class="col-md-4 login-part-2">
-      <h1 class="text-center"><b>AK </b>e-Accounting</h1>
+<div class="login">
+  <!-- Marka tarafı -->
+  <section class="login__brand">
+    <div class="login__brand-inner">
+      <img src="assets/ak-logo.png" alt="AK" class="login__logo" />
 
-      <div class="demo-cta">
-        <p class="demo-cta__lead">
-          Ön muhasebe uygulamasını kendi izole veritabanınızda deneyin. Kasa ve banka
-          kayıtlarını ekleyip silebilir, hareket girebilirsiniz.
+      <h1 class="login__headline">
+        AK <span class="ak-acid">e-Muhasebe</span>
+      </h1>
+
+      <p class="login__lead">
+        Çok kiracılı ön muhasebe uygulaması. Her firmanın verisi kendi
+        veritabanında tutulur; kasa ve banka hareketleri tek arayüzden yönetilir.
+      </p>
+
+      <ul class="login__points">
+        <li><i class="fas fa-check"></i> Firma başına ayrı veritabanı</li>
+        <li><i class="fas fa-check"></i> Kasa ve banka hareketleri, virman</li>
+        <li><i class="fas fa-check"></i> TL, USD ve EUR desteği</li>
+      </ul>
+
+      <a
+        class="login__site"
+        href="https://ataberkkaya.com"
+        target="_blank"
+        rel="noopener"
+      >
+        ataberkkaya.com
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Form tarafı -->
+  <section class="login__panel">
+    <div class="login__form">
+      <div class="login__demo">
+        <span class="ak-tag ak-tag--acid">Demo</span>
+        <p class="login__demo-text">
+          Uygulamayı kendi izole veritabanınızda deneyin. Kasa ve banka kayıtları
+          ekleyip silebilir, hareket girebilirsiniz.
         </p>
 
         @if(!isDemoLoading){
-        <button (click)="startDemo()" class="btn btn-primary btn-block demo-cta__button">
-          <i class="fa-solid fa-play me-1"></i>
+        <button
+          type="button"
+          class="ak-btn ak-btn--primary ak-btn--block"
+          (click)="startDemo()"
+        >
+          <i class="fas fa-play"></i>
           Demoyu Başlat
         </button>
         }@else {
-        <button class="btn btn-primary btn-block" type="button" disabled>
-          <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-          <span role="status">Demo hazırlanıyor...</span>
+        <button type="button" class="ak-btn ak-btn--primary ak-btn--block" disabled>
+          <i class="fas fa-circle-notch ak-spin"></i>
+          Demo hazırlanıyor...
         </button>
         }
 
-        <p class="demo-cta__note">
+        <p class="login__demo-note">
           Örnek verilerle açılır, oturum sonunda otomatik sıfırlanır.
         </p>
       </div>
 
-      <div class="demo-cta__divider"><span>veya hesabınızla girin</span></div>
+      <div class="login__divider"><span>veya hesabınızla girin</span></div>
 
-      <div class="input-group mb-3">
-        <input
-          [(ngModel)]="model.userNameOrEmail"
-          type="email"
-          class="form-control"
-          placeholder="Email"
-        />
-        <div class="input-group-append">
-          <div class="input-group-text">
-            <span class="fas fa-envelope"></span>
-          </div>
+      <form autocomplete="off" (ngSubmit)="signIn()">
+        <div class="ak-field">
+          <label class="ak-label">Kullanıcı Adı veya E-posta</label>
+          <input
+            [(ngModel)]="model.userNameOrEmail"
+            name="userNameOrEmail"
+            type="text"
+            class="ak-input"
+            placeholder="ornek@eposta.com"
+          />
         </div>
-      </div>
-      <div class="input-group mb-3">
-        <input
-          [(ngModel)]="model.password"
-          type="password"
-          class="form-control"
-          placeholder="Password"
-        />
-        <div class="input-group-append">
-          <div class="input-group-text">
-            <span class="fas fa-lock"></span>
-          </div>
-        </div>
-      </div>
 
-      @if(!isLoading){
-      <button (click)="signIn()" class="btn btn-dark btn-block">
-        <i class="fa-solid fa-lock me-1"></i>
-        Giriş Yap
+        <div class="ak-field">
+          <label class="ak-label">Parola</label>
+          <input
+            [(ngModel)]="model.password"
+            name="password"
+            type="password"
+            class="ak-input"
+            placeholder="••••••••"
+          />
+        </div>
+
+        @if(!isLoading){
+        <button type="submit" class="ak-btn ak-btn--block">
+          <i class="fas fa-sign-in-alt"></i>
+          Giriş Yap
+        </button>
+        }@else {
+        <button type="button" class="ak-btn ak-btn--block" disabled>
+          <i class="fas fa-circle-notch ak-spin"></i>
+          Giriş yapılıyor...
+        </button>
+        }
+      </form>
+
+      <button
+        type="button"
+        class="ak-btn ak-btn--ghost ak-btn--sm login__link"
+        (click)="confirmMailOpen = true"
+      >
+        Onay mailini tekrar gönder
       </button>
-      <div style="float: right; margin-top: 5px">
-        <a data-toggle="modal" data-target="#sendConfirmEmailModal" href="#"
-          >Onay Mailini Gönder</a
-        >
-      </div>
-      }@else {
-      <button class="btn btn-dark" type="button" disabled>
-        <span
-          class="spinner-border spinner-border-sm me-1"
-          aria-hidden="true"
-        ></span>
-        <span role="status">Giriş yapılıyor...</span>
-      </button>
-      }
     </div>
-  </div>
+  </section>
 </div>
 
-<div
-  class="modal fade"
-  id="sendConfirmEmailModal"
-  tabindex="-1"
-  aria-hidden="true"
+<app-modal
+  [open]="confirmMailOpen"
+  title="Onay Maili Gönder"
+  (closed)="confirmMailOpen = false"
 >
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5">Onay Maili Gönder</h1>
-        <button
-          #sendConfirmEmailModalCloseBtn
-          type="button"
-          data-dismiss="modal"
-          aria-label="Close"
-          class="btn btn-outline-danger"
-        >
-          <i class="fa-solid fa-x"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="">Mail Adresi</label>
-          <input type="email" [(ngModel)]="email" class="form-control" />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button
-          (click)="sendConfirmEmail()"
-          type="button"
-          class="btn btn-primary"
-        >
-          Gönder
-        </button>
-      </div>
+  <div class="ak-modal__body">
+    <div class="ak-field">
+      <label class="ak-label">Mail Adresi</label>
+      <input type="email" [(ngModel)]="email" name="confirmEmail" class="ak-input" />
     </div>
   </div>
-</div>
+
+  <div class="ak-modal__foot">
+    <button type="button" class="ak-btn" (click)="confirmMailOpen = false">
+      Vazgeç
+    </button>
+    <button type="button" class="ak-btn ak-btn--primary" (click)="sendConfirmEmail()">
+      Gönder
+    </button>
+  </div>
+</app-modal>

@@ -3,7 +3,7 @@
   <span class="demo-banner__tag">DEMO</span>
 
   <span class="demo-banner__metric" title="Bu oturumda kalan işlem hakkı">
-    <i class="fas fa-pen-to-square"></i>
+    <i class="fas fa-edit"></i>
     {{ demo.writesLeft() }} işlem
   </span>
 
@@ -13,7 +13,7 @@
   </span>
 
   <button type="button" class="demo-banner__button" (click)="resetSandbox()" [disabled]="demo.starting()">
-    <i class="fas fa-rotate"></i> Sıfırla
+    <i class="fas fa-sync-alt"></i> Sıfırla
   </button>
 
   <button type="button" class="demo-banner__button demo-banner__button--accent" (click)="contact()">

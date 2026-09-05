@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { UserModel } from '../../models/user.model';
 import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
@@ -19,17 +19,23 @@ export class UsersComponent {
   companies: CompanyModel[] = [];
   search: string = '';
 
-  @ViewChild('createModalCloseBtn') createModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
-  @ViewChild('updateModalCloseBtn') updateModalCloseBtn:
-    | ElementRef<HTMLButtonElement>
-    | undefined;
+  createOpen = false;
+  updateOpen = false;
 
   createModel: UserModel = new UserModel();
   updateModel: UserModel = new UserModel();
 
   constructor(private http: HttpService, private swal: SwalService) {}
+
+  openCreate() {
+    this.createModel = new UserModel();
+    this.createOpen = true;
+  }
+
+  openUpdate(model: UserModel) {
+    this.get(model);
+    this.updateOpen = true;
+  }
 
   ngOnInit(): void {
     this.getAll();
@@ -53,7 +59,7 @@ export class UsersComponent {
       this.http.post<string>('Users/Create', this.createModel, (res) => {
         this.swal.callToast(res);
         this.createModel = new UserModel();
-        this.createModalCloseBtn?.nativeElement.click();
+        this.createOpen = false;
         this.getAll();
       });
     }
@@ -61,8 +67,8 @@ export class UsersComponent {
 
   deleteById(model: UserModel) {
     this.swal.callSwal(
-      'Veriyi Sil?',
-      `${model.userName} verisini silmek istiyor musunuz?`,
+      'Kullanıcıyı sil',
+      `${model.userName} kaydını silmek istediğinize emin misiniz?`,
       () => {
         this.http.post<string>('Users/DeleteById', { id: model.id }, (res) => {
           this.getAll();
@@ -85,7 +91,7 @@ export class UsersComponent {
 
       this.http.post<string>('Users/Update', this.updateModel, (res) => {
         this.swal.callToast(res, 'info');
-        this.updateModalCloseBtn?.nativeElement.click();
+        this.updateOpen = false;
         this.getAll();
       });
     }

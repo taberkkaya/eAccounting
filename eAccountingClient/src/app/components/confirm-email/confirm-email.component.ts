@@ -1,26 +1,54 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 
 @Component({
   selector: 'app-confirm-email',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   template: `
-    <div
-      style="height: 90vh; display: flex; align-items:center; justify-content:center; flex-direction:column"
-    >
-      <h1>{{ response }}</h1>
-      <a href="/login">Giriş sayfasına dönmek için tıklayın.</a>
+    <div class="confirm">
+      <img src="assets/ak-logo.png" alt="AK" class="confirm__logo" />
+      <h1 class="confirm__title">{{ response }}</h1>
+      <a routerLink="/login" class="ak-btn ak-btn--primary">
+        Giriş sayfasına dön
+      </a>
     </div>
   `,
+  styles: [
+    `
+      .confirm {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 24px;
+        text-align: center;
+      }
+
+      .confirm__logo {
+        width: 52px;
+        height: 52px;
+      }
+
+      .confirm__title {
+        max-width: 520px;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+        line-height: 1.3;
+      }
+    `,
+  ],
 })
 export class ConfirmEmailComponent {
   email: string | undefined = '';
   token: string | undefined = '';
-  response: string = 'response';
+  response: string = 'E-posta doğrulanıyor...';
+
   constructor(private route: ActivatedRoute, private http: HttpService) {
-    this.route.params.subscribe((res) => {
+    this.route.params.subscribe(() => {
       this.email = this.route.snapshot.queryParamMap.get('email')?.toString();
       this.token = this.route.snapshot.queryParamMap.get('token')?.toString();
       this.confirm();
@@ -33,6 +61,9 @@ export class ConfirmEmailComponent {
       { email: this.email, token: this.token },
       (res) => {
         this.response = res;
+      },
+      () => {
+        this.response = 'E-posta doğrulanamadı. Bağlantı geçersiz olabilir.';
       }
     );
   }

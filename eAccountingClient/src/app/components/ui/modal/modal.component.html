@@ -1,0 +1,19 @@
+@if (open) {
+<div class="ak-modal" (click)="onBackdrop($event)">
+  <div class="ak-modal__box" [class.ak-modal__box--wide]="wide">
+    <div class="ak-modal__head">
+      <h3 class="ak-modal__title">{{ title }}</h3>
+      <button
+        type="button"
+        class="ak-btn ak-btn--ghost ak-btn--icon"
+        (click)="close()"
+        aria-label="Kapat"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <ng-content></ng-content>
+  </div>
+</div>
+}

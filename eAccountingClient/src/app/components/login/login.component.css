@@ -1,51 +1,165 @@
-.login-row{
-    width: 99%;
+.login {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  min-height: 100vh;
 }
 
-.login-part-2{
-    height: 100vh;    
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+/* --- marka tarafı --------------------------------------------------------- */
 
-}
-.demo-cta {
-    margin-top: 1rem;
-}
-
-.demo-cta__lead {
-    margin-bottom: 0.85rem;
-    color: #6c757d;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    text-align: center;
+.login__brand {
+  display: flex;
+  align-items: center;
+  padding: 56px;
+  border-right: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+  /* Asit yeşili hafif bir aydınlanma, düz siyahı kırıyor. */
+  background-image: radial-gradient(
+    circle at 20% 25%,
+    rgba(216, 255, 54, 0.07),
+    transparent 55%
+  );
 }
 
-.demo-cta__button {
-    font-weight: 600;
+.login__brand-inner {
+  max-width: 460px;
 }
 
-.demo-cta__note {
-    margin: 0.5rem 0 0;
-    color: #adb5bd;
-    font-size: 0.75rem;
-    text-align: center;
+.login__logo {
+  width: 62px;
+  height: 62px;
+  margin-bottom: 26px;
 }
 
-.demo-cta__divider {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: 1.5rem 0 1rem;
-    color: #adb5bd;
-    font-size: 0.75rem;
-    text-transform: lowercase;
+.login__headline {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+  text-transform: uppercase;
+  margin-bottom: 18px;
 }
 
-.demo-cta__divider::before,
-.demo-cta__divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #dee2e6;
+.login__lead {
+  color: var(--ak-gray);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+.login__points {
+  list-style: none;
+  margin: 0 0 30px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.login__points li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ak-gray);
+  font-size: 0.87rem;
+}
+
+.login__points i {
+  color: var(--ak-acid);
+  font-size: 0.72rem;
+}
+
+.login__site {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-top: 20px;
+  border-top: 1px solid var(--ak-line);
+  color: var(--ak-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.login__site:hover {
+  color: var(--ak-acid);
+}
+
+/* --- form tarafı ---------------------------------------------------------- */
+
+.login__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+}
+
+.login__form {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login__demo {
+  padding: 20px;
+  border: 1px solid rgba(216, 255, 54, 0.25);
+  background: rgba(216, 255, 54, 0.04);
+  margin-bottom: 26px;
+}
+
+.login__demo-text {
+  margin: 12px 0 16px;
+  color: var(--ak-gray);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.login__demo-note {
+  margin: 10px 0 0;
+  color: var(--ak-muted);
+  font-size: 0.73rem;
+  text-align: center;
+}
+
+.login__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  color: var(--ak-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.login__divider::before,
+.login__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--ak-line);
+}
+
+.login__link {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* --- duyarlılık ----------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .login {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .login__brand {
+    padding: 40px 24px 32px;
+    border-right: none;
+    border-bottom: 1px solid var(--ak-line);
+  }
+
+  .login__points {
+    display: none;
+  }
+
+  .login__panel {
+    padding: 32px 24px 48px;
+  }
 }
