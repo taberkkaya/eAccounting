@@ -42,7 +42,9 @@ export class DemoVisitorsComponent implements OnInit {
     return this.visitors.filter(
       (v) =>
         v.email.toLocaleLowerCase('tr').includes(term) ||
-        (v.ipAddress ?? '').includes(term)
+        (v.ipAddress ?? '').includes(term) ||
+        (v.country ?? '').toLocaleLowerCase('tr').includes(term) ||
+        (v.city ?? '').toLocaleLowerCase('tr').includes(term)
     );
   }
 

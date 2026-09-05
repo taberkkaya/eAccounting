@@ -24,6 +24,9 @@ namespace eAccountingServer.Infrastructure
         {
             services.AddHttpContextAccessor();
 
+            // Konum araması dışarıya HTTP çağrısı yapıyor.
+            services.AddHttpClient();
+
             services.AddScoped<CompanyDbContext>();
 
             services.AddDbContext<ApplicationDbContext>(opt =>

@@ -19,7 +19,10 @@ public sealed record DemoVisitorDto(
     DateTimeOffset? LastSessionAt,
     DateTimeOffset FirstSeenAt,
     string? IpAddress,
-    string? UserAgent);
+    string? UserAgent,
+    string? Country,
+    string? CountryCode,
+    string? City);
 
 /// <summary>Ziyaretçi deposunu okumak için; uygulama katmanı bağlamı görmez.</summary>
 public interface IDemoVisitorReader

@@ -5,6 +5,8 @@ using eAccountingServer.Infrastructure;
 using eAccountingServer.WebApi;
 using eAccountingServer.WebApi.Middlewares;
 using eAccountingServer.WebApi.Modules;
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Scalar.AspNetCore;
 
@@ -65,9 +67,36 @@ builder.Services.AddRateLimiter(options =>
         }));
 });
 
+// Uygulama bir ters vekilin arkasında çalışıyor; bu olmadan istemcinin IP'si
+// yerine vekilin konteyner adresi görülür. Ziyaretçi kaydı da hız sınırı da
+// gerçek adrese bakmak zorunda.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+    // Zincirde kaç vekil olduğu dağıtıma göre değişiyor (yerelde yalnız Caddy,
+    // Coolify'da önünde bir de Traefik). Sabit bir sayı yazmak yerine vekiller
+    // adreslerinden tanınıyor: başlık sağdan sola, özel ağ adresleri atlanarak
+    // okunuyor ve ilk genel adreste duruluyor.
+    //
+    // Bunun yan faydası, istemcinin kendi uydurduğu bir X-Forwarded-For değerine
+    // hiç ulaşılmaması: o değer zincirde her zaman gerçek adresin solunda kalır.
+    options.ForwardLimit = null;
+    options.KnownProxies.Clear();
+    options.KnownNetworks.Clear();
+
+    foreach ((string prefix, int length) in TrustedProxyNetworks())
+        options.KnownNetworks.Add(
+            new Microsoft.AspNetCore.HttpOverrides.IPNetwork(IPAddress.Parse(prefix), length));
+});
+
 builder.Services.AddExceptionHandler<ExceptionHandler>().AddProblemDetails();
 
 var app = builder.Build();
+
+// Adresi okuyan her şeyden önce gelmeli.
+if (app.Configuration.GetValue("Network:TrustForwardedHeaders", true))
+    app.UseForwardedHeaders();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
@@ -117,3 +146,20 @@ ExtensionsMiddleware.MigrateDatabase(app);
 ExtensionsMiddleware.CreateFirstUser(app);
 
 app.Run();
+
+/// <summary>
+/// Vekil olabilecek adres aralıkları: yönlendirilebilir olmayan her şey. Bir
+/// konteyner ağında vekilin adresi her başlatmada değiştiği için tek tek
+/// yazılamaz, ama bu aralıkların dışından gelen bir adres de vekil değildir.
+/// </summary>
+static (string Prefix, int Length)[] TrustedProxyNetworks() =>
+[
+    ("10.0.0.0", 8),
+    ("172.16.0.0", 12),
+    ("192.168.0.0", 16),
+    ("127.0.0.0", 8),
+    ("100.64.0.0", 10),
+    ("::1", 128),
+    ("fc00::", 7),
+    ("fe80::", 10)
+];

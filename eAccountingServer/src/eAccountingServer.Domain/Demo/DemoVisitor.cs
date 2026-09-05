@@ -44,4 +44,11 @@ public sealed class DemoVisitor : Entity
     public string? IpAddress { get; set; }
 
     public string? UserAgent { get; set; }
+
+    /// <summary>IP adresinden çıkarılan kaba konum; kesin değil, yalnızca fikir verir.</summary>
+    public string? Country { get; set; }
+
+    public string? CountryCode { get; set; }
+
+    public string? City { get; set; }
 }

@@ -9,4 +9,7 @@ export class DemoVisitorModel {
   firstSeenAt: string = '';
   ipAddress: string | null = null;
   userAgent: string | null = null;
+  country: string | null = null;
+  countryCode: string | null = null;
+  city: string | null = null;
 }

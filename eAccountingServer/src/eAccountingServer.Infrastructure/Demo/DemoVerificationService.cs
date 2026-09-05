@@ -17,6 +17,7 @@ internal sealed class DemoVerificationService(
     IFluentEmail fluentEmail,
     IOptions<DemoOptions> demoOptions,
     IOptions<MailOptions> mailOptions,
+    IGeoLocationService geoLocationService,
     ILogger<DemoVerificationService> logger
     ) : IDemoVerificationService
 {
@@ -68,6 +69,17 @@ internal sealed class DemoVerificationService(
         visitor.CodesSent++;
         visitor.IpAddress = Trim(ipAddress, 45);
         visitor.UserAgent = Trim(userAgent, 400);
+
+        // Konum bulunamazsa eldeki değer korunur: ziyaretçi daha önce bilinen bir
+        // yerden geldiyse geçici bir arama hatası onu silmemeli.
+        GeoLocation? location = await geoLocationService.LookupAsync(ipAddress, cancellationToken);
+
+        if (location is not null)
+        {
+            visitor.Country = Trim(location.Country, 80);
+            visitor.CountryCode = Trim(location.CountryCode, 2);
+            visitor.City = Trim(location.City, 80);
+        }
 
         await context.SaveChangesAsync(cancellationToken);
 

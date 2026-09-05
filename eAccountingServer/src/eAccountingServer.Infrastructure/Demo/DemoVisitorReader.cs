@@ -22,6 +22,9 @@ internal sealed class DemoVisitorReader(ApplicationDbContext context) : IDemoVis
                 p.LastSessionAt,
                 p.CreatedAt,
                 p.IpAddress,
-                p.UserAgent))
+                p.UserAgent,
+                p.Country,
+                p.CountryCode,
+                p.City))
             .ToListAsync(cancellationToken);
 }

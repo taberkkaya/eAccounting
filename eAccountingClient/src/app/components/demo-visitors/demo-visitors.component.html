@@ -11,7 +11,7 @@
         [(ngModel)]="search"
         type="search"
         class="ak-input"
-        placeholder="E-posta veya IP ara"
+        placeholder="E-posta, IP veya konum ara"
       />
 
       <button type="button" class="ak-btn" (click)="getAll()" title="Yenile">
@@ -31,6 +31,7 @@
             <th class="ak-table__amount">Oturum</th>
             <th>Son Oturum</th>
             <th>İlk Talep</th>
+            <th>Konum</th>
             <th>IP</th>
           </tr>
         </thead>
@@ -55,13 +56,22 @@
               {{ data.lastSessionAt ? (data.lastSessionAt | date : "dd.MM.yyyy HH:mm") : "—" }}
             </td>
             <td class="ak-muted">{{ data.firstSeenAt | date : "dd.MM.yyyy HH:mm" }}</td>
+            <td>
+              @if(data.country || data.city){
+              <span [title]="data.countryCode ?? ''">
+                {{ data.city ? data.city + ", " : "" }}{{ data.country }}
+              </span>
+              }@else {
+              <span class="ak-muted">—</span>
+              }
+            </td>
             <td class="ak-muted" [title]="data.userAgent ?? ''">
               {{ data.ipAddress ?? "—" }}
             </td>
           </tr>
           }@empty {
           <tr>
-            <td colspan="8">
+            <td colspan="9">
               <div class="ak-empty">
                 @if(loading){
                 <i class="fas fa-circle-notch ak-spin"></i>

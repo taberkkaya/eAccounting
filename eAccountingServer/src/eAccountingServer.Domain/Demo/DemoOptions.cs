@@ -70,4 +70,13 @@ public sealed class DemoOptions
 
     /// <summary>Bir kod için tanınan yanlış deneme hakkı.</summary>
     public int MaxCodeAttempts { get; set; } = 5;
+
+    /// <summary>
+    /// Ziyaretçinin IP adresini ülke ve şehre çeviren servis. {ip} yer tutucusu
+    /// adresle değiştirilir. Boş bırakılırsa konum hiç sorulmaz; adresin üçüncü
+    /// bir servise gitmesini istemeyen kurulum bunu boşaltır.
+    /// </summary>
+    public string GeoLookupUrl { get; set; } = "https://ipwho.is/{ip}";
+
+    public int GeoLookupTimeoutSeconds { get; set; } = 4;
 }
