@@ -1,107 +1,310 @@
-.home-hero {
+/* --- para birimi kartları -------------------------------------------------- */
+
+.dash-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.dash-tile {
+  padding: 20px;
   border: 1px solid var(--ak-line);
   background: var(--ak-surface);
-  padding: 34px 32px;
-  margin-bottom: 18px;
 }
 
-.home-hero__body {
-  max-width: 780px;
-}
-
-.home-hero__title {
-  margin: 14px 0 12px;
-  font-size: clamp(1.5rem, 3.2vw, 2.3rem);
-  line-height: 1.15;
-  text-transform: uppercase;
-}
-
-.home-hero__text {
-  color: var(--ak-gray);
-  font-size: 0.95rem;
-  line-height: 1.65;
-  margin-bottom: 20px;
-}
-
-.home-stack {
+.dash-tile__head {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-.home-stack__chip {
-  padding: 4px 9px;
-  background: var(--ak-surface-2);
-  border: 1px solid var(--ak-line);
-  color: var(--ak-gray);
+.dash-tile__currency {
+  font-family: var(--ak-font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--ak-acid);
+}
+
+.dash-tile__value {
+  font-family: var(--ak-font-display);
+  font-size: 1.55rem;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-tile__label {
+  margin-top: 4px;
+  color: var(--ak-muted);
   font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* Kartlar aralarındaki çizgiyi paylaşsın diye negatif boşluk yerine tek kenarlık. */
-.home-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.home-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 22px;
-  border: 1px solid var(--ak-line);
-  background: var(--ak-surface);
-  transition: border-color 0.14s, transform 0.14s;
-}
-
-.home-card:hover {
-  border-color: var(--ak-acid);
-  transform: translateY(-2px);
-}
-
-.home-card__icon {
-  font-size: 1.15rem;
-  color: var(--ak-acid);
-  margin-bottom: 4px;
-}
-
-.home-card__title {
-  font-family: var(--ak-font-display);
-  font-size: 1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.home-card__text {
-  flex: 1;
-  color: var(--ak-muted);
-  font-size: 0.83rem;
-  line-height: 1.55;
-}
-
-.home-card__go {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 13px;
-  border-top: 1px solid var(--ak-line);
-  color: var(--ak-paper);
-  font-size: 0.7rem;
-  font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.home-card:hover .home-card__go {
+.dash-tile__flows {
+  display: grid;
+  gap: 7px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ak-line-soft);
+}
+
+.dash-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+
+.dash-flow__label {
+  color: var(--ak-muted);
+}
+
+.dash-flow__label i {
+  margin-right: 5px;
+  font-size: 0.7rem;
+}
+
+.dash-flow__value {
+  color: var(--ak-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- grafik düzeni --------------------------------------------------------- */
+
+.dash-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 1000px) {
+  .dash-charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.dash-chart {
+  min-width: 0;
+}
+
+/* --- para birimi filtresi -------------------------------------------------- */
+
+.dash-filters {
+  display: flex;
+  gap: 5px;
+}
+
+.dash-filter {
+  padding: 4px 11px;
+  border: 1px solid var(--ak-line);
+  background: transparent;
+  color: var(--ak-muted);
+  font-family: var(--ak-font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+
+.dash-filter:hover {
+  color: var(--ak-paper);
+}
+
+.dash-filter.is-active {
+  border-color: var(--ak-acid);
+  background: rgba(216, 255, 54, 0.1);
   color: var(--ak-acid);
 }
 
+/* --- yatay çubuklar -------------------------------------------------------- */
+
+.dash-bar + .dash-bar {
+  margin-top: 18px;
+}
+
+.dash-bar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 7px;
+}
+
+.dash-bar__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dash-bar__icon {
+  color: var(--ak-muted);
+  font-size: 0.75rem;
+  flex: none;
+}
+
+.dash-bar__value {
+  color: var(--ak-gray);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dash-bar__track {
+  height: 8px;
+  background: var(--ak-surface-3);
+}
+
+.dash-bar__fill {
+  height: 100%;
+  background: var(--ak-acid);
+  transition: width 0.35s ease-out;
+}
+
+/* Banka satırları aynı ailede ama daha sakin bir tonda. */
+.dash-bar__fill--bank {
+  background: #7fae2a;
+}
+
+.dash-bar__fill--negative {
+  background: var(--ak-danger);
+}
+
+/* --- halka grafik ---------------------------------------------------------- */
+
+.dash-donut {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.dash-donut__svg {
+  width: 130px;
+  height: 130px;
+  flex: none;
+}
+
+.dash-legend {
+  flex: 1;
+  min-width: 150px;
+}
+
+.dash-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 0;
+  font-size: 0.83rem;
+}
+
+.dash-legend__dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+}
+
+.dash-legend__dot--cash {
+  background: var(--ak-acid);
+}
+
+.dash-legend__dot--bank {
+  background: #2f6f4a;
+}
+
+.dash-legend__name {
+  flex: 1;
+  color: var(--ak-gray);
+}
+
+.dash-legend__value {
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-legend__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 9px;
+  padding-top: 11px;
+  border-top: 1px solid var(--ak-line-soft);
+  color: var(--ak-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dash-legend__total strong {
+  color: var(--ak-paper);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* --- hızlı erişim ---------------------------------------------------------- */
+
+.dash-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.dash-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--ak-line);
+  background: var(--ak-surface);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: border-color 0.14s;
+}
+
+.dash-link > i:first-child {
+  color: var(--ak-acid);
+}
+
+.dash-link span {
+  flex: 1;
+}
+
+.dash-link__go {
+  color: var(--ak-muted);
+  font-size: 0.78rem;
+  transition: transform 0.14s, color 0.14s;
+}
+
+.dash-link:hover {
+  border-color: var(--ak-acid);
+}
+
+.dash-link:hover .dash-link__go {
+  color: var(--ak-acid);
+  transform: translateX(3px);
+}
+
+/* --- demo kutusu ----------------------------------------------------------- */
+
 .home-demo {
+  margin-top: 14px;
   padding: 22px 24px;
   border: 1px solid rgba(216, 255, 54, 0.28);
   border-left: 3px solid var(--ak-acid);

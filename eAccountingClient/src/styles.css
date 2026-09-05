@@ -867,3 +867,58 @@ select.ak-select[multiple] {
 select.ak-select[multiple] option {
   padding: 5px 8px;
 }
+
+/* --- çıkış butonu --------------------------------------------------------- */
+
+/* Sürekli kırmızı durmasın; niyet belli olduğunda renklensin. */
+.ak-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  height: 34px;
+  border: 1px solid var(--ak-line);
+  background: transparent;
+  color: var(--ak-gray);
+  font-family: var(--ak-font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.16s, color 0.16s, background 0.16s;
+}
+
+.ak-logout i {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 100%;
+  flex: none;
+  font-size: 0.82rem;
+}
+
+/* Metin varsayılan olarak kapalı, üzerine gelince açılıyor. */
+.ak-logout span {
+  max-width: 0;
+  padding-right: 0;
+  opacity: 0;
+  white-space: nowrap;
+  transition: max-width 0.18s ease-out, opacity 0.14s, padding-right 0.18s;
+}
+
+.ak-logout:hover {
+  border-color: rgba(255, 92, 92, 0.55);
+  background: rgba(255, 92, 92, 0.09);
+  color: var(--ak-danger);
+}
+
+.ak-logout:hover span {
+  max-width: 70px;
+  padding-right: 12px;
+  opacity: 1;
+}
+
+.ak-logout:focus-visible {
+  outline: 1px solid var(--ak-danger);
+  outline-offset: 2px;
+}

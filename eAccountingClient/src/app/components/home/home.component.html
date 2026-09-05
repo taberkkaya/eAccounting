@@ -1,63 +1,199 @@
-<app-blank pageName="Ana Sayfa">
-  <div class="home-hero">
-    <div class="home-hero__body">
-      <span class="ak-tag ak-tag--acid">Çok kiracılı mimari</span>
-      <h2 class="home-hero__title">
-        Ön muhasebe, <span class="ak-acid">firma başına ayrı veritabanı</span>
-        ile
-      </h2>
-      <p class="home-hero__text">
-        Her firmanın verisi kendi veritabanında tutulur. Oturum açan kullanıcının
-        firması JWT üzerinden çözülür ve veritabanı bağlantısı çalışma zamanında
-        kurulur — uygulama tek, veri katmanı firma sayısı kadardır.
-      </p>
-
-      <div class="home-stack">
-        @for(item of stack; track item){
-        <span class="home-stack__chip">{{ item }}</span>
-        }
+<app-blank pageName="Genel Bakış">
+  @if(loading()){
+  <div class="ak-panel">
+    <div class="ak-empty">
+      <i class="fas fa-circle-notch ak-spin"></i>
+      <div class="ak-empty__text">Veriler yükleniyor...</div>
+    </div>
+  </div>
+  }@else if(accounts().length === 0){
+  <div class="ak-panel">
+    <div class="ak-empty">
+      <i class="fas fa-chart-simple"></i>
+      <div class="ak-empty__text">
+        Henüz kasa veya banka kaydı yok. Ekledikçe özet burada oluşacak.
       </div>
     </div>
   </div>
+  }@else {
 
-  <div class="home-cards">
-    <a class="home-card" routerLink="/cash-registers">
-      <i class="fas fa-cash-register home-card__icon"></i>
-      <span class="home-card__title">Kasalar</span>
-      <span class="home-card__text">
-        TL, USD ve EUR kasaları; tahsilat, ödeme ve kasalar arası virman.
-      </span>
-      <span class="home-card__go">
-        Aç <i class="fas fa-arrow-right"></i>
-      </span>
-    </a>
+  <!-- Para birimi bazında özet -->
+  <div class="dash-tiles">
+    @for(summary of summaries(); track summary.currency){
+    <div class="dash-tile">
+      <div class="dash-tile__head">
+        <span class="dash-tile__currency">{{ summary.currency }}</span>
+        <span class="ak-tag ak-tag--muted"
+          >{{ summary.accountCount }} hesap</span
+        >
+      </div>
 
-    <a class="home-card" routerLink="/banks">
-      <i class="fas fa-university home-card__icon"></i>
-      <span class="home-card__title">Bankalar</span>
-      <span class="home-card__text">
-        IBAN bazlı banka hesapları, hesap hareketleri ve bakiye takibi.
-      </span>
-      <span class="home-card__go">
-        Aç <i class="fas fa-arrow-right"></i>
-      </span>
-    </a>
+      <div
+        class="dash-tile__value"
+        [class.ak-negative]="summary.balance < 0"
+      >
+        {{ summary.balance | trCurrency : summary.symbol : true }}
+      </div>
+      <div class="dash-tile__label">Toplam bakiye</div>
 
-    @if(auth.user.isAdmin){
-    <a class="home-card" routerLink="/companies">
-      <i class="fas fa-city home-card__icon"></i>
-      <span class="home-card__title">Firmalar</span>
-      <span class="home-card__text">
-        Firma tanımları ve her firma için ayrı veritabanı migrasyonu.
-      </span>
-      <span class="home-card__go">
-        Aç <i class="fas fa-arrow-right"></i>
-      </span>
-    </a>
+      <div class="dash-tile__flows">
+        <div class="dash-flow">
+          <span class="dash-flow__label">
+            <i class="fas fa-arrow-down ak-positive"></i> Giren
+          </span>
+          <span class="dash-flow__value">
+            {{ summary.deposit | trCurrency : summary.symbol : true }}
+          </span>
+        </div>
+        <div class="dash-flow">
+          <span class="dash-flow__label">
+            <i class="fas fa-arrow-up ak-negative"></i> Çıkan
+          </span>
+          <span class="dash-flow__value">
+            {{ summary.withdrawal | trCurrency : summary.symbol : true }}
+          </span>
+        </div>
+      </div>
+    </div>
     }
   </div>
 
-  @if(demo.status(); as status){
+  <!-- Grafikler -->
+  <div class="dash-charts">
+    <section class="ak-panel dash-chart">
+      <div class="ak-panel__head">
+        <h2 class="ak-panel__title">Hesap Bakiyeleri</h2>
+
+        <div class="dash-filters">
+          @for(summary of summaries(); track summary.currency){
+          <button
+            type="button"
+            class="dash-filter"
+            [class.is-active]="summary.currency === selectedCurrency()"
+            (click)="selectCurrency(summary.currency)"
+          >
+            {{ summary.currency }}
+          </button>
+          }
+        </div>
+      </div>
+
+      <div class="ak-panel__body">
+        @for(row of selectedRows(); track row.name){
+        <div class="dash-bar">
+          <div class="dash-bar__head">
+            <span class="dash-bar__name">
+              <i
+                class="dash-bar__icon"
+                [class.fas]="true"
+                [class.fa-cash-register]="row.kind === 'Kasa'"
+                [class.fa-university]="row.kind === 'Banka'"
+              ></i>
+              {{ row.name }}
+            </span>
+            <span
+              class="dash-bar__value"
+              [class.ak-negative]="row.balance < 0"
+            >
+              {{ row.balance | trCurrency : selectedSymbol() : true }}
+            </span>
+          </div>
+
+          <div class="dash-bar__track">
+            <div
+              class="dash-bar__fill"
+              [class.dash-bar__fill--bank]="row.kind === 'Banka'"
+              [class.dash-bar__fill--negative]="row.balance < 0"
+              [style.width.%]="barWidth(row.balance)"
+            ></div>
+          </div>
+        </div>
+        }@empty {
+        <div class="ak-empty">
+          <div class="ak-empty__text">Bu para biriminde hesap yok.</div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <section class="ak-panel dash-chart">
+      <div class="ak-panel__head">
+        <h2 class="ak-panel__title">Kasa / Banka Dağılımı</h2>
+      </div>
+
+      <div class="ak-panel__body dash-donut">
+        <svg viewBox="0 0 140 140" class="dash-donut__svg" role="img"
+             aria-label="Kasa ve banka bakiyelerinin dağılımı">
+          <!-- Tam halka banka payını temsil eder, üstüne kasa dilimi çizilir. -->
+          <circle
+            cx="70"
+            cy="70"
+            r="54"
+            fill="none"
+            stroke="#2f6f4a"
+            stroke-width="16"
+          />
+          <circle
+            cx="70"
+            cy="70"
+            r="54"
+            fill="none"
+            stroke="#d8ff36"
+            stroke-width="16"
+            [attr.stroke-dasharray]="cashDash()"
+            transform="rotate(-90 70 70)"
+          />
+        </svg>
+
+        <div class="dash-legend">
+          <div class="dash-legend__row">
+            <span class="dash-legend__dot dash-legend__dot--cash"></span>
+            <span class="dash-legend__name">Kasa</span>
+            <span class="dash-legend__value">
+              {{ split().cash | trCurrency : selectedSymbol() : true }}
+            </span>
+          </div>
+          <div class="dash-legend__row">
+            <span class="dash-legend__dot dash-legend__dot--bank"></span>
+            <span class="dash-legend__name">Banka</span>
+            <span class="dash-legend__value">
+              {{ split().bank | trCurrency : selectedSymbol() : true }}
+            </span>
+          </div>
+          <div class="dash-legend__total">
+            <span>Toplam</span>
+            <strong>
+              {{ split().total | trCurrency : selectedSymbol() : true }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Hızlı erişim -->
+  <div class="dash-links">
+    <a class="dash-link" routerLink="/cash-registers">
+      <i class="fas fa-cash-register"></i>
+      <span>Kasalar</span>
+      <i class="fas fa-arrow-right dash-link__go"></i>
+    </a>
+    <a class="dash-link" routerLink="/banks">
+      <i class="fas fa-university"></i>
+      <span>Bankalar</span>
+      <i class="fas fa-arrow-right dash-link__go"></i>
+    </a>
+    @if(auth.user.isAdmin){
+    <a class="dash-link" routerLink="/companies">
+      <i class="fas fa-city"></i>
+      <span>Firmalar</span>
+      <i class="fas fa-arrow-right dash-link__go"></i>
+    </a>
+    }
+  </div>
+  }
+
+  @if(demo.status()){
   <div class="home-demo">
     <div class="home-demo__head">
       <i class="fas fa-flask"></i>
