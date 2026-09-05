@@ -1,4 +1,4 @@
-import { CompanyModel } from './company.model';
+import { TokenCompanyModel } from './company.model';
 import { CompanyUserModel } from './companyUser.model';
 
 export class UserModel {
@@ -13,6 +13,6 @@ export class UserModel {
   companyId: string = '';
   companyIds: string[] = [];
   companyUsers: CompanyUserModel[] = [];
-  companies: CompanyModel[] = [];
+  companies: TokenCompanyModel[] = [];
   isAdmin: boolean = false;
 }

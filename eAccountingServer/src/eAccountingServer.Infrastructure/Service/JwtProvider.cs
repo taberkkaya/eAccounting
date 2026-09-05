@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -28,7 +28,11 @@ namespace eAccountingServer.Infrastructure.Service
                 new Claim("UserName", user.UserName ?? string.Empty),
                 new Claim("Email", user.Email ?? string.Empty),
                 new Claim("CompanyId", companyId.ToString() ?? string.Empty),
-                new Claim("Companies", JsonSerializer.Serialize(companies)),
+                // Yalnızca kimlik ve ad: firmanın tamamı gömülünce veritabanı sunucusu,
+                // kullanıcı adı ve parolası da token'ın içinde taşınıyordu. Token
+                // tarayıcıda duruyor ve base64'ten ibaret; oraya sır konmaz.
+                new Claim("Companies", JsonSerializer.Serialize(
+                    companies.Select(company => new { company.Id, company.Name }))),
                 new Claim("IsAdmin", user.IsAdmin.ToString())
             };
 

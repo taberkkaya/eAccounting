@@ -6,7 +6,14 @@ export class CompanyModel {
   taxDepartment: string = '';
   taxNumber: string = '';
   database: DatabaseModel = new DatabaseModel();
+}
 
+/**
+ * Token'daki firma listesi. Sunucu bunu PascalCase üretiyor, API yanıtları ise
+ * camelCase; ikisi tek sınıfta toplanınca firma kaydederken boş "Name" alanı
+ * dolu "name" alanını eziyor ve firma adı sunucuya boş gidiyordu.
+ */
+export class TokenCompanyModel {
   Id: string = '';
   Name: string = '';
 }
