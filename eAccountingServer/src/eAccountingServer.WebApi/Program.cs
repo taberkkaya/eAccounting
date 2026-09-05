@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Threading.RateLimiting;
 using eAccountingServer.Application;
 using eAccountingServer.Infrastructure;
@@ -73,6 +73,10 @@ app.UseCors(policy =>
         .Get<string[]>() ?? [];
 
     policy.AllowAnyHeader().AllowAnyMethod();
+
+    // Rapor indirmelerinde dosya adı bu başlıktan okunuyor; farklı kaynaktan
+    // çağrıldığında tarayıcı başlığı açıkça izin verilmedikçe gizliyor.
+    policy.WithExposedHeaders("Content-Disposition");
 
     if (allowedOrigins.Length > 0)
         policy.WithOrigins(allowedOrigins).AllowCredentials();

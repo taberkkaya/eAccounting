@@ -29,6 +29,9 @@ export class BankDetailsComponent {
 
   search: string = '';
 
+  /** Sürmekte olan dışa aktarma; düğmenin beklemesi için. */
+  exporting: 'excel' | 'pdf' | null = null;
+
   createOpen = false;
   updateOpen = false;
 
@@ -58,6 +61,27 @@ export class BankDetailsComponent {
       this.getAll();
       this.getAllBanks();
     });
+  }
+
+  /**
+   * Ekrandaki tarih aralığını sunucuya gönderip biçimlendirilmiş dosyayı indirir.
+   * Rapor sunucuda üretiliyor; böylece Excel ve PDF aynı veriden çıkıyor.
+   */
+  export(format: 'excel' | 'pdf') {
+    this.exporting = format;
+
+    this.http.download(
+      'BankDetails/Export',
+      {
+        bankId: this.bankId,
+        startDate: this.startDate,
+        endDate: this.endDate,
+        format: format === 'pdf' ? 1 : 0,
+      },
+      `banka-ekstre.${format === 'pdf' ? 'pdf' : 'xlsx'}`,
+      () => (this.exporting = null),
+      () => (this.exporting = null)
+    );
   }
 
   openCreate() {
@@ -149,7 +173,7 @@ export class BankDetailsComponent {
   changeCurrencyNameToSymbol(name: string) {
     if (name === 'TL') return '₺';
     else if (name === 'USD') return '$';
-    else if (name === 'EURO') return 'Є';
+    else if (name === 'EURO') return '€';
     else return '';
   }
 

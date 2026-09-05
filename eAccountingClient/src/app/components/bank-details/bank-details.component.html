@@ -16,14 +16,12 @@
       <input
         type="date"
         class="ak-input"
-        style="width: 160px"
         [(ngModel)]="startDate"
         aria-label="Başlangıç tarihi"
       />
       <input
         type="date"
         class="ak-input"
-        style="width: 160px"
         [(ngModel)]="endDate"
         aria-label="Bitiş tarihi"
       />
@@ -32,9 +30,43 @@
         Listele
       </button>
 
+      <button
+        type="button"
+        class="ak-btn"
+        (click)="export('excel')"
+        [disabled]="exporting !== null"
+        title="Seçili aralığı Excel olarak indir"
+      >
+        <i
+          class="fas"
+          [class.fa-file-excel]="exporting !== 'excel'"
+          [class.ak-btn__excel]="exporting !== 'excel'"
+          [class.fa-circle-notch]="exporting === 'excel'"
+          [class.ak-spin]="exporting === 'excel'"
+        ></i>
+        Excel
+      </button>
+
+      <button
+        type="button"
+        class="ak-btn"
+        (click)="export('pdf')"
+        [disabled]="exporting !== null"
+        title="Seçili aralığı PDF olarak indir"
+      >
+        <i
+          class="fas"
+          [class.fa-file-pdf]="exporting !== 'pdf'"
+          [class.ak-btn__pdf]="exporting !== 'pdf'"
+          [class.fa-circle-notch]="exporting === 'pdf'"
+          [class.ak-spin]="exporting === 'pdf'"
+        ></i>
+        PDF
+      </button>
+
       <div class="ak-toolbar__spacer"></div>
 
-      <span class="ak-tag ak-tag--acid">
+      <span class="ak-tag ak-tag--brand">
         Bakiye:
         {{
           bank.depositAmount - bank.withdrawalAmount
@@ -48,7 +80,6 @@
         [(ngModel)]="search"
         type="search"
         class="ak-input"
-        style="width: 200px"
         placeholder="Açıklamada ara"
       />
     </div>
