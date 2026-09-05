@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using eAccountingServer.Application.Services;
@@ -186,7 +186,8 @@ internal sealed class DemoSessionService(
     public async Task<DemoSessionStartResult> StartAsync(CancellationToken cancellationToken = default)
     {
         if (!Enabled || !_ready)
-            throw new InvalidOperationException("Demo mode is not available right now.");
+            throw new InvalidOperationException(
+                "Demo ortamı henüz hazır değil, birkaç saniye sonra tekrar deneyin.");
 
         DemoSlot slot = await LeaseSlotAsync(cancellationToken);
 
@@ -255,13 +256,15 @@ internal sealed class DemoSessionService(
         DemoSession? oldest = _sessions.Values.OrderBy(s => s.LastSeenAt).FirstOrDefault();
 
         if (oldest is null)
-            throw new InvalidOperationException("Demo mode is not available right now.");
+            throw new InvalidOperationException(
+                "Şu anda boş demo alanı yok, birazdan tekrar deneyin.");
 
         logger.LogInformation("All demo slots are leased; reclaiming session {SessionId}.", oldest.Id);
         await EndAsync(oldest.Id, DemoSessionEndReason.SlotReclaimed, cancellationToken);
 
         return _slots.FirstOrDefault(s => s.IsFree)
-               ?? throw new InvalidOperationException("Demo mode is not available right now.");
+               ?? throw new InvalidOperationException(
+                   "Şu anda boş demo alanı yok, birazdan tekrar deneyin.");
     }
 
     private async Task ResetSlotAsync(DemoSlot slot, CancellationToken cancellationToken)

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { SharedModule } from '../../modules/shared.module';
 import { LoginModel } from '../../models/login.model';
 import { HttpService } from '../../services/http.service';
@@ -36,14 +37,30 @@ export class LoginComponent {
         this.isDemoLoading = false;
         this.router.navigateByUrl('/');
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.isDemoLoading = false;
-        this.swal.callToast(
-          'Şu anda tüm demo oturumları dolu, birazdan tekrar deneyin.',
-          'error'
-        );
+        this.swal.callToast(this.demoStartError(err), 'error');
       },
     });
+  }
+
+  /**
+   * Demo açılmadığında sebebi söyler. Eskiden her hata "tüm oturumlar dolu"
+   * diye görünüyordu; sunucuya hiç ulaşılamadığında bile öyle yazdığı için
+   * demonun tek kişilik olduğu izlenimi veriyordu.
+   */
+  private demoStartError(err: HttpErrorResponse): string {
+    if (err.status === 0)
+      return 'Sunucuya ulaşılamadı. Bağlantınızı kontrol edip tekrar deneyin.';
+
+    if (err.status === 404) return 'Demo şu anda kapalı.';
+
+    // 503 ve diğer durumlarda sunucunun kendi açıklaması daha isabetli:
+    // ortam hazırlanıyor olabilir ya da gerçekten boş alan kalmamış olabilir.
+    const messages: string[] | undefined = err.error?.errorMessages;
+    if (messages?.length) return messages.join(' ');
+
+    return 'Demo başlatılamadı, birazdan tekrar deneyin.';
   }
 
   signIn() {
