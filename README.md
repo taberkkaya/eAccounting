@@ -1,4 +1,4 @@
-# eAccounting
+# Defter
 
 Çok kiracılı (multi-tenant) bir ön muhasebe uygulaması. Her firmanın verisi **kendi
 veritabanında** tutulur; oturum açan kullanıcının firması JWT üzerinden çözülerek

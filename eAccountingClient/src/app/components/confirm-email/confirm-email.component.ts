@@ -8,7 +8,7 @@ import { HttpService } from '../../services/http.service';
   imports: [RouterLink],
   template: `
     <div class="confirm">
-      <img src="assets/ak-logo.png" alt="AK" class="confirm__logo" />
+      <p class="confirm__brand">Defter</p>
       <h1 class="confirm__title">{{ response }}</h1>
       <a routerLink="/login" class="ak-btn ak-btn--primary">
         Giriş sayfasına dön
@@ -28,16 +28,18 @@ import { HttpService } from '../../services/http.service';
         text-align: center;
       }
 
-      .confirm__logo {
-        width: 52px;
-        height: 52px;
+      .confirm__brand {
+        margin: 0;
+        color: var(--ak-brand);
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
       }
 
       .confirm__title {
         max-width: 520px;
         font-size: 1.3rem;
-        text-transform: uppercase;
-        line-height: 1.3;
+        line-height: 1.35;
       }
     `,
   ],

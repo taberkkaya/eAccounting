@@ -1,4 +1,4 @@
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Reporting;
 using QuestPDF.Fluent;
@@ -386,7 +386,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
         {
             row.RelativeItem().Text(text =>
             {
-                text.Span("AK e-Muhasebe").FontSize(7.5f).SemiBold().FontColor(Muted);
+                text.Span("Defter").FontSize(7.5f).SemiBold().FontColor(Muted);
                 text.Span($"  ·  {DateTime.Now:dd.MM.yyyy HH:mm} tarihinde oluşturuldu")
                     .FontSize(7.5f).FontColor(Muted);
             });

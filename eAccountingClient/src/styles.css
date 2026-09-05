@@ -1,5 +1,5 @@
 /* ============================================================================
-   AK e-Muhasebe — tasarım sistemi
+   Defter — tasarım sistemi
 
    Kurumsal muhasebe yazılımı dili: koyu lacivert bir kenar çubuğu, açık ve
    sakin bir içerik alanı, yumuşak köşeler ve rakamların hizalı okunmasını
@@ -216,28 +216,41 @@ app-footer {
   white-space: nowrap;
 }
 
+/* Marka işareti bir görsel değil, baş harf: şerit görünümünde tek başına
+   ayakta durması gereken tek parça o. */
 .ak-brand__mark {
-  width: 30px;
-  height: 30px;
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
   flex: none;
   border-radius: 8px;
-  object-fit: cover;
-  background: #fff;
+  background: var(--ak-brand);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .ak-brand__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   font-family: var(--ak-font-display);
-  font-size: 0.95rem;
+  font-size: 0.97rem;
   font-weight: 700;
+  line-height: 1.2;
   letter-spacing: -0.01em;
   color: #fff;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ak-brand__text span {
   color: var(--ak-sidebar-muted);
+  font-size: 0.68rem;
   font-weight: 500;
+  letter-spacing: 0;
 }
 
 .ak-sidebar__user {

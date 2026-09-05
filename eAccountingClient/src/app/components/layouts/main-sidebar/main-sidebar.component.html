@@ -1,7 +1,11 @@
 <aside class="ak-sidebar" [class.is-open]="open">
-  <a routerLink="/" class="ak-brand" title="AK e-Muhasebe" (click)="navigated.emit()">
-    <img src="assets/ak-logo.png" alt="AK" class="ak-brand__mark" />
-    <span class="ak-brand__text">AK <span>e-Muhasebe</span></span>
+  <a routerLink="/" class="ak-brand" title="Defter" (click)="navigated.emit()">
+    <!-- Şerit görünümünde marka yazısı gizlendiği için baş harf tek başına kalır. -->
+    <span class="ak-brand__mark" aria-hidden="true">D</span>
+    <span class="ak-brand__text">
+      Defter
+      <span>ön muhasebe</span>
+    </span>
   </a>
 
   <div class="ak-sidebar__user">

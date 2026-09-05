@@ -27,13 +27,13 @@
   max-width: 470px;
 }
 
-.login__logo {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 26px;
-  border-radius: 12px;
-  background: #fff;
-  object-fit: cover;
+.login__eyebrow {
+  margin: 0 0 10px;
+  color: #93c5fd;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .login__headline {
@@ -179,12 +179,6 @@
   .login__lead {
     margin-bottom: 0;
     font-size: 0.88rem;
-  }
-
-  .login__logo {
-    width: 46px;
-    height: 46px;
-    margin-bottom: 18px;
   }
 
   .login__panel {
