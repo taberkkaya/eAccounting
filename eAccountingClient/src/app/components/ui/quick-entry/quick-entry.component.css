@@ -1,0 +1,238 @@
+/* --- ana sayfadaki iki düğme ------------------------------------------------ */
+
+.quick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+/* Dokunma hedefleri kasten büyük: telefonda ve yaşlı gözde ıskalanmasın. */
+.quick__action {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 76px;
+  padding: 16px 18px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius);
+  background: var(--ak-surface);
+  box-shadow: var(--ak-shadow);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.14s, box-shadow 0.14s, transform 0.06s;
+}
+
+.quick__action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.quick__action:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.quick__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 12px;
+  font-size: 1.05rem;
+}
+
+.quick__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quick__text strong {
+  color: var(--ak-ink);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.quick__text small {
+  color: var(--ak-muted);
+  font-size: 0.76rem;
+}
+
+.quick__action--in .quick__icon {
+  background: var(--ak-success-soft);
+  color: var(--ak-success);
+}
+
+.quick__action--in:hover:not(:disabled) {
+  border-color: #a7f3d0;
+  box-shadow: 0 3px 12px rgba(5, 150, 105, 0.14);
+}
+
+.quick__action--out .quick__icon {
+  background: var(--ak-danger-soft);
+  color: var(--ak-danger);
+}
+
+.quick__action--out:hover:not(:disabled) {
+  border-color: #fecaca;
+  box-shadow: 0 3px 12px rgba(220, 38, 38, 0.14);
+}
+
+/* --- giriş ekranı ----------------------------------------------------------- */
+
+.entry__label {
+  display: block;
+  margin: 18px 0 8px;
+  color: var(--ak-gray);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.entry__label:first-child {
+  margin-top: 0;
+}
+
+/* Tutar ekranın en belirgin öğesi: girilen ilk ve en önemli bilgi o. */
+.entry__amount {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  border: 2px solid var(--ak-success);
+  border-radius: var(--ak-radius);
+  background: var(--ak-success-soft);
+}
+
+.entry__amount--out {
+  border-color: var(--ak-danger);
+  background: var(--ak-danger-soft);
+}
+
+.entry__amount-input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  height: 56px;
+  border: 0;
+  background: transparent;
+  color: var(--ak-ink);
+  font-family: inherit;
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.entry__amount-input::placeholder {
+  color: var(--ak-muted);
+  opacity: 0.6;
+}
+
+.entry__amount-symbol {
+  color: var(--ak-gray);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* --- hesap seçimi ----------------------------------------------------------- */
+
+.entry__accounts {
+  display: grid;
+  gap: 8px;
+}
+
+.entry__account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 14px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.13s, background 0.13s;
+}
+
+.entry__account:hover {
+  background: var(--ak-surface-2);
+}
+
+.entry__account.is-selected {
+  border-color: var(--ak-brand);
+  background: var(--ak-brand-soft);
+}
+
+.entry__account-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: 9px;
+  background: var(--ak-surface-3);
+  color: var(--ak-gray);
+}
+
+.entry__account.is-selected .entry__account-icon {
+  background: var(--ak-brand);
+  color: #fff;
+}
+
+.entry__account-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.entry__account-text strong {
+  color: var(--ak-ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry__account-text small {
+  color: var(--ak-muted);
+  font-size: 0.74rem;
+}
+
+/* Seçim işareti yer kaplamaya devam ediyor: seçilince satır kaymasın. */
+.entry__account-check {
+  flex: none;
+  color: var(--ak-brand);
+  visibility: hidden;
+}
+
+.entry__account.is-selected .entry__account-check {
+  visibility: visible;
+}
+
+.entry__input {
+  height: 46px;
+}
+
+.entry__save {
+  min-width: 130px;
+  height: 46px;
+}
+
+@media (max-width: 640px) {
+  .quick {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .entry__amount-input {
+    font-size: 1.75rem;
+  }
+}

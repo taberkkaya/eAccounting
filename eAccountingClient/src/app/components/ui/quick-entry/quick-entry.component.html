@@ -1,0 +1,115 @@
+<!-- Ana sayfadaki iki büyük düğme -->
+<div class="quick">
+  <button
+    type="button"
+    class="quick__action quick__action--in"
+    (click)="start(0)"
+    [disabled]="accounts.length === 0"
+  >
+    <span class="quick__icon"><i class="fas fa-arrow-down"></i></span>
+    <span class="quick__text">
+      <strong>Para Girdi</strong>
+      <small>Tahsilat, gelen ödeme</small>
+    </span>
+  </button>
+
+  <button
+    type="button"
+    class="quick__action quick__action--out"
+    (click)="start(1)"
+    [disabled]="accounts.length === 0"
+  >
+    <span class="quick__icon"><i class="fas fa-arrow-up"></i></span>
+    <span class="quick__text">
+      <strong>Para Çıktı</strong>
+      <small>Ödeme, gider</small>
+    </span>
+  </button>
+</div>
+
+<app-modal [open]="open" [title]="title" (closed)="open = false">
+  <div class="ak-modal__body">
+    <!-- 1. Tutar -->
+    <label class="entry__label" for="quickAmount">Ne kadar?</label>
+    <div class="entry__amount" [class.entry__amount--out]="direction === 1">
+      <input
+        id="quickAmount"
+        type="text"
+        inputmode="decimal"
+        class="entry__amount-input"
+        placeholder="0"
+        [(ngModel)]="amountText"
+        name="quickAmount"
+        autocomplete="off"
+      />
+      <span class="entry__amount-symbol">{{ selected?.symbol || "" }}</span>
+    </div>
+
+    <!-- 2. Hesap -->
+    <label class="entry__label">
+      {{ direction === 0 ? "Nereye girdi?" : "Nereden çıktı?" }}
+    </label>
+    <div class="entry__accounts">
+      @for(account of accounts; track account.id){
+      <button
+        type="button"
+        class="entry__account"
+        [class.is-selected]="account.id === accountId"
+        (click)="pick(account)"
+      >
+        <span class="entry__account-icon">
+          <i
+            class="fas"
+            [class.fa-cash-register]="account.kind === 'Kasa'"
+            [class.fa-university]="account.kind === 'Banka'"
+          ></i>
+        </span>
+        <span class="entry__account-text">
+          <strong>{{ account.name }}</strong>
+          <small>{{ account.kind }} · {{ account.currency }}</small>
+        </span>
+        <span class="entry__account-check"><i class="fas fa-check"></i></span>
+      </button>
+      }
+    </div>
+
+    <!-- 3. Açıklama ve tarih -->
+    <label class="entry__label" for="quickDescription">Açıklama</label>
+    <input
+      id="quickDescription"
+      type="text"
+      class="ak-input entry__input"
+      placeholder="Örn. Ahmet Bey'den tahsilat"
+      [(ngModel)]="description"
+      name="quickDescription"
+      autocomplete="off"
+    />
+
+    <label class="entry__label" for="quickDate">Tarih</label>
+    <input
+      id="quickDate"
+      type="date"
+      class="ak-input entry__input"
+      [(ngModel)]="entryDate"
+      name="quickDate"
+    />
+  </div>
+
+  <div class="ak-modal__foot">
+    <button type="button" class="ak-btn" (click)="open = false">Vazgeç</button>
+    <button
+      type="button"
+      class="ak-btn ak-btn--primary entry__save"
+      [disabled]="!canSave"
+      (click)="save()"
+    >
+      @if(saving){
+      <i class="fas fa-circle-notch ak-spin"></i>
+      Kaydediliyor...
+      }@else {
+      <i class="fas fa-check"></i>
+      Kaydet
+      }
+    </button>
+  </div>
+</app-modal>

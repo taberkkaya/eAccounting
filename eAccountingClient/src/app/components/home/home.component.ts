@@ -6,10 +6,13 @@ import { HttpService } from '../../services/http.service';
 import { CashRegisterModel } from '../../models/cashRegister.model';
 import { BankModel } from '../../models/bank.model';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
+import { QuickEntryComponent } from '../ui/quick-entry/quick-entry.component';
+import { QuickAccount } from '../ui/quick-entry/quick-entry.model';
 
 type AccountKind = 'Kasa' | 'Banka';
 
 interface AccountRow {
+  id: string;
   name: string;
   kind: AccountKind;
   currency: string;
@@ -33,7 +36,7 @@ const DONUT_CIRCUMFERENCE = 2 * Math.PI * 54;
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule, NoCompanyComponent],
+  imports: [SharedModule, NoCompanyComponent, QuickEntryComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -104,6 +107,7 @@ export class HomeComponent implements OnInit {
     kind: AccountKind
   ): AccountRow {
     return {
+      id: item.id,
       name: item.name,
       kind,
       currency: item.currencyType?.name ?? '',
@@ -209,6 +213,24 @@ export class HomeComponent implements OnInit {
     const share = this.split().cashShare;
     return `${share * DONUT_CIRCUMFERENCE} ${DONUT_CIRCUMFERENCE}`;
   });
+
+  /** Hızlı hareket ekranının hesap listesi: kasa ve banka bir arada. */
+  readonly quickAccounts = computed<QuickAccount[]>(() =>
+    this.accounts().map((row) => ({
+      id: row.id,
+      name: row.name,
+      kind: row.kind,
+      currency: row.currency,
+      symbol: this.symbolFor(row.currency),
+      balance: row.balance,
+    }))
+  );
+
+  /** Hareket kaydedildikten sonra özetin yeniden çıkarılması gerekiyor. */
+  reload(): void {
+    this.loading.set(true);
+    this.load();
+  }
 
   selectCurrency(currency: string): void {
     this.selectedCurrency.set(currency);

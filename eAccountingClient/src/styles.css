@@ -1223,6 +1223,14 @@ app-footer {
     border-radius: 0;
   }
 
+  /* Telefonda form ekrandan uzun olabiliyor; kaydet düğmesi için sayfanın
+     sonuna kadar inmek gerekmesin. */
+  .ak-modal__foot {
+    position: sticky;
+    bottom: 0;
+    box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.06);
+  }
+
   .ak-modal__foot .ak-btn {
     flex: 1;
   }

@@ -19,6 +19,12 @@
   </div>
   }@else {
 
+  <!-- Hareket girmek için kasa/banka ayrımını bilmek gerekmesin -->
+  <app-quick-entry
+    [accounts]="quickAccounts()"
+    (saved)="reload()"
+  ></app-quick-entry>
+
   <!-- Para birimi bazında özet -->
   <div class="dash-tiles">
     @for(summary of summaries(); track summary.currency){
