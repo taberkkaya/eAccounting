@@ -268,6 +268,83 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* --- son hareketler --------------------------------------------------------- */
+
+.dash-recent {
+  margin-bottom: 16px;
+}
+
+/* Tablo değil satır: telefonda yatay kaydırma gerektirmiyor ve tek dokunuşla
+   hesabın kendi sayfasına götürüyor. */
+.move {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--ak-line-soft);
+  transition: background 0.12s;
+}
+
+.move:last-child {
+  border-bottom: 0;
+}
+
+.move:hover {
+  background: var(--ak-surface-2);
+}
+
+.move__dir {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 9px;
+  font-size: 0.78rem;
+}
+
+.move__dir--in {
+  background: var(--ak-success-soft);
+  color: var(--ak-success);
+}
+
+.move__dir--out {
+  background: var(--ak-danger-soft);
+  color: var(--ak-danger);
+}
+
+.move__text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.move__text strong {
+  color: var(--ak-ink);
+  font-size: 0.89rem;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.move__text small {
+  color: var(--ak-muted);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.move__amount {
+  flex: none;
+  font-size: 0.9rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* --- hızlı erişim ---------------------------------------------------------- */
 
 .dash-links {

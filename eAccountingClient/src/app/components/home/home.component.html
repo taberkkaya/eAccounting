@@ -179,6 +179,55 @@
     </section>
   </div>
 
+  <!-- Son hareketler: hesap hesap dolaşmadan, tabloya girmeden görülsün -->
+  <section class="ak-panel dash-recent">
+    <div class="ak-panel__head">
+      <h2 class="ak-panel__title">Son Hareketler</h2>
+      <span class="ak-tag ak-tag--muted">tümü</span>
+    </div>
+
+    <div class="ak-panel__body ak-panel__body--flush">
+      @for(movement of movements(); track movement.id){
+      <a class="move" [routerLink]="movementLink(movement)">
+        <span
+          class="move__dir"
+          [class.move__dir--in]="movement.deposit > 0"
+          [class.move__dir--out]="movement.withdrawal > 0"
+        >
+          <i class="fas" [class.fa-arrow-down]="movement.deposit > 0" [class.fa-arrow-up]="movement.withdrawal > 0"></i>
+        </span>
+
+        <span class="move__text">
+          <strong>{{ movement.description }}</strong>
+          <small>
+            {{ movement.date | date : "dd.MM.yyyy" }} · {{ movement.accountName }}
+            @if(movement.isTransfer){ · virman }
+          </small>
+        </span>
+
+        <span
+          class="move__amount"
+          [class.ak-positive]="movement.deposit > 0"
+          [class.ak-negative]="movement.withdrawal > 0"
+        >
+          {{ movement.deposit > 0 ? "+" : "−"
+          }}{{
+            (movement.deposit > 0 ? movement.deposit : movement.withdrawal)
+              | trCurrency : symbolFor(movement.currencyName) : true
+          }}
+        </span>
+      </a>
+      }@empty {
+      <div class="ak-empty">
+        <i class="far fa-file-alt"></i>
+        <div class="ak-empty__text">
+          Henüz hareket yok. Yukarıdaki düğmelerden ilkini girebilirsiniz.
+        </div>
+      </div>
+      }
+    </div>
+  </section>
+
   <!-- Hızlı erişim -->
   <div class="dash-links">
     <a class="dash-link" routerLink="/cash-registers">

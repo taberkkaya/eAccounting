@@ -8,6 +8,7 @@ import { BankModel } from '../../models/bank.model';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { QuickEntryComponent } from '../ui/quick-entry/quick-entry.component';
 import { QuickAccount } from '../ui/quick-entry/quick-entry.model';
+import { MovementModel } from '../../models/movement.model';
 
 type AccountKind = 'Kasa' | 'Banka';
 
@@ -49,6 +50,9 @@ export class HomeComponent implements OnInit {
   readonly accounts = signal<AccountRow[]>([]);
   readonly selectedCurrency = signal<string>('');
 
+  /** Ana sayfadan görülebilsin diye bütün hesapların son hareketleri. */
+  readonly movements = signal<MovementModel[]>([]);
+
   readonly donutCircumference = DONUT_CIRCUMFERENCE;
 
   ngOnInit(): void {
@@ -62,8 +66,19 @@ export class HomeComponent implements OnInit {
     this.load();
   }
 
+  private loadMovements(): void {
+    this.http.post<MovementModel[]>(
+      'Movements/GetRecent',
+      { take: 12 },
+      (res) => this.movements.set(res),
+      () => this.movements.set([])
+    );
+  }
+
   /** Kasa ve banka listeleri tek bir hesap listesine indirgeniyor. */
   private load(): void {
+    this.loadMovements();
+
     let pending = 2;
     let cashRegisters: CashRegisterModel[] = [];
     let banks: BankModel[] = [];
@@ -230,6 +245,13 @@ export class HomeComponent implements OnInit {
   reload(): void {
     this.loading.set(true);
     this.load();
+  }
+
+  /** Hareketin ait olduğu hesabın kendi sayfası. */
+  movementLink(movement: MovementModel): string {
+    const base = movement.accountKind === 'Kasa' ? 'cash-registers' : 'banks';
+
+    return `/${base}/details/${movement.accountId}`;
   }
 
   selectCurrency(currency: string): void {
