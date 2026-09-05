@@ -1,4 +1,4 @@
-using eAccountingServer.Application.Services;
+﻿using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Demo;
 using eAccountingServer.Domain.Repositories;
 using eAccountingServer.Domain.Users;
@@ -56,7 +56,15 @@ namespace eAccountingServer.Infrastructure
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer();
-            services.AddAuthorization();
+
+            services.AddAuthorization(options =>
+            {
+                // User and company management is administration, not ordinary use, so it
+                // is gated on the claim the token already carries rather than on merely
+                // being signed in.
+                options.AddPolicy(AuthorizationPolicies.Admin, policy =>
+                    policy.RequireClaim("IsAdmin", bool.TrueString));
+            });
 
             services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
 

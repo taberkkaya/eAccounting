@@ -34,10 +34,12 @@ export const routes: Routes = [
       {
         path: 'users',
         component: UsersComponent,
+        canActivate: [() => inject(AuthService).isAdmin()],
       },
       {
         path: 'companies',
         component: CompaniesComponent,
+        canActivate: [() => inject(AuthService).isAdmin()],
       },
       {
         path: 'cash-registers',

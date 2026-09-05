@@ -1,10 +1,13 @@
 ﻿using eAccountingServer.Application.Features.User;
+using eAccountingServer.Domain.Users;
 using eAccountingServer.WebApi.Abstractions;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eAccountingServer.WebApi.Controller;
 
+[Authorize(Policy = AuthorizationPolicies.Admin)]
 public class UsersController : ApiController
 {
     public UsersController(IMediator mediator) : base(mediator)

@@ -37,4 +37,16 @@ export class AuthService {
     this.user.isAdmin = decode['IsAdmin'] == 'True' ? true : false;
     return true;
   }
+
+  /** Yönetim ekranları için: giriş yapılmış olmak yetmez, yönetici olmak gerekir. */
+  isAdmin() {
+    if (!this.isAuthenticated()) return false;
+
+    if (!this.user.isAdmin) {
+      this.router.navigateByUrl('');
+      return false;
+    }
+
+    return true;
+  }
 }
