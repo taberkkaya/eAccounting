@@ -113,7 +113,8 @@
 >
   <form formValidate #createForm="ngForm" autocomplete="off" (ngSubmit)="create(createForm)">
     <div class="ak-modal__body">
-      <div class="ak-field">
+      <!-- Tür sorulmuyor: hangi düğmeye basıldıysa o. Başlıkta da yazıyor. -->
+      <div class="ak-field" style="margin-bottom: 0">
         <label class="ak-label">Kalem Adı</label>
         <input
           type="text"
@@ -121,17 +122,9 @@
           [(ngModel)]="createModel.name"
           class="ak-input"
           name="name"
-          placeholder="Örn. Kira"
+          [placeholder]="createModel.direction === 0 ? 'Örn. Satış' : 'Örn. Kira'"
         />
         <div class="invalid-feedback"></div>
-      </div>
-
-      <div class="ak-field" style="margin-bottom: 0">
-        <label class="ak-label">Türü</label>
-        <select class="ak-select" name="direction" [(ngModel)]="createModel.direction">
-          <option [value]="0">Gelir</option>
-          <option [value]="1">Gider</option>
-        </select>
       </div>
     </div>
 
@@ -164,6 +157,9 @@
           <option [value]="0">Gelir</option>
           <option [value]="1">Gider</option>
         </select>
+        <p class="ak-muted" style="margin: 6px 0 0; font-size: 0.76rem">
+          Yanlış tarafa eklediyseniz buradan diğer listeye taşıyabilirsiniz.
+        </p>
       </div>
     </div>
 

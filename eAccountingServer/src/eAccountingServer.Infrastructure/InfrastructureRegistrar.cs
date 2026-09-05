@@ -1,6 +1,7 @@
 ﻿using eAccountingServer.Application.Features.DemoVisitors;
 using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Demo;
+using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Repositories;
 using eAccountingServer.Domain.Users;
 using eAccountingServer.Infrastructure.Context;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Scrutor;
 using StackExchange.Redis;
 
@@ -105,6 +107,46 @@ namespace eAccountingServer.Infrastructure
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             context.Database.Migrate();
+
+            MigrateCompanyDatabases(scope.ServiceProvider, context);
+        }
+
+        /// <summary>
+        /// Firmaların kendi veritabanlarını da günceller.
+        ///
+        /// Bunlar ana veritabanıyla birlikte gelmiyordu: yeni bir tablo eklendiğinde
+        /// önceden kurulmuş firmalar onu almıyor ve uygulama o firmada "Invalid object
+        /// name" diye ham bir SQL hatası veriyordu. Arayüzde bir güncelleme düğmesi
+        /// var ama bunu bilmek ve basmak kullanıcıya kalıyordu.
+        ///
+        /// Bir firmanın veritabanına ulaşılamaması diğerlerini ya da uygulamanın
+        /// açılışını engellemiyor; hata kaydediliyor ve sıradakine geçiliyor.
+        /// </summary>
+        private static void MigrateCompanyDatabases(
+            IServiceProvider serviceProvider, ApplicationDbContext context)
+        {
+            var logger = serviceProvider.GetRequiredService<ILoggerFactory>()
+                .CreateLogger(nameof(InfrastructureRegistrar));
+
+            List<Company> companies = context.Companies.AsNoTracking().ToList();
+
+            foreach (Company company in companies)
+            {
+                try
+                {
+                    using CompanyDbContext companyContext = new(company);
+                    companyContext.Database.Migrate();
+                }
+                catch (Exception exception)
+                {
+                    logger.LogError(
+                        exception,
+                        "{Company} firmasının veritabanı güncellenemedi ({Database}).",
+                        company.Name, company.Database.DatabaseName);
+                }
+            }
+
+            logger.LogInformation("{Count} firma veritabanı denetlendi.", companies.Count);
         }
 
         private static IServiceCollection AddDemo(this IServiceCollection services, IConfiguration configuration)
