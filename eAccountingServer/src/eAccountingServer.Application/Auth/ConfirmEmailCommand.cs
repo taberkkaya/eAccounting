@@ -16,15 +16,18 @@ internal sealed class ConfirmEmailCommandHandler(
 {
     public async Task<Result<string>> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
     {
-        AppUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Email == request.Email);
+        AppUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Email == request.Email, cancellationToken);
         if (user is null)
-            return "Kullanıcı bulunamadı.";
+            return Result<string>.Failure("Kullanıcı bulunamadı.");
 
         if (user.EmailConfirmed)
             return "Bu e-posta adresi zaten doğrulanmış.";
 
-        user.EmailConfirmed = true;
-        IdentityResult result = await userManager.ConfirmEmailAsync(user,request.Token);
+        // Onayı ConfirmEmailAsync jetonu doğruladıktan sonra kendisi yazıyor.
+        // Burada baştan işaretlemek, geçersiz jetonla gelen birinin de doğrulanmış
+        // sayılabilmesi demekti: takip edilen varlık daha sonraki bir kayıtla
+        // veritabanına geçebilirdi.
+        IdentityResult result = await userManager.ConfirmEmailAsync(user, request.Token);
         if (!result.Succeeded)
             return Result<string>.Failure(result.Errors.Select(s => s.Description).ToList());
 

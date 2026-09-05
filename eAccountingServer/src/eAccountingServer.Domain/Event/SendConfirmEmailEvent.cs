@@ -1,4 +1,4 @@
-using eAccountingServer.Domain.Mail;
+﻿using eAccountingServer.Domain.Mail;
 using eAccountingServer.Domain.Users;
 using FluentEmail.Core;
 using MediatR;
@@ -29,27 +29,29 @@ public sealed class SendConfirmEmailEvent(
 
         await fluentEmail
             .To(user.Email)
-            .Subject("E-posta adresinizi doğrulayın")
+            .Subject("Defter — e-posta adresinizi doğrulayın")
             .Body(
                 $"""
-                <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#222">
-                  <h2 style="margin:0 0 12px">E-posta adresinizi doğrulayın</h2>
-                  <p>Merhaba {user.FirstName},</p>
-                  <p>
-                    Hesabınızı kullanmaya başlamak için aşağıdaki bağlantıya tıklayarak
-                    <strong>{user.Email}</strong> adresini doğrulayın.
+                <div style="font-family:Inter,Arial,Helvetica,sans-serif;font-size:15px;color:#0f172a">
+                  <h2 style="margin:0 0 12px;font-size:20px">E-posta adresinizi doğrulayın</h2>
+                  <p style="color:#475569">Merhaba {user.FirstName},</p>
+                  <p style="color:#475569">
+                    Defter hesabınızı kullanmaya başlamak için aşağıdaki düğmeye tıklayarak
+                    <strong style="color:#0f172a">{user.Email}</strong> adresini doğrulayın.
                   </p>
-                  <p style="margin:22px 0">
+                  <p style="margin:24px 0">
                     <a href="{confirmUrl}"
-                       style="background:#050505;color:#d8ff36;padding:12px 20px;text-decoration:none;font-weight:bold">
+                       style="display:inline-block;background:#2563eb;color:#ffffff;
+                              padding:13px 24px;border-radius:8px;text-decoration:none;
+                              font-weight:600;font-size:15px">
                       E-postamı doğrula
                     </a>
                   </p>
-                  <p style="color:#666;font-size:13px">
-                    Bağlantı çalışmazsa bu adresi tarayıcınıza yapıştırabilirsiniz:<br>
-                    {confirmUrl}
+                  <p style="color:#64748b;font-size:13px;line-height:1.6">
+                    Düğme çalışmazsa bu adresi tarayıcınıza yapıştırabilirsiniz:<br>
+                    <span style="color:#2563eb;word-break:break-all">{confirmUrl}</span>
                   </p>
-                  <p style="color:#666;font-size:13px">
+                  <p style="color:#94a3b8;font-size:13px">
                     Bu isteği siz yapmadıysanız bu maili yok sayabilirsiniz.
                   </p>
                 </div>

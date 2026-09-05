@@ -6,6 +6,7 @@ using eAccountingServer.WebApi;
 using eAccountingServer.WebApi.Middlewares;
 using eAccountingServer.WebApi.Modules;
 using System.Net;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Scalar.AspNetCore;
@@ -21,6 +22,21 @@ if (string.IsNullOrWhiteSpace(builder.Configuration["Jwt:SecretKey"]))
             "Jwt:SecretKey is not configured. Set the Jwt__SecretKey environment variable.");
 
     builder.Configuration["Jwt:SecretKey"] = RandomNumberGenerator.GetHexString(128);
+}
+
+// Kimlik doğrulama jetonları (e-posta onayı, parola sıfırlama) bu anahtarlarla
+// şifreleniyor. Varsayılan yer konteynerin içi: her dağıtımda anahtarlar
+// yenileniyor ve önceki konteynerin gönderdiği onay bağlantısı geçersiz oluyordu.
+string? keysPath = builder.Configuration["DataProtection:KeysPath"];
+
+if (!string.IsNullOrWhiteSpace(keysPath))
+{
+    Directory.CreateDirectory(keysPath);
+
+    builder.Services.AddDataProtection()
+        // Adı sabitlemek, aynı anahtarların yeniden kullanılabilmesi için şart.
+        .SetApplicationName("eAccounting")
+        .PersistKeysToFileSystem(new DirectoryInfo(keysPath));
 }
 
 builder.Services.AddResponseCompression(

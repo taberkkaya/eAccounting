@@ -18,7 +18,11 @@ services:
       Jwt__Issuer: eAccounting
       Jwt__Audience: eAccounting
       Database__MigrateOnStartup: "true"
-      Identity__RequireConfirmedEmail: "false"
+      # Onay ve parola sıfırlama jetonlarını şifreleyen anahtarlar; kalıcı
+      # olmazsa her dağıtımdan sonra gönderilmiş bağlantılar geçersiz olur.
+      DataProtection__KeysPath: /keys
+      # Hesabıyla giriş yapabilmek için önce e-posta adresini doğrulaması gerekir.
+      Identity__RequireConfirmedEmail: ${REQUIRE_CONFIRMED_EMAIL:-true}
       # Mail gönderimi: SmtpHost boşsa mailler sessizce düşürülür.
       Mail__From: ${MAIL_FROM:-}
       Mail__SmtpHost: ${MAIL_SMTP_HOST:-}
@@ -42,6 +46,8 @@ services:
       Demo__RequireEmailVerification: "true"
       # The client reaches the API through Caddy on the same origin, so no CORS entry.
       Cors__AllowedOrigins__0: ""
+    volumes:
+      - dataprotection-keys:/keys
     healthcheck:
       # Coolify dağıtımda yeni konteynere ne zaman geçeceğini buradan anlıyor;
       # bu olmadan eski konteyner kapanıp yenisi hazır olana kadar açık bir
@@ -76,3 +82,6 @@ services:
       retries: 6
       start_period: 10s
     restart: unless-stopped
+
+volumes:
+  dataprotection-keys:

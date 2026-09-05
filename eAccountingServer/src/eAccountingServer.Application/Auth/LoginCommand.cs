@@ -46,7 +46,7 @@ namespace eAccountingServer.Application.Auth
 
             if (signInResult.IsNotAllowed)
             {
-                return (500, "Your email address not confirmed!");
+                return (500, "E-posta adresiniz henüz doğrulanmadı. Giriş ekranındaki bağlantıdan onay mailini tekrar isteyebilirsiniz.");
             }
 
             if (!signInResult.Succeeded)
