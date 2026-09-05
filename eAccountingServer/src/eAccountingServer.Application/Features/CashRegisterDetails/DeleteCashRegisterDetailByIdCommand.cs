@@ -28,13 +28,13 @@ public sealed class DeleteCashRegisterDetailByIdCommandHandler(
             .GetByExpressionWithTrackingAsync(p => p.Id == request.Id, cancellationToken);
 
         if(cashRegisterDetail is null)
-            return Result<string>.Failure("Cash register detail not found.");
+            return Result<string>.Failure("Kasa hareketi bulunamadı.");
 
         CashRegister? cashRegister = await cashRegisterRepository
             .GetByExpressionWithTrackingAsync(p => p.Id == cashRegisterDetail.CashRegisterId, cancellationToken);
 
         if (cashRegister is null)
-            return Result<string>.Failure("Cash register not found.");
+            return Result<string>.Failure("Kasa bulunamadı.");
 
         cashRegister.DepositAmount -= cashRegisterDetail.DepositAmount;
         cashRegister.WithdrawalAmount -= cashRegisterDetail.WithdrawalAmount;
@@ -45,14 +45,14 @@ public sealed class DeleteCashRegisterDetailByIdCommandHandler(
                 .GetByExpressionWithTrackingAsync(p => p.Id == cashRegisterDetail.CashRegisterDetailId, cancellationToken);
 
             if (oppositeCashRegisterDetail is null)
-                return Result<string>.Failure("Opposite cash register detail not found.");
+                return Result<string>.Failure("Karşı kasa hareketi bulunamadı.");
 
 
             CashRegister? oppositeCashRegister = await cashRegisterRepository
                 .GetByExpressionWithTrackingAsync(p => p.Id == oppositeCashRegisterDetail.CashRegisterId, cancellationToken);
 
             if (oppositeCashRegister is null)
-                return Result<string>.Failure("Opposite cash register not found.");
+                return Result<string>.Failure("Karşı kasa bulunamadı.");
 
 
             // Reverse only what this leg of the transfer contributed; subtracting the
@@ -69,6 +69,6 @@ public sealed class DeleteCashRegisterDetailByIdCommandHandler(
 
         cacheService.Remove("cashRegisters");
 
-        return "Cash register detail deleted successfully.";
+        return "Kasa hareketi silindi.";
     }
 }

@@ -27,13 +27,13 @@ internal sealed class UpdateBankDetailCommandHandler(
             .GetByExpressionWithTrackingAsync(p => p.Id == request.Id, cancellationToken);
 
         if (bankDetail is null)
-            return Result<string>.Failure("Bank detail not found.");
+            return Result<string>.Failure("Banka hareketi bulunamadı.");
 
         Bank? bank = await bankRepository
             .GetByExpressionWithTrackingAsync(p => p.Id == bankDetail.BankId, cancellationToken);
 
         if (bank is null)
-            return Result<string>.Failure("Bank not found.");
+            return Result<string>.Failure("Banka bulunamadı.");
 
         bank.DepositAmount -= bankDetail.DepositAmount;
         bank.WithdrawalAmount -= bankDetail.WithdrawalAmount;
@@ -51,6 +51,6 @@ internal sealed class UpdateBankDetailCommandHandler(
 
         cacheService.Remove("banks");
 
-        return "Bank details updated successfully.";
+        return "Banka hareketi güncellendi.";
     }
 }

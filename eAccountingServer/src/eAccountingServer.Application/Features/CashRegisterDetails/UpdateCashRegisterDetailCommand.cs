@@ -27,13 +27,13 @@ internal sealed class UpdateCashRegisterDetailCommandHandler(
             .GetByExpressionWithTrackingAsync(p => p.Id == request.Id, cancellationToken);
 
         if (cashRegisterDetail is null)
-            return Result<string>.Failure("Cash register detail not found.");
+            return Result<string>.Failure("Kasa hareketi bulunamadı.");
 
         CashRegister? cashRegister = await cashRegisterRepository
             .GetByExpressionWithTrackingAsync(p => p.Id == cashRegisterDetail.CashRegisterId, cancellationToken);
 
         if (cashRegister is null)
-            return Result<string>.Failure("Cash register not found.");
+            return Result<string>.Failure("Kasa bulunamadı.");
 
         cashRegister.DepositAmount -= cashRegisterDetail.DepositAmount;
         cashRegister.WithdrawalAmount -= cashRegisterDetail.WithdrawalAmount;
@@ -51,6 +51,6 @@ internal sealed class UpdateCashRegisterDetailCommandHandler(
 
         cacheService.Remove("cashRegisters");
         
-        return "Cash register details updated successfully.";
+        return "Kasa hareketi güncellendi.";
     }
 }

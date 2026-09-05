@@ -24,7 +24,7 @@ internal sealed class DeleteBankByIdCommandHandler(
        );
 
         if (bank is null)
-            return Result<string>.Failure("Bank not found.");
+            return Result<string>.Failure("Banka bulunamadı.");
 
         bank.IsDeleted = true;
 
@@ -32,6 +32,6 @@ internal sealed class DeleteBankByIdCommandHandler(
         
         cacheService.Remove("banks");
 
-        return "Bank deleted successfully.";
+        return "Banka silindi.";
     }
 }

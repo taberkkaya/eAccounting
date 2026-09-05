@@ -86,6 +86,6 @@ internal sealed class CreateCashRegisterDetailCommandHandler(
 
         cacheService.Remove("cashRegisters");
 
-        return "Cash register detail created successfully.";
+        return "Kasa hareketi eklendi.";
     }
 }

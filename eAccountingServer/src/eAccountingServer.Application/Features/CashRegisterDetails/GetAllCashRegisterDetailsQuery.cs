@@ -26,7 +26,7 @@ internal sealed class GetAllCashRegisterDetailsQueryHandler(
         .FirstOrDefaultAsync(cancellationToken);
 
         if (cashRegister is null)
-            return Result<CashRegister>.Failure("Cash register not found.");
+            return Result<CashRegister>.Failure("Kasa bulunamadı.");
 
         return cashRegister;
     }

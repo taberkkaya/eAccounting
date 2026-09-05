@@ -16,12 +16,12 @@ internal sealed class SendConfirmEmailCommandHandler(
     {
         AppUser? user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
-            return Result<string>.Failure("User not found");
+            return Result<string>.Failure("Kullanıcı bulunamadı.");
         
         if(user.EmailConfirmed)
-            return Result<string>.Failure("Email already confirmed!");
+            return Result<string>.Failure("Bu e-posta adresi zaten doğrulanmış.");
 
         await mediator.Publish(new AppUserEvent(user.Id));
-        return "Confirmation email sent successfully!";
+        return "Onay maili gönderildi.";
     }
 }

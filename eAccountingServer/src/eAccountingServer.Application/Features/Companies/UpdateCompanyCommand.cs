@@ -29,12 +29,12 @@ internal sealed class UpdateCompanyCommandHandler(
             .GetByExpressionWithTrackingAsync(p => p.Id == request.Id, cancellationToken);
 
         if (company is null)
-            return Result<string>.Failure("Company not found.");
+            return Result<string>.Failure("Firma bulunamadı.");
 
         bool isTaxNumberExist = await companyRepository.AnyAsync(p => p.TaxNumber == request.TaxNumber && p.Id != request.Id, cancellationToken);
 
         if (isTaxNumberExist)
-            return Result<string>.Failure("Tax number already exists.");
+            return Result<string>.Failure("Bu vergi numarası zaten kayıtlı.");
 
         company = request.Adapt(company);
 
@@ -42,6 +42,6 @@ internal sealed class UpdateCompanyCommandHandler(
 
         cacheService.Remove("companies");
 
-        return "Company updated successfully.";
+        return "Firma güncellendi.";
     }
 }

@@ -26,7 +26,7 @@ internal sealed class GetAllBankDetailsHandler(
       .FirstOrDefaultAsync(cancellationToken);
 
         if (cashRegister is null)
-            return Result<Bank>.Failure("Bank not found.");
+            return Result<Bank>.Failure("Banka bulunamadı.");
 
         return cashRegister;
     }

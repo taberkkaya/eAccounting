@@ -32,6 +32,6 @@ internal sealed class CreateCashRegisterCommandHandler(
 
         cacheService.Remove("cashRegisters");
 
-        return "Cash register created successfully.";
+        return "Kasa eklendi.";
     }
 }

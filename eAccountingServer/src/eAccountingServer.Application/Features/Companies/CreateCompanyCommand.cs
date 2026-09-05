@@ -27,7 +27,7 @@ public sealed class CreateCompanyCommandHandler(
         bool isTaxNumberExist = await companyRepository.AnyAsync(p => p.TaxNumber == request.TaxNumber, cancellationToken);
 
         if(isTaxNumberExist)
-            return Result<string>.Failure("Tax number already exists.");
+            return Result<string>.Failure("Bu vergi numarası zaten kayıtlı.");
 
         Company company = request.Adapt<Company>();
         await companyRepository.AddAsync(company);
@@ -35,6 +35,6 @@ public sealed class CreateCompanyCommandHandler(
 
         cacheService.Remove("companies");
 
-        return "Company created successfully.";
+        return "Firma eklendi.";
     }
 }

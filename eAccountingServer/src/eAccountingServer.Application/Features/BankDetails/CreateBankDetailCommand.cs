@@ -86,6 +86,6 @@ internal sealed class CreateBankDetailHandler(
 
         cacheService.Remove("banks");
 
-        return "Bank detail created successfully.";
+        return "Banka hareketi eklendi.";
     }
 }

@@ -18,6 +18,6 @@ internal sealed class MigrateAllCompaniesCommandHandler(
         List<Company> companies = await companyRepository.GetAll().ToListAsync(cancellationToken);
         companyService.MigrateAllCompanies(companies);
 
-        return "Companies migration successfully.";
+        return "Firma veritabanları güncellendi.";
     }
 }

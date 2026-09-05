@@ -22,13 +22,13 @@ internal sealed class DeleteBankDetailByIdCommandHandler(
             .GetByExpressionWithTrackingAsync(p => p.Id == request.Id, cancellationToken);
 
         if (bankDetail is null)
-            return Result<string>.Failure("Bank detail not found.");
+            return Result<string>.Failure("Banka hareketi bulunamadı.");
 
         Bank? bank = await bankRepository
             .GetByExpressionWithTrackingAsync(p => p.Id == bankDetail.BankId, cancellationToken);
 
         if (bank is null)
-            return Result<string>.Failure("Bank not found.");
+            return Result<string>.Failure("Banka bulunamadı.");
 
         bank.DepositAmount -= bankDetail.DepositAmount;
         bank.WithdrawalAmount -= bankDetail.WithdrawalAmount;
@@ -39,14 +39,14 @@ internal sealed class DeleteBankDetailByIdCommandHandler(
                 .GetByExpressionWithTrackingAsync(p => p.Id == bankDetail.BankDetailId, cancellationToken);
 
             if (oppositeBankDetail is null)
-                return Result<string>.Failure("Opposite bank detail not found.");
+                return Result<string>.Failure("Karşı banka hareketi bulunamadı.");
 
 
             Bank? oppositeBank = await bankRepository
                 .GetByExpressionWithTrackingAsync(p => p.Id == oppositeBankDetail.BankId, cancellationToken);
 
             if (oppositeBank is null)
-                return Result<string>.Failure("Opposite bank not found.");
+                return Result<string>.Failure("Karşı banka bulunamadı.");
 
 
             // Reverse only what this leg of the transfer contributed; subtracting the
@@ -63,6 +63,6 @@ internal sealed class DeleteBankDetailByIdCommandHandler(
 
         cacheService.Remove("banks");
 
-        return "Bank detail deleted successfully.";
+        return "Banka hareketi silindi.";
     }
 }

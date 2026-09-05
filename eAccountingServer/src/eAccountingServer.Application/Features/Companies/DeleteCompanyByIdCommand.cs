@@ -20,11 +20,11 @@ internal sealed class DeleteCompanyByIdCommandHandler(
             .GetByExpressionWithTrackingAsync(p => p.Id == request.Id, cancellationToken);
 
         if (company is null)
-            return Result<string>.Failure("Company not found.");
+            return Result<string>.Failure("Firma bulunamadı.");
 
         company.IsDeleted = true;
         await unitOfWork.SaveChangesAsync(cancellationToken);
         cacheService.Remove("companies");
-        return "Company deleted successfully.";
+        return "Firma silindi.";
     }
 }

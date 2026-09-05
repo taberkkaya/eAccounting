@@ -29,6 +29,6 @@ internal sealed class DeleteCashRegisterByIdCommandHandler(
 
         cacheService.Remove("cashRegisters");
 
-        return "Cash register removed successfully.";
+        return "Kasa silindi.";
     }
 }

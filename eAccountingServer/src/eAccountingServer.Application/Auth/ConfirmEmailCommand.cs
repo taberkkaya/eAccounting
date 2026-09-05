@@ -18,16 +18,16 @@ internal sealed class ConfirmEmailCommandHandler(
     {
         AppUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Email == request.Email);
         if (user is null)
-            return "User not found!";
+            return "Kullanıcı bulunamadı.";
 
         if (user.EmailConfirmed)
-            return "Email already confirmed!";
+            return "Bu e-posta adresi zaten doğrulanmış.";
 
         user.EmailConfirmed = true;
         IdentityResult result = await userManager.ConfirmEmailAsync(user,request.Token);
         if (!result.Succeeded)
             return Result<string>.Failure(result.Errors.Select(s => s.Description).ToList());
 
-        return "Email confirmed successfully!";
+        return "E-posta adresiniz doğrulandı.";
     }
 }

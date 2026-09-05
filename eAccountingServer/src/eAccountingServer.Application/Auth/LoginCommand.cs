@@ -31,7 +31,7 @@ namespace eAccountingServer.Application.Auth
                 p => p.Email == request.UserNameOrEmail || p.UserName == request.UserNameOrEmail);
 
             if (user is null)
-                return Result<LoginCommandResponse>.Failure("User not found!");
+                return Result<LoginCommandResponse>.Failure("Kullanıcı bulunamadı.");
 
             SignInResult signInResult = await signInManager.CheckPasswordSignInAsync(user, request.Password, true);
 

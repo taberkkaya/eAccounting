@@ -23,7 +23,7 @@ internal sealed class CreateBankCommandHandler(
         
         bool isIBANExists = await bankRepository.AnyAsync(p => p.IBAN == request.IBAN);
         if(isIBANExists)
-            return Result<string>.Failure("IBAN already exists.");
+            return Result<string>.Failure("Bu IBAN zaten kayıtlı.");
 
         Bank bank = request.Adapt<Bank>();
 
@@ -32,7 +32,7 @@ internal sealed class CreateBankCommandHandler(
 
         cacheService.Remove("banks");
         
-        return "Bank created successfully.";
+        return "Banka eklendi.";
     }
 
 }

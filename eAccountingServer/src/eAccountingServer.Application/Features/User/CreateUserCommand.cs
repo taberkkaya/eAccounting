@@ -34,11 +34,11 @@ internal sealed class CreateUserCommandHandler(
     {
         bool isEmailExist = await userManager.Users.AnyAsync(p => p.Email == request.Email);
         if (isEmailExist)
-            return Result<string>.Failure("Email already exists!");
+            return Result<string>.Failure("Bu e-posta adresi zaten kayıtlı.");
 
         bool isUserNameExist = await userManager.Users.AnyAsync(p => p.UserName == request.UserName);
         if (isUserNameExist)
-            return Result<string>.Failure("UserName already exists!");
+            return Result<string>.Failure("Bu kullanıcı adı zaten kullanılıyor.");
 
         var user = request.Adapt<AppUser>();
 
@@ -59,6 +59,6 @@ internal sealed class CreateUserCommandHandler(
         await mediator.Publish(new AppUserEvent(user.Id));
 
 
-        return "User created successfully!";
+        return "Kullanıcı oluşturuldu.";
     }
 }

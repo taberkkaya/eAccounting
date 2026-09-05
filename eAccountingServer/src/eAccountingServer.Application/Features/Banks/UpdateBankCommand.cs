@@ -26,13 +26,13 @@ internal sealed class UpdateBankCommandHandler(
         );
 
         if(bank is null)
-            return Result<string>.Failure("Bank not found.");
+            return Result<string>.Failure("Banka bulunamadı.");
 
         if(bank.IBAN != request.IBAN)
         {
             bool isIBANExists = await bankRepository.AnyAsync(p => p.IBAN == request.IBAN);
             if (isIBANExists)
-                return Result<string>.Failure("IBAN already exists.");
+                return Result<string>.Failure("Bu IBAN zaten kayıtlı.");
         }
 
         request.Adapt(bank);
@@ -40,6 +40,6 @@ internal sealed class UpdateBankCommandHandler(
         await unitOfWorkCompany.SaveChangesAsync(cancellationToken);
         cacheService.Remove("banks");
 
-        return "Bank updated successfully.";
+        return "Banka güncellendi.";
     }
 }
