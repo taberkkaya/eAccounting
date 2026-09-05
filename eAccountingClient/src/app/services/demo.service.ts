@@ -96,7 +96,20 @@ export class DemoService {
   }
 
   openContactPage(): void {
-    window.open(this.contactUrl(), '_blank', 'noopener');
+    window.open(this.resolvedContactUrl(), '_blank', 'noopener');
+  }
+
+  /**
+   * Yapılandırmaya düz bir e-posta adresi girilebiliyor; şema eklemezsek tarayıcı
+   * onu göreli bir yol sanıp bozuk bir sekme açıyor.
+   */
+  private resolvedContactUrl(): string {
+    const value = this.contactUrl();
+
+    if (/^[a-z][a-z0-9+.-]*:/i.test(value)) return value;
+    if (value.includes('@')) return `mailto:${value}`;
+
+    return `https://${value}`;
   }
 
   /** Leaves the demo behind and returns to the sign-in screen. */
