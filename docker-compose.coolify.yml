@@ -19,6 +19,13 @@ services:
       Jwt__Audience: eAccounting
       Database__MigrateOnStartup: "true"
       Identity__RequireConfirmedEmail: "false"
+      # Mail gönderimi: SmtpHost boşsa mailler sessizce düşürülür.
+      Mail__From: ${MAIL_FROM:-}
+      Mail__SmtpHost: ${MAIL_SMTP_HOST:-}
+      Mail__SmtpPort: ${MAIL_SMTP_PORT:-587}
+      Mail__Username: ${MAIL_USERNAME:-}
+      Mail__Password: ${MAIL_PASSWORD:-}
+      Mail__ClientBaseUrl: ${PUBLIC_URL:-}
       Seed__AdminPassword: ${ADMIN_PASSWORD}
       Demo__Enabled: "true"
       Demo__DatabaseNamePrefix: ${DEMO_DB_PREFIX}

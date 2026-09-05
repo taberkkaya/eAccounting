@@ -1,6 +1,9 @@
+using System.Net;
+using System.Net.Mail;
 using eAccountingServer.Application.Behaviors;
 using eAccountingServer.Application.Mail;
 using eAccountingServer.Application.Mapping;
+using eAccountingServer.Domain.Mail;
 using eAccountingServer.Domain.Users;
 using FluentEmail.Core.Interfaces;
 using FluentValidation;
@@ -32,18 +35,38 @@ namespace eAccountingServer.Application
 
         private static IServiceCollection AddEmail(this IServiceCollection services, IConfiguration configuration)
         {
-            string fromAddress = configuration["Mail:From"] ?? "info@eaccounting.com";
-            string? host = configuration["Mail:SmtpHost"];
+            IConfigurationSection section = configuration.GetSection(MailOptions.SectionName);
+            services.Configure<MailOptions>(section);
 
-            var builder = services.AddFluentEmail(fromAddress);
+            MailOptions options = section.Get<MailOptions>() ?? new MailOptions();
 
-            if (string.IsNullOrWhiteSpace(host))
+            var builder = services.AddFluentEmail(
+                options.From,
+                string.IsNullOrWhiteSpace(options.FromName) ? null : options.FromName);
+
+            if (string.IsNullOrWhiteSpace(options.SmtpHost))
             {
                 services.AddSingleton<ISender, NullEmailSender>();
                 return services;
             }
 
-            builder.AddSmtpSender(host, configuration.GetValue("Mail:SmtpPort", 25));
+            // Gerçek mail sunucuları neredeyse her zaman kimlik doğrulama ve TLS ister;
+            // yalnızca host ve port veren kurulum onlara bağlanamaz.
+            builder.AddSmtpSender(() =>
+            {
+                var client = new SmtpClient(options.SmtpHost, options.SmtpPort)
+                {
+                    EnableSsl = options.UseSsl,
+                };
+
+                if (!string.IsNullOrWhiteSpace(options.Username))
+                {
+                    client.UseDefaultCredentials = false;
+                    client.Credentials = new NetworkCredential(options.Username, options.Password);
+                }
+
+                return client;
+            });
 
             return services;
         }
