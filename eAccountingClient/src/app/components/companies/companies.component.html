@@ -154,11 +154,11 @@
         </div>
 
         <div class="ak-field">
-          <label class="ak-label">Sunucu</label>
+          <label class="ak-label">Sunucu <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="createModel.database.server"
+            placeholder="Boş bırakın"
             class="ak-input"
             name="databaseServer"
           />
@@ -166,11 +166,11 @@
         </div>
 
         <div class="ak-field">
-          <label class="ak-label">Veritabanı Adı</label>
+          <label class="ak-label">Veritabanı Adı <span class="ak-muted">(isteğe bağlı)</span></label>
           <input
             type="text"
-            required
             [(ngModel)]="createModel.database.databaseName"
+            placeholder="Firma adından türetilir"
             class="ak-input"
             name="databaseDatabaseName"
           />
@@ -199,8 +199,9 @@
       </div>
 
       <p class="ak-muted" style="margin: 4px 0 0; font-size: 0.78rem">
-        Kullanıcı adı boş bırakılırsa bağlantı Windows kimlik doğrulaması ile
-        kurulur.
+        Bu alanları boş bırakırsanız firma, uygulamanın kendi veritabanı
+        sunucusuna kurulur ve kaydettiğiniz anda kullanıma hazır olur. Yalnızca
+        başka bir sunucu kullanacaksanız doldurun.
       </p>
     </div>
 

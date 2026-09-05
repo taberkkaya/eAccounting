@@ -44,8 +44,19 @@ services:
       # Demoya girmeden önce e-posta doğrulaması. Mail ayarları boşken kod
       # gönderilemeyeceği için doğrulama kendiliğinden devre dışı kalır.
       Demo__RequireEmailVerification: "true"
+      # Yeni firmaların veritabanı burada kurulur. Yönetilen hosting veritabanı
+      # oluşturma yetkisi vermediği için firma arayüzden eklenemiyordu; kendi
+      # sunucumuzda bu kısıt yok. Demo sandbox'ları hosting'de kalmaya devam
+      # ediyor, onlar zaten önceden açılmış durumda.
+      Company__DefaultDatabase__Server: sqlserver,1433
+      Company__DefaultDatabase__Username: sa
+      Company__DefaultDatabase__Password: ${MSSQL_SA_PASSWORD}
+      Company__DefaultDatabase__NamePrefix: Defter_
       # The client reaches the API through Caddy on the same origin, so no CORS entry.
       Cors__AllowedOrigins__0: ""
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     volumes:
       - dataprotection-keys:/keys
     healthcheck:
@@ -83,5 +94,25 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      # Express ücretsiz ve bu iş için fazlasıyla yeterli; ayrıca bellek
+      # iştahı sınırlı, VPS'te yer dar.
+      MSSQL_PID: Express
+      MSSQL_MEMORY_LIMIT_MB: "1024"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 45s
+    restart: unless-stopped
+
 volumes:
   dataprotection-keys:
+  sqlserver-data:

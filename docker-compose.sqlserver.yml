@@ -29,6 +29,10 @@ services:
       ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=eAccountingServerDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=True"
       # The bundled server lets the app create its own sandbox databases.
       Demo__DatabaseNamePrefix: eAccounting_Demo_Slot
+      # ...and the databases of companies added through the interface.
+      Company__DefaultDatabase__Server: sqlserver,1433
+      Company__DefaultDatabase__Username: sa
+      Company__DefaultDatabase__Password: ${MSSQL_SA_PASSWORD}
 
 volumes:
   sqlserver-data:

@@ -1,9 +1,10 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 using eAccountingServer.Application.Behaviors;
 using eAccountingServer.Application.Mail;
 using eAccountingServer.Application.Mapping;
 using eAccountingServer.Domain.Mail;
+using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Users;
 using FluentEmail.Core.Interfaces;
 using FluentValidation;
@@ -19,6 +20,10 @@ namespace eAccountingServer.Application
             MapsterConfig.RegisterMappings();
 
             services.AddEmail(configuration);
+
+            // Yeni firmaların veritabanının kurulacağı sunucu.
+            services.Configure<CompanyDatabaseOptions>(
+                configuration.GetSection(CompanyDatabaseOptions.SectionName));
 
             services.AddMediatR(conf =>
             {
