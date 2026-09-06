@@ -25,4 +25,19 @@ public class MovementsController : ApiController
         var response = await _mediator.Send(request, cancellationToken);
         return StatusCode(response.StatusCode, response);
     }
+
+    /// <summary>
+    /// Seçili filtrelerin sonucunu Excel veya PDF olarak indirir. Hata durumunda
+    /// diğer uçlarla aynı gövdeyi döner ki istemci mesajı gösterebilsin.
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> Export(ExportMovementsQuery request, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+
+        if (!response.IsSuccessful || response.Data is null)
+            return StatusCode(response.StatusCode, response);
+
+        return File(response.Data.Content, response.Data.ContentType, response.Data.FileName);
+    }
 }

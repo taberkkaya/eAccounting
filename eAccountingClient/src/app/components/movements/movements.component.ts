@@ -19,6 +19,15 @@ interface AccountOption {
 /** Açılış aralığı: bugünden geriye kaç gün. */
 const DEFAULT_RANGE_DAYS = 90;
 
+/** Ekranda en fazla kaç satır çizilir. */
+const LIST_LIMIT = 500;
+
+/**
+ * Dosyaya en fazla kaç satır girer. Ekrandan yüksek: tabloyu uzatmak sayfayı
+ * yavaşlatır ama dosyanın eksik olması işe yaramaz hale getirir.
+ */
+const EXPORT_LIMIT = 2000;
+
 /**
  * Bütün hesapların hareketleri tek yerde.
  *
@@ -44,6 +53,12 @@ export class MovementsComponent implements OnInit {
   categories: CategoryModel[] = [];
   accounts: AccountOption[] = [];
   loading = true;
+
+  /** Sürmekte olan dışa aktarma; düğmenin beklemesi için. */
+  exporting: 'excel' | 'pdf' | null = null;
+
+  /** Şablonda yazdırmak için. */
+  readonly listLimit = LIST_LIMIT;
 
   startDate = '';
   endDate = '';
@@ -75,22 +90,51 @@ export class MovementsComponent implements OnInit {
 
     this.http.post<MovementModel[]>(
       'Movements/GetAll',
-      {
-        startDate: this.startDate || null,
-        endDate: this.endDate || null,
-        // Boş dize "hepsi" demek; sunucu null bekliyor.
-        direction: this.direction === '' ? null : +this.direction,
-        accountId: this.accountId || null,
-        categoryId: this.categoryId || null,
-        search: this.search.trim() || null,
-        take: 500,
-      },
+      { ...this.filters(), take: LIST_LIMIT },
       (res) => {
         this.movements = res;
         this.loading = false;
       },
       () => (this.loading = false)
     );
+  }
+
+  /**
+   * Ekrandaki filtreleri sunucuya gönderip biçimlendirilmiş dosyayı indirir.
+   * Dosya sunucuda üretiliyor; böylece Excel ve PDF aynı veriden çıkıyor.
+   */
+  export(format: 'excel' | 'pdf'): void {
+    this.exporting = format;
+
+    this.http.download(
+      'Movements/Export',
+      {
+        ...this.filters(),
+        take: EXPORT_LIMIT,
+        format: format === 'pdf' ? 1 : 0,
+      },
+      `hareketler.${format === 'pdf' ? 'pdf' : 'xlsx'}`,
+      () => (this.exporting = null),
+      () => (this.exporting = null)
+    );
+  }
+
+  /** Liste ve dosya aynı filtreleri kullansın diye tek yerden. */
+  private filters() {
+    return {
+      startDate: this.startDate || null,
+      endDate: this.endDate || null,
+      // Boş dize "hepsi" demek; sunucu null bekliyor.
+      direction: this.direction === '' ? null : +this.direction,
+      accountId: this.accountId || null,
+      categoryId: this.categoryId || null,
+      search: this.search.trim() || null,
+    };
+  }
+
+  /** Liste sınıra dayandıysa kullanıcı eksik baktığını bilmeli. */
+  get capped(): boolean {
+    return this.movements.length >= LIST_LIMIT;
   }
 
   clear(): void {

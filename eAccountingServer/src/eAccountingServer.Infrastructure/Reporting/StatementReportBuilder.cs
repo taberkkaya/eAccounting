@@ -13,19 +13,7 @@ namespace eAccountingServer.Infrastructure.Reporting;
 /// </summary>
 internal sealed class StatementReportBuilder : IStatementReportBuilder
 {
-    private const string Navy = "#0F172A";
-    private const string Blue = "#2563EB";
-    private const string Green = "#059669";
-    private const string Red = "#DC2626";
-    private const string Line = "#E2E8F0";
-    private const string Zebra = "#F8FAFC";
-    private const string Muted = "#64748B";
-
-    static StatementReportBuilder()
-    {
-        // QuestPDF topluluk lisansı; bireysel ve küçük ölçekli kullanım için.
-        QuestPDF.Settings.License = LicenseType.Community;
-    }
+    static StatementReportBuilder() => ReportTheme.EnsureLicense();
 
     public ReportFile Build(Statement statement, ReportFormat format) => format switch
     {
@@ -59,7 +47,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
         sheet.Cell("A1").Value = $"{statement.AccountKind} Ekstresi";
         sheet.Cell("A1").Style
             .Font.SetBold().Font.SetFontSize(16).Font.SetFontColor(XLColor.White)
-            .Fill.SetBackgroundColor(XLColor.FromHtml(Navy))
+            .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Navy))
             .Alignment.SetVertical(XLAlignmentVerticalValues.Center)
             .Alignment.SetIndent(1);
         sheet.Row(1).Height = 30;
@@ -70,7 +58,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
             + $"{statement.StartDate:dd.MM.yyyy} - {statement.EndDate:dd.MM.yyyy}";
         sheet.Cell("A2").Style
             .Font.SetFontColor(XLColor.White)
-            .Fill.SetBackgroundColor(XLColor.FromHtml(Blue))
+            .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Blue))
             .Alignment.SetVertical(XLAlignmentVerticalValues.Center)
             .Alignment.SetIndent(1);
         sheet.Row(2).Height = 20;
@@ -85,7 +73,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
             cell.Value = headers[i];
             cell.Style
                 .Font.SetBold().Font.SetFontColor(XLColor.White)
-                .Fill.SetBackgroundColor(XLColor.FromHtml(Navy))
+                .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Navy))
                 .Alignment.SetHorizontal(i >= 3
                     ? XLAlignmentHorizontalValues.Right
                     : XLAlignmentHorizontalValues.Left)
@@ -113,13 +101,13 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
 
             sheet.Cell(row, 2).Style.DateFormat.Format = "dd.MM.yyyy";
             sheet.Range(row, 4, row, 6).Style.NumberFormat.Format = money;
-            sheet.Cell(row, 4).Style.Font.SetFontColor(XLColor.FromHtml(Green));
-            sheet.Cell(row, 5).Style.Font.SetFontColor(XLColor.FromHtml(Red));
+            sheet.Cell(row, 4).Style.Font.SetFontColor(XLColor.FromHtml(ReportTheme.Green));
+            sheet.Cell(row, 5).Style.Font.SetFontColor(XLColor.FromHtml(ReportTheme.Red));
             sheet.Cell(row, 6).Style.Font.SetBold();
 
             if (index % 2 == 1)
                 sheet.Range(row, 1, row, 6).Style
-                    .Fill.SetBackgroundColor(XLColor.FromHtml(Zebra));
+                    .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Zebra));
 
             row++;
         }
@@ -129,7 +117,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
             sheet.Range(row, 1, row, 6).Merge();
             sheet.Cell(row, 1).Value = "Seçili tarih aralığında hareket bulunamadı.";
             sheet.Cell(row, 1).Style
-                .Font.SetItalic().Font.SetFontColor(XLColor.FromHtml(Muted))
+                .Font.SetItalic().Font.SetFontColor(XLColor.FromHtml(ReportTheme.Muted))
                 .Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
             row++;
         }
@@ -143,18 +131,18 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
 
         sheet.Range(row, 1, row, 6).Style
             .Font.SetBold()
-            .Fill.SetBackgroundColor(XLColor.FromHtml("#EFF6FF"))
+            .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Wash))
             .Border.SetTopBorder(XLBorderStyleValues.Medium)
-            .Border.SetTopBorderColor(XLColor.FromHtml(Navy));
+            .Border.SetTopBorderColor(XLColor.FromHtml(ReportTheme.Navy));
         sheet.Range(row, 4, row, 6).Style.NumberFormat.Format = money;
         sheet.Cell(row, 1).Style.Alignment.SetIndent(1);
 
         // çerçeve ve ölçüler
         IXLRange table = sheet.Range(headerRow, 1, row, 6);
         table.Style.Border.SetInsideBorder(XLBorderStyleValues.Thin)
-            .Border.SetInsideBorderColor(XLColor.FromHtml(Line))
+            .Border.SetInsideBorderColor(XLColor.FromHtml(ReportTheme.Line))
             .Border.SetOutsideBorder(XLBorderStyleValues.Thin)
-            .Border.SetOutsideBorderColor(XLColor.FromHtml(Line));
+            .Border.SetOutsideBorderColor(XLColor.FromHtml(ReportTheme.Line));
 
         sheet.Column(1).Width = 6;
         sheet.Column(2).Width = 13;
@@ -185,18 +173,18 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
             {
                 page.Size(PageSizes.A4);
                 page.Margin(28);
-                page.DefaultTextStyle(text => text.FontSize(9).FontColor(Navy));
+                page.DefaultTextStyle(text => text.FontSize(9).FontColor(ReportTheme.Navy));
 
                 page.Header().Element(container => ComposeHeader(container, statement));
                 page.Content().PaddingVertical(14).Element(container => ComposeBody(container, statement));
-                page.Footer().Element(ComposeFooter);
+                page.Footer().Element(ReportTheme.ComposeFooter);
             });
         }).GeneratePdf();
     }
 
     private static void ComposeHeader(IContainer container, Statement statement)
     {
-        container.Background(Navy).Padding(18).Row(row =>
+        container.Background(ReportTheme.Navy).Padding(18).Row(row =>
         {
             row.RelativeItem().Column(column =>
             {
@@ -210,7 +198,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
             row.ConstantItem(190).AlignRight().Column(column =>
             {
                 column.Item().Text("DÖNEM")
-                    .FontSize(7).SemiBold().FontColor(Muted).LetterSpacing(0.12f);
+                    .FontSize(7).SemiBold().FontColor(ReportTheme.Muted).LetterSpacing(0.12f);
 
                 column.Item().PaddingTop(2)
                     .Text($"{statement.StartDate:dd.MM.yyyy} — {statement.EndDate:dd.MM.yyyy}")
@@ -236,35 +224,35 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
         container.Row(row =>
         {
             row.RelativeItem().Element(c => SummaryCard(
-                c, "GİREN", Money(statement.TotalDeposit, statement.CurrencySymbol), Green));
+                c, "GİREN", ReportTheme.Money(statement.TotalDeposit, statement.CurrencySymbol), ReportTheme.Green));
 
             row.ConstantItem(10);
 
             row.RelativeItem().Element(c => SummaryCard(
-                c, "ÇIKAN", Money(statement.TotalWithdrawal, statement.CurrencySymbol), Red));
+                c, "ÇIKAN", ReportTheme.Money(statement.TotalWithdrawal, statement.CurrencySymbol), ReportTheme.Red));
 
             row.ConstantItem(10);
 
             row.RelativeItem().Element(c => SummaryCard(
-                c, "DÖNEM NETİ", Money(statement.Net, statement.CurrencySymbol),
-                statement.Net < 0 ? Red : Blue));
+                c, "DÖNEM NETİ", ReportTheme.Money(statement.Net, statement.CurrencySymbol),
+                statement.Net < 0 ? ReportTheme.Red : ReportTheme.Blue));
 
             row.ConstantItem(10);
 
             row.RelativeItem().Element(c => SummaryCard(
-                c, "HAREKET", statement.Lines.Count.ToString(), Navy));
+                c, "HAREKET", statement.Lines.Count.ToString(), ReportTheme.Navy));
         });
     }
 
     private static void SummaryCard(IContainer container, string label, string value, string color)
     {
         container
-            .Border(1).BorderColor(Line)
-            .Background(Zebra)
+            .Border(1).BorderColor(ReportTheme.Line)
+            .Background(ReportTheme.Zebra)
             .PaddingVertical(9).PaddingHorizontal(11)
             .Column(column =>
             {
-                column.Item().Text(label).FontSize(7).SemiBold().FontColor(Muted);
+                column.Item().Text(label).FontSize(7).SemiBold().FontColor(ReportTheme.Muted);
                 column.Item().PaddingTop(3).Text(value).FontSize(11).SemiBold().FontColor(color);
             });
     }
@@ -273,9 +261,9 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
     {
         if (statement.Lines.Count == 0)
         {
-            container.Border(1).BorderColor(Line).Padding(30).AlignCenter()
+            container.Border(1).BorderColor(ReportTheme.Line).Padding(30).AlignCenter()
                 .Text("Seçili tarih aralığında hareket bulunamadı.")
-                .FontSize(9).Italic().FontColor(Muted);
+                .FontSize(9).Italic().FontColor(ReportTheme.Muted);
             return;
         }
 
@@ -307,9 +295,9 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
             foreach (StatementLine line in statement.Lines)
             {
                 running += line.Deposit - line.Withdrawal;
-                string background = index % 2 == 1 ? Zebra : Colors.White;
+                string background = index % 2 == 1 ? ReportTheme.Zebra : Colors.White;
 
-                BodyCell(table.Cell(), background).Text((index + 1).ToString()).FontColor(Muted);
+                BodyCell(table.Cell(), background).Text((index + 1).ToString()).FontColor(ReportTheme.Muted);
                 BodyCell(table.Cell(), background).Text(line.Date.ToString("dd.MM.yyyy"));
 
                 BodyCell(table.Cell(), background).Text(text =>
@@ -317,39 +305,39 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
                     text.Span(line.Description);
 
                     if (line.IsTransfer)
-                        text.Span("  · virman").FontSize(7).FontColor(Muted);
+                        text.Span("  · virman").FontSize(7).FontColor(ReportTheme.Muted);
                 });
 
                 MoneyCell(table.Cell(), background, line.Deposit, statement.CurrencySymbol,
-                    line.Deposit > 0 ? Green : Muted);
+                    line.Deposit > 0 ? ReportTheme.Green : ReportTheme.Muted);
 
                 MoneyCell(table.Cell(), background, line.Withdrawal, statement.CurrencySymbol,
-                    line.Withdrawal > 0 ? Red : Muted);
+                    line.Withdrawal > 0 ? ReportTheme.Red : ReportTheme.Muted);
 
                 BodyCell(table.Cell(), background).AlignRight()
-                    .Text(Money(running, statement.CurrencySymbol))
-                    .SemiBold().FontColor(running < 0 ? Red : Navy);
+                    .Text(ReportTheme.Money(running, statement.CurrencySymbol))
+                    .SemiBold().FontColor(running < 0 ? ReportTheme.Red : ReportTheme.Navy);
 
                 index++;
             }
 
             // toplam satırı
-            table.Cell().ColumnSpan(3).Background("#EFF6FF")
-                .BorderTop(1).BorderColor(Navy)
+            table.Cell().ColumnSpan(3).Background(ReportTheme.Wash)
+                .BorderTop(1).BorderColor(ReportTheme.Navy)
                 .PaddingVertical(7).PaddingHorizontal(6)
                 .Text("TOPLAM").SemiBold();
 
-            TotalCell(table.Cell(), statement.TotalDeposit, statement.CurrencySymbol, Green);
-            TotalCell(table.Cell(), statement.TotalWithdrawal, statement.CurrencySymbol, Red);
+            TotalCell(table.Cell(), statement.TotalDeposit, statement.CurrencySymbol, ReportTheme.Green);
+            TotalCell(table.Cell(), statement.TotalWithdrawal, statement.CurrencySymbol, ReportTheme.Red);
             TotalCell(table.Cell(), statement.Net, statement.CurrencySymbol,
-                statement.Net < 0 ? Red : Navy);
+                statement.Net < 0 ? ReportTheme.Red : ReportTheme.Navy);
         });
     }
 
     private static void HeaderCell(IContainer container, string text, bool right = false)
     {
         IContainer cell = container
-            .Background(Navy)
+            .Background(ReportTheme.Navy)
             .PaddingVertical(7).PaddingHorizontal(6);
 
         if (right) cell = cell.AlignRight();
@@ -360,50 +348,23 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
     private static IContainer BodyCell(IContainer container, string background) =>
         container
             .Background(background)
-            .BorderBottom(0.5f).BorderColor(Line)
+            .BorderBottom(0.5f).BorderColor(ReportTheme.Line)
             .PaddingVertical(5).PaddingHorizontal(6);
 
     private static void MoneyCell(
         IContainer container, string background, decimal amount, string symbol, string color)
     {
         BodyCell(container, background).AlignRight()
-            .Text(amount == 0 ? "—" : Money(amount, symbol))
+            .Text(amount == 0 ? "—" : ReportTheme.Money(amount, symbol))
             .FontColor(color);
     }
 
     private static void TotalCell(IContainer container, decimal amount, string symbol, string color)
     {
-        container.Background("#EFF6FF")
-            .BorderTop(1).BorderColor(Navy)
+        container.Background(ReportTheme.Wash)
+            .BorderTop(1).BorderColor(ReportTheme.Navy)
             .PaddingVertical(7).PaddingHorizontal(6)
             .AlignRight()
-            .Text(Money(amount, symbol)).SemiBold().FontColor(color);
+            .Text(ReportTheme.Money(amount, symbol)).SemiBold().FontColor(color);
     }
-
-    private static void ComposeFooter(IContainer container)
-    {
-        container.BorderTop(0.5f).BorderColor(Line).PaddingTop(7).Row(row =>
-        {
-            row.RelativeItem().Text(text =>
-            {
-                text.Span("Defter").FontSize(7.5f).SemiBold().FontColor(Muted);
-                text.Span($"  ·  {DateTime.Now:dd.MM.yyyy HH:mm} tarihinde oluşturuldu")
-                    .FontSize(7.5f).FontColor(Muted);
-            });
-
-            row.ConstantItem(90).AlignRight().Text(text =>
-            {
-                text.DefaultTextStyle(style => style.FontSize(7.5f).FontColor(Muted));
-                text.CurrentPageNumber();
-                text.Span(" / ");
-                text.TotalPages();
-            });
-        });
-    }
-
-    /// <summary>Tutarlar Türkçe biçimde, binlik ayracıyla ve sembolle yazılır.</summary>
-    private static string Money(decimal amount, string symbol) =>
-        string.Create(
-            System.Globalization.CultureInfo.GetCultureInfo("tr-TR"),
-            $"{amount:N2} {symbol}").Trim();
 }

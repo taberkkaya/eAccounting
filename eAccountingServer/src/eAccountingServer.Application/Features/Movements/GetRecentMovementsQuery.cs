@@ -143,6 +143,32 @@ internal sealed class MovementReader(
             .ToList();
     }
 
+    /// <summary>
+    /// Bir hesabın adı. Filtre sonuç döndürmediğinde hareketlerden okunamadığı
+    /// için rapor başlığı bunu ayrıca soruyor.
+    /// </summary>
+    public async Task<string?> AccountNameAsync(Guid id, CancellationToken cancellationToken)
+    {
+        CashRegister? cash = await cashRegisterRepository
+            .Where(account => account.Id == id).FirstOrDefaultAsync(cancellationToken);
+
+        if (cash is not null) return cash.Name;
+
+        Bank? bank = await bankRepository
+            .Where(account => account.Id == id).FirstOrDefaultAsync(cancellationToken);
+
+        return bank?.Name;
+    }
+
+    /// <summary>Bir kalemin adı; <see cref="AccountNameAsync"/> ile aynı sebeple.</summary>
+    public async Task<string?> CategoryNameAsync(Guid id, CancellationToken cancellationToken)
+    {
+        Category? category = await categoryRepository
+            .Where(item => item.Id == id).FirstOrDefaultAsync(cancellationToken);
+
+        return category?.Name;
+    }
+
     private static MovementDto Map(
         Guid id, Guid accountId, string accountName, string kind, string currency,
         DateOnly date, string description, decimal deposit, decimal withdrawal,
