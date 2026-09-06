@@ -132,7 +132,7 @@
             <th class="ak-table__num">#</th>
             <th>Tarih</th>
             <th>Açıklama</th>
-            <th>Kalem</th>
+            <th>Kalem / Cari</th>
             <th>Hesap</th>
             <th class="ak-table__amount">Giren</th>
             <th class="ak-table__amount">Çıkan</th>
@@ -149,8 +149,15 @@
               <span class="ak-tag ak-tag--muted">virman</span>
               }
             </td>
+            <!-- Faturasız hareketin etiketi kalem, cariye bağlı olanınki cari
+                 adı: ikisi de "bu para neyle ilgili" sorusunun cevabı. -->
             <td>
-              @if(movement.categoryName){
+              @if(movement.contactName){
+              <a class="mv-account" [routerLink]="['/contacts', movement.contactId]">
+                <i class="fas fa-address-book"></i>
+                {{ movement.contactName }}
+              </a>
+              }@else if(movement.categoryName){
               <span class="ak-tag">{{ movement.categoryName }}</span>
               }@else {
               <span class="ak-muted">—</span>

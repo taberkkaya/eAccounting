@@ -48,10 +48,7 @@ internal sealed class GetAgingReportQueryHandler(
         InvoiceType type = (InvoiceType)request.Type;
 
         List<Invoice> invoices = await invoiceRepository
-            .Where(p => p.Type == type
-                && p.Status != InvoiceStatus.Paid
-                && p.Status != InvoiceStatus.Cancelled
-                && p.Status != InvoiceStatus.Draft)
+            .Where(p => p.Type == type && p.Status != InvoiceStatus.Paid)
             .ToListAsync(cancellationToken);
 
         Dictionary<Guid, Contact> contacts = await contactRepository
@@ -135,10 +132,7 @@ internal sealed class GetVatReportQueryHandler(
         // KDV yalnızca TL üzerinden anlamlı; dövizli faturalar kur çevirisi
         // gerektirir ve o çeviri burada yapılmıyor.
         List<Invoice> invoices = await invoiceRepository
-            .Where(p => p.Date >= request.StartDate
-                && p.Date <= request.EndDate
-                && p.Status != InvoiceStatus.Cancelled
-                && p.Status != InvoiceStatus.Draft)
+            .Where(p => p.Date >= request.StartDate && p.Date <= request.EndDate)
             .ToListAsync(cancellationToken);
 
         invoices = invoices.Where(p => p.CurrencyType.Value == CurrencyTypeEnum.TL.Value).ToList();
@@ -206,10 +200,7 @@ internal sealed class GetProfitLossQueryHandler(
         GetProfitLossQuery request, CancellationToken cancellationToken)
     {
         List<Invoice> invoices = (await invoiceRepository
-            .Where(p => p.Date >= request.StartDate
-                && p.Date <= request.EndDate
-                && p.Status != InvoiceStatus.Cancelled
-                && p.Status != InvoiceStatus.Draft)
+            .Where(p => p.Date >= request.StartDate && p.Date <= request.EndDate)
             .ToListAsync(cancellationToken))
             .Where(p => p.CurrencyType.Value == CurrencyTypeEnum.TL.Value)
             .ToList();

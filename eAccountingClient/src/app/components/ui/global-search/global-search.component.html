@@ -1,0 +1,58 @@
+<div class="gs" [class.is-open]="open">
+  <div class="gs__field">
+    <i class="fas fa-search gs__icon"></i>
+    <input
+      #input
+      type="search"
+      class="gs__input"
+      [(ngModel)]="term"
+      (ngModelChange)="onInput()"
+      (keydown)="onKeydown($event)"
+      (focus)="term.length > 0 && (open = true)"
+      placeholder="Cari, ürün, fatura ara"
+      autocomplete="off"
+      aria-label="Genel arama"
+    />
+    @if(term){
+    <button type="button" class="gs__clear" (click)="close()" aria-label="Aramayı temizle">
+      <i class="fas fa-times"></i>
+    </button>
+    }@else {
+    <kbd class="gs__kbd">{{ shortcut }}</kbd>
+    }
+  </div>
+
+  @if(open){
+  <div class="gs__panel">
+    @if(loading){
+    <div class="gs__note">
+      <i class="fas fa-circle-notch ak-spin"></i>
+      Aranıyor...
+    </div>
+    }@else if(term.trim().length < 2){
+    <div class="gs__note">En az iki harf yazın.</div>
+    }@else {
+    @for(hit of hits; track hit.kind + hit.id; let i = $index){
+    <button
+      type="button"
+      class="gs__hit"
+      [class.is-active]="i === activeIndex"
+      (mouseenter)="activeIndex = i"
+      (click)="go(hit)"
+    >
+      <span class="gs__hit-icon"><i [class]="iconOf(hit.kind)"></i></span>
+      <span class="gs__hit-text">
+        <strong>{{ hit.title }}</strong>
+        <small>{{ hit.hint || labelOf(hit.kind) }}</small>
+      </span>
+      @if(hit.meta){
+      <span class="gs__hit-meta">{{ hit.meta }}</span>
+      }
+    </button>
+    }@empty {
+    <div class="gs__note">Sonuç yok.</div>
+    }
+    }
+  </div>
+  }
+</div>

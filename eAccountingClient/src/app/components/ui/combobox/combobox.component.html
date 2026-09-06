@@ -1,0 +1,75 @@
+<button
+  #trigger
+  type="button"
+  class="combo__trigger ak-select"
+  [class.is-open]="open"
+  [class.is-placeholder]="isPlaceholder"
+  [disabled]="disabled"
+  [attr.aria-expanded]="open"
+  aria-haspopup="listbox"
+  (click)="toggle($event)"
+  (keydown)="onTriggerKeydown($event)"
+>
+  <span class="combo__value">{{ display }}</span>
+</button>
+
+@if(open){
+<div
+  class="combo__panel"
+  role="listbox"
+  [style.top.px]="top"
+  [style.left.px]="left"
+  [style.width.px]="width"
+>
+  <div class="combo__search">
+    <i class="fas fa-search"></i>
+    <input
+      #searchInput
+      type="text"
+      [(ngModel)]="search"
+      (ngModelChange)="onSearchChange()"
+      (keydown)="onSearchKeydown($event)"
+      placeholder="Ara"
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="combo__list">
+    @if(emptyLabel){
+    <button
+      type="button"
+      class="combo__option combo__option--empty"
+      [class.is-selected]="!value"
+      (click)="pick(null)"
+    >
+      {{ emptyLabel }}
+    </button>
+    }
+
+    @for(option of filtered; track option.value; let i = $index){
+    <button
+      type="button"
+      class="combo__option"
+      role="option"
+      [class.is-active]="i === activeIndex"
+      [class.is-selected]="option.value === value"
+      [attr.aria-selected]="option.value === value"
+      (click)="pick(option)"
+      (mouseenter)="activeIndex = i"
+    >
+      <span class="combo__option-text">
+        <strong>{{ option.label }}</strong>
+        @if(option.hint){
+        <small>{{ option.hint }}</small>
+        }
+      </span>
+      @if(option.value === value){
+      <i class="fas fa-check"></i>
+      }
+    </button>
+    }@empty {
+    <div class="combo__empty">Eşleşen kayıt yok.</div>
+    }
+  </div>
+</div>
+}

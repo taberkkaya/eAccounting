@@ -53,7 +53,15 @@
       </div>
 
       <div class="cd-actions">
-        <button type="button" class="ak-btn ak-btn--primary" (click)="openPayment(0)">
+        <a
+          class="ak-btn ak-btn--primary"
+          routerLink="/invoices/new"
+          [queryParams]="{ type: invoiceType, contactId: contact.id }"
+        >
+          <i class="fas fa-file-invoice"></i>
+          Fatura Kes
+        </a>
+        <button type="button" class="ak-btn" (click)="openPayment(0)">
           <i class="fas fa-arrow-down"></i>
           Tahsilat
         </button>
@@ -62,6 +70,70 @@
           Ödeme
         </button>
       </div>
+    </div>
+  </app-section>
+  }
+
+  <!-- Açık faturalar: tahsilat yapmadan önce hangisine sayılacağına bakılan yer. -->
+  @if(invoices.length > 0){
+  <app-section sectionTitle="Faturalar">
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th>Fatura</th>
+            <th>Tarih</th>
+            <th>Vade</th>
+            <th>Durum</th>
+            <th class="ak-table__amount">Tutar</th>
+            <th class="ak-table__amount">Kalan</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(invoice of invoices; track invoice.id){
+          <tr>
+            <td>
+              <a class="cd-source" [routerLink]="['/invoices', invoice.id]">
+                <i class="far fa-file-alt"></i>
+                <strong>{{ invoice.number }}</strong>
+              </a>
+            </td>
+            <td>{{ invoice.date | date : "dd.MM.yyyy" }}</td>
+            <td [class.ak-negative]="invoice.isOverdue">
+              {{ invoice.dueDate | date : "dd.MM.yyyy" }}
+            </td>
+            <td>
+              <span class="ak-tag" [class.ak-tag--brand]="invoice.remainingAmount > 0">
+                {{ invoice.isOverdue ? "Gecikmiş" : invoice.statusName }}
+              </span>
+            </td>
+            <td class="ak-table__amount">
+              {{ invoice.grandTotal | trCurrency : symbol : true }}
+            </td>
+            <td class="ak-table__amount">
+              @if(invoice.remainingAmount > 0){
+              <strong class="ak-negative">
+                {{ invoice.remainingAmount | trCurrency : symbol : true }}
+              </strong>
+              }@else {
+              <span class="ak-positive">Kapandı</span>
+              }
+            </td>
+            <td>
+              <app-action-menu>
+                <a class="menu__item" [routerLink]="['/invoices', invoice.id]">
+                  <i class="far fa-file-alt"></i> Görüntüle
+                </a>
+                <a class="menu__item" [routerLink]="['/invoices', invoice.id, 'edit']">
+                  <i class="fas fa-pen"></i> Düzenle
+                </a>
+              </app-action-menu>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
     </div>
   </app-section>
   }

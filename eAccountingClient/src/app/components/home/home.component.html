@@ -327,6 +327,7 @@
           <strong>{{ movement.description }}</strong>
           <small>
             {{ movement.date | date : "dd.MM.yyyy" }} · {{ movement.accountName }}
+            @if(movement.contactName){ · {{ movement.contactName }} }
             @if(movement.isTransfer){ · virman }
           </small>
         </span>

@@ -12,6 +12,7 @@ import {
   ContactModel,
   ContactStatementLineModel,
   ContactStatementModel,
+  InvoiceModel,
   currencySymbol,
 } from '../../models/accounting.model';
 
@@ -53,6 +54,9 @@ export class ContactDetailComponent implements OnInit {
   startDate = '';
   endDate = '';
 
+  /** Bu carinin faturaları; ekstre satırından ayrı bir liste olarak. */
+  invoices: InvoiceModel[] = [];
+
   exporting: 'excel' | 'pdf' | null = null;
 
   paymentOpen = false;
@@ -76,7 +80,26 @@ export class ContactDetailComponent implements OnInit {
 
       this.loadContact();
       this.loadStatement();
+      this.loadInvoices();
     });
+  }
+
+  /**
+   * Ekstre "ne oldu"yu, fatura listesi "ne kadarı açık kaldı"yı gösteriyor.
+   * İkisini ayrı tutmak, tahsilat yapmadan önce hangi faturaya sayılacağına
+   * bakmayı kolaylaştırıyor.
+   */
+  private loadInvoices(): void {
+    this.http.post<InvoiceModel[]>(
+      'Invoices/GetAll',
+      { contactId: this.contactId, take: 100 },
+      (res) => (this.invoices = res),
+      () => (this.invoices = [])
+    );
+  }
+
+  get openInvoices(): InvoiceModel[] {
+    return this.invoices.filter((invoice) => invoice.remainingAmount > 0);
   }
 
   loadStatement(): void {
@@ -107,6 +130,12 @@ export class ContactDetailComponent implements OnInit {
   refresh(): void {
     this.loadContact();
     this.loadStatement();
+    this.loadInvoices();
+  }
+
+  /** Carinin türüne göre hangi faturayı kesmek mantıklıysa o. */
+  get invoiceType(): 1 | 2 {
+    return this.contact?.type === 2 ? 2 : 1;
   }
 
   export(format: 'excel' | 'pdf'): void {

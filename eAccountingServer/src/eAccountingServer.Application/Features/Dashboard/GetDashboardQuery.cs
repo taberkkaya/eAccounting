@@ -93,8 +93,7 @@ internal sealed class GetDashboardQueryHandler(
         Dictionary<Guid, Contact> contactsById = contacts.ToDictionary(p => p.Id);
 
         List<Invoice> openInvoices = invoices
-            .Where(p => p.Status is not (InvoiceStatus.Paid or InvoiceStatus.Cancelled
-                or InvoiceStatus.Draft))
+            .Where(p => p.Status != InvoiceStatus.Paid)
             .ToList();
 
         List<Invoice> overdue = openInvoices.Where(p => p.DueDate < today).ToList();

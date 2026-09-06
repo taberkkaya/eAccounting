@@ -7,6 +7,7 @@ import { SwalService } from '../../services/swal.service';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 import { PaymentDialogComponent } from '../ui/payment-dialog/payment-dialog.component';
+import { ComboboxComponent, ComboOption } from '../ui/combobox/combobox.component';
 import {
   ContactModel,
   InvoiceModel,
@@ -31,6 +32,7 @@ const DEFAULT_RANGE_DAYS = 90;
     NoCompanyComponent,
     ActionMenuComponent,
     PaymentDialogComponent,
+    ComboboxComponent,
   ],
   templateUrl: './invoices.component.html',
   styleUrl: './invoices.component.css',
@@ -116,6 +118,14 @@ export class InvoicesComponent implements OnInit {
     this.onlyOverdue = false;
     this.search = '';
     this.getAll();
+  }
+
+  get contactOptions(): ComboOption[] {
+    return this.contacts.map((c) => ({
+      value: c.id,
+      label: c.name,
+      hint: c.typeName,
+    }));
   }
 
   get counts(): { all: number; sales: number; purchase: number; overdue: number } {

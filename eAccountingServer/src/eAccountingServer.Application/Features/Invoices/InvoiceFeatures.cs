@@ -62,11 +62,9 @@ internal static class InvoiceMapping
 
     public static string StatusName(InvoiceStatus status) => status switch
     {
-        InvoiceStatus.Draft => "Taslak",
-        InvoiceStatus.Approved => "Açık",
         InvoiceStatus.PartiallyPaid => "Kısmi Ödendi",
         InvoiceStatus.Paid => "Ödendi",
-        _ => "İptal"
+        _ => "Açık"
     };
 
     public static InvoiceDto Map(Invoice invoice, string contactName)
@@ -80,9 +78,7 @@ internal static class InvoiceMapping
             (int)invoice.Status, StatusName(invoice.Status),
             invoice.SubTotal, invoice.DiscountTotal, invoice.VatTotal, invoice.GrandTotal,
             invoice.PaidAmount, invoice.GrandTotal - invoice.PaidAmount,
-            invoice.DueDate < today
-                && invoice.Status is not (InvoiceStatus.Paid or InvoiceStatus.Cancelled
-                    or InvoiceStatus.Draft),
+            invoice.DueDate < today && invoice.Status != InvoiceStatus.Paid,
             invoice.Note,
             (invoice.Lines ?? [])
                 .Select(l => new InvoiceLineDto(
@@ -150,10 +146,7 @@ internal sealed class GetAllInvoicesQueryHandler(
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
-            query = query.Where(p => p.DueDate < today
-                && p.Status != InvoiceStatus.Paid
-                && p.Status != InvoiceStatus.Cancelled
-                && p.Status != InvoiceStatus.Draft);
+            query = query.Where(p => p.DueDate < today && p.Status != InvoiceStatus.Paid);
         }
 
         List<Invoice> invoices = await query

@@ -19,16 +19,19 @@ public enum InvoiceType
 }
 
 /// <summary>
-/// Faturanın hayatındaki yer. Taslak hiçbir yere işlemez; onaylanınca cariye ve
-/// stoğa yazılır, tahsilat girildikçe kısmen ya da tamamen kapanır.
+/// Faturanın hayatındaki yer: kesildiği anda cariye ve stoğa işleniyor, tahsilat
+/// girildikçe kısmen ya da tamamen kapanıyor.
+///
+/// Taslak ve iptal durumları vardı ama hiçbir yol onları üretmiyordu; her sorgu
+/// "taslak değilse ve iptal değilse" koşulunu boşuna taşıyor, okuyan da olmayan
+/// bir akış olduğunu sanıyordu. Faturayı geri almanın yolu silmek, ve silme
+/// cari ile stoğu birlikte geri alıyor.
 /// </summary>
 public enum InvoiceStatus
 {
-    Draft = 0,
     Approved = 1,
     PartiallyPaid = 2,
-    Paid = 3,
-    Cancelled = 4
+    Paid = 3
 }
 
 /// <summary>

@@ -12,4 +12,7 @@ export class MovementModel {
   isTransfer: boolean = false;
   categoryId: string | null = null;
   categoryName: string | null = null;
+  /** Tahsilat ya da ödemeyse hangi cariyle. */
+  contactId: string | null = null;
+  contactName: string | null = null;
 }

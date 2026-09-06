@@ -61,12 +61,13 @@
       <input type="date" class="ak-input" [(ngModel)]="startDate" aria-label="Başlangıç tarihi" />
       <input type="date" class="ak-input" [(ngModel)]="endDate" aria-label="Bitiş tarihi" />
 
-      <select class="ak-select" [(ngModel)]="contactId" aria-label="Cari">
-        <option value="">Tüm cariler</option>
-        @for(contact of contacts; track contact.id){
-        <option [value]="contact.id">{{ contact.name }}</option>
-        }
-      </select>
+      <app-combobox
+        class="iv-contact-filter"
+        [options]="contactOptions"
+        [(ngModel)]="contactId"
+        emptyLabel="Tüm cariler"
+        placeholder="Tüm cariler"
+      ></app-combobox>
 
       <select class="ak-select" [(ngModel)]="statusFilter" aria-label="Durum">
         <option value="">Tüm durumlar</option>
@@ -188,6 +189,13 @@
                 }
                 <a class="menu__item" [routerLink]="['/invoices', invoice.id, 'edit']">
                   <i class="fas fa-pen"></i> Düzenle
+                </a>
+                <a
+                  class="menu__item"
+                  routerLink="/invoices/new"
+                  [queryParams]="{ copyFrom: invoice.id }"
+                >
+                  <i class="far fa-copy"></i> Kopyala
                 </a>
                 <div class="menu__separator"></div>
                 <button

@@ -103,10 +103,7 @@ internal sealed class GetAllContactsQueryHandler(
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
         return await invoiceRepository
-            .Where(p => p.DueDate < today
-                && p.Status != InvoiceStatus.Paid
-                && p.Status != InvoiceStatus.Cancelled
-                && p.Status != InvoiceStatus.Draft)
+            .Where(p => p.DueDate < today && p.Status != InvoiceStatus.Paid)
             .GroupBy(p => p.ContactId)
             .Select(g => new { g.Key, Amount = g.Sum(p => p.GrandTotal - p.PaidAmount) })
             .ToDictionaryAsync(x => x.Key, x => x.Amount, cancellationToken);

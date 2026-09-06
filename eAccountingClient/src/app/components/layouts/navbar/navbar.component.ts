@@ -6,11 +6,12 @@ import { HttpService } from '../../../services/http.service';
 import { LoginResponseModel } from '../../../models/login.response.model';
 import { DemoBannerComponent } from '../../demo/demo-banner/demo-banner.component';
 import { DemoService } from '../../../services/demo.service';
+import { GlobalSearchComponent } from '../../ui/global-search/global-search.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [FormsModule, DemoBannerComponent],
+  imports: [FormsModule, DemoBannerComponent, GlobalSearchComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })

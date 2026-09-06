@@ -34,6 +34,11 @@
       Düzenle
     </a>
 
+    <a class="ak-btn" routerLink="/invoices/new" [queryParams]="{ copyFrom: invoice.id }">
+      <i class="far fa-copy"></i>
+      Kopyala
+    </a>
+
     <button type="button" class="ak-btn" (click)="print()">
       <i class="fas fa-print"></i>
       Yazdır
@@ -60,8 +65,22 @@
       </div>
     </div>
 
-    <!-- taraflar ve tarihler -->
+    <!-- taraflar ve tarihler. Satış faturasında satıcı biziz, alışta alıcı. -->
     <div class="id-doc__parties">
+      @if(company){
+      <div class="id-party">
+        <span class="id-party__label">
+          {{ invoice.type === 1 ? "SATICI" : "ALICI" }}
+        </span>
+        <strong>{{ company.name }}</strong>
+        <div class="id-party__meta">
+          @if(company.taxNumber){<span>VKN/TCKN: {{ company.taxNumber }}</span>}
+          @if(company.taxDepartment){<span>{{ company.taxDepartment }} V.D.</span>}
+          @if(company.address){<span>{{ company.address }}</span>}
+        </div>
+      </div>
+      }
+
       <div class="id-party">
         <span class="id-party__label">
           {{ invoice.type === 1 ? "ALICI" : "SATICI" }}

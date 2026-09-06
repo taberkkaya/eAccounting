@@ -7,6 +7,7 @@ import { SwalService } from '../../services/swal.service';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { PaymentDialogComponent } from '../ui/payment-dialog/payment-dialog.component';
 import {
+  CompanyProfileModel,
   ContactModel,
   InvoiceLineModel,
   InvoiceModel,
@@ -37,6 +38,13 @@ export class InvoiceDetailComponent implements OnInit {
   invoiceId = '';
   invoice: InvoiceModel | null = null;
   contact: ContactModel | null = null;
+
+  /**
+   * Kendi firmamızın künyesi. Belgede yalnızca karşı taraf yazıyordu; bir
+   * faturanın kimin kestiğini söylememesi kâğıda basılınca eksik kalıyor.
+   */
+  company: CompanyProfileModel | null = null;
+
   loading = true;
 
   paymentOpen = false;
@@ -47,10 +55,21 @@ export class InvoiceDetailComponent implements OnInit {
       return;
     }
 
+    this.loadCompany();
+
     this.route.params.subscribe((params) => {
       this.invoiceId = params['id'];
       this.load();
     });
+  }
+
+  private loadCompany(): void {
+    this.http.post<CompanyProfileModel>(
+      'Companies/GetProfile',
+      {},
+      (res) => (this.company = res),
+      () => (this.company = null)
+    );
   }
 
   load(): void {

@@ -6,6 +6,7 @@ import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 import { SwalService } from '../../services/swal.service';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
+import { ComboboxComponent, ComboOption } from '../ui/combobox/combobox.component';
 import { CashRegisterModel } from '../../models/cashRegister.model';
 import { BankModel } from '../../models/bank.model';
 import {
@@ -43,7 +44,7 @@ const DUE_PRESETS = [
 @Component({
   selector: 'app-invoice-form',
   standalone: true,
-  imports: [SharedModule, NoCompanyComponent],
+  imports: [SharedModule, NoCompanyComponent, ComboboxComponent],
   templateUrl: './invoice-form.component.html',
   styleUrl: './invoice-form.component.css',
   providers: [DatePipe],
@@ -103,6 +104,31 @@ export class InvoiceFormComponent implements OnInit {
     const kind = this.type === 1 ? 'Satış Faturası' : 'Alış Faturası';
 
     return this.isEdit ? `${kind} Düzenle` : `Yeni ${kind}`;
+  }
+
+  /** Cari seçicideki satırlar; ipucu satırında vergi numarası ve bakiye. */
+  get contactOptions(): ComboOption[] {
+    return this.contacts.map((c) => ({
+      value: c.id,
+      label: c.name,
+      hint: [c.typeName, c.taxNumber, c.currencyName].filter(Boolean).join(' · '),
+    }));
+  }
+
+  /** Ürün seçicideki satırlar; fiyat ve stok ipucu satırında. */
+  get productOptions(): ComboOption[] {
+    const price = (p: ProductModel) =>
+      (this.type === 1 ? p.salePrice : p.purchasePrice).toLocaleString('tr-TR', {
+        minimumFractionDigits: 2,
+      });
+
+    return this.products.map((p) => ({
+      value: p.id,
+      label: p.name,
+      hint: p.isService
+        ? `Hizmet · ${price(p)} ${p.currencyName}`
+        : `${price(p)} ${p.currencyName} · stok ${p.stockQuantity} ${p.unit}`,
+    }));
   }
 
   get contact(): ContactModel | null {
@@ -278,20 +304,58 @@ export class InvoiceFormComponent implements OnInit {
   // --- yükleme ------------------------------------------------------------
 
   private startNew(): void {
-    const queryType = Number(this.route.snapshot.queryParamMap.get('type'));
+    const params = this.route.snapshot.queryParamMap;
+    const queryType = Number(params.get('type'));
     this.type = queryType === 2 ? 2 : 1;
 
     const today = new Date();
     this.invoiceDate = this.format(today);
     this.dueDate = this.format(today);
     this.lines = [];
-    this.addLine();
-    this.loadNextNumber();
     this.loading = false;
 
     // Cari adresten geldiyse önden seçili gelsin.
-    const contactId = this.route.snapshot.queryParamMap.get('contactId');
+    const contactId = params.get('contactId');
     if (contactId) this.contactId = contactId;
+
+    // Kopyalama: aynı müşteriye her ay aynı faturayı kesen biri satırları
+    // yeniden yazmasın. Numara ve tarihler yeniden üretiliyor; kopyalanan
+    // faturanın tahsilat durumu taşınmıyor.
+    const copyFrom = params.get('copyFrom');
+
+    if (copyFrom) {
+      this.copyFrom(copyFrom);
+      return;
+    }
+
+    this.addLine();
+    this.loadNextNumber();
+  }
+
+  private copyFrom(invoiceId: string): void {
+    this.loading = true;
+
+    this.http.post<InvoiceModel>(
+      'Invoices/GetById',
+      { id: invoiceId },
+      (res) => {
+        this.type = res.type === 2 ? 2 : 1;
+        this.contactId = res.contactId;
+        this.note = res.note ?? '';
+        this.lines = res.lines.map((line, index) => ({
+          ...line,
+          id: `copy-${index}`,
+        }));
+
+        this.loadNextNumber();
+        this.loading = false;
+      },
+      () => {
+        this.addLine();
+        this.loadNextNumber();
+        this.loading = false;
+      }
+    );
   }
 
   private loadInvoice(): void {

@@ -149,6 +149,15 @@ export class InvoiceModel {
   lines: InvoiceLineModel[] = [];
 }
 
+/** Faturanın kâğıda basılan hâlinde bizim tarafı yazan bilgiler. */
+export class CompanyProfileModel {
+  id: string = '';
+  name: string = '';
+  taxNumber: string | null = null;
+  taxDepartment: string | null = null;
+  address: string | null = null;
+}
+
 export class CurrencyAmountModel {
   currencyName: string = 'TL';
   amount: number = 0;

@@ -7,12 +7,13 @@
     <div class="if-head">
       <div class="ak-field">
         <label class="ak-label">Cari</label>
-        <select class="ak-select" [(ngModel)]="contactId" name="contactId" [disabled]="isEdit">
-          <option value="">Seçin...</option>
-          @for(item of contacts; track item.id){
-          <option [value]="item.id">{{ item.name }} ({{ item.currencyName }})</option>
-          }
-        </select>
+        <app-combobox
+          [options]="contactOptions"
+          [(ngModel)]="contactId"
+          name="contactId"
+          [disabled]="isEdit"
+          placeholder="Cari ara ve seç"
+        ></app-combobox>
         @if(isEdit){
         <p class="ak-hint">Faturanın carisi değiştirilemez; yeni fatura kesin.</p>
         }@else if(contacts.length === 0){
@@ -77,17 +78,14 @@
           <tr>
             <td class="ak-table__num">{{ i + 1 }}</td>
             <td>
-              <select
-                class="ak-select"
+              <app-combobox
+                [options]="productOptions"
                 [(ngModel)]="line.productId"
                 [name]="'product' + i"
-                (ngModelChange)="onProductChange(line)"
-              >
-                <option [ngValue]="null">Serbest satır</option>
-                @for(product of products; track product.id){
-                <option [ngValue]="product.id">{{ product.name }}</option>
-                }
-              </select>
+                emptyLabel="Serbest satır"
+                placeholder="Serbest satır"
+                (valueChange)="onProductChange(line)"
+              ></app-combobox>
             </td>
             <td>
               <input

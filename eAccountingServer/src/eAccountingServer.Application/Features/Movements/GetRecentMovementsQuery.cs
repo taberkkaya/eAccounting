@@ -19,7 +19,10 @@ public sealed record MovementDto(
     decimal Withdrawal,
     bool IsTransfer,
     Guid? CategoryId,
-    string? CategoryName);
+    string? CategoryName,
+    /// <summary>Tahsilat ya da ödemeyse hangi cariyle; listede "kimden" yazabilmek için.</summary>
+    Guid? ContactId,
+    string? ContactName);
 
 /// <summary>Ana sayfadaki kısa liste.</summary>
 public sealed record GetRecentMovementsQuery(int Take = 10) : IRequest<Result<List<MovementDto>>>;
@@ -43,7 +46,8 @@ internal sealed class MovementReader(
     ICashRegisterDetailRepository cashRegisterDetailRepository,
     IBankRepository bankRepository,
     IBankDetailRepository bankDetailRepository,
-    ICategoryRepository categoryRepository)
+    ICategoryRepository categoryRepository,
+    IContactRepository contactRepository)
 {
     /// <summary>
     /// İki hareket tablosunu tek listeye indirger. Hesap adı ve para birimi
@@ -63,6 +67,9 @@ internal sealed class MovementReader(
             .GetAll().ToListAsync(cancellationToken)).ToDictionary(a => a.Id);
 
         Dictionary<Guid, string> categories = (await categoryRepository
+            .GetAll().ToListAsync(cancellationToken)).ToDictionary(c => c.Id, c => c.Name);
+
+        Dictionary<Guid, string> contacts = (await contactRepository
             .GetAll().ToListAsync(cancellationToken)).ToDictionary(c => c.Id, c => c.Name);
 
         List<MovementDto> movements = [];
@@ -94,7 +101,8 @@ internal sealed class MovementReader(
                     cashAccounts[detail.CashRegisterId].Name, "Kasa",
                     cashAccounts[detail.CashRegisterId].CurrencyType.Name,
                     detail.Date, detail.Description, detail.DepositAmount, detail.WithdrawalAmount,
-                    detail.CashRegisterDetailId is not null, detail.CategoryId, categories)));
+                    detail.CashRegisterDetailId is not null, detail.CategoryId, categories,
+                    detail.ContactId, contacts)));
         }
 
         if (wantsBank)
@@ -121,7 +129,8 @@ internal sealed class MovementReader(
                     bankAccounts[detail.BankId].Name, "Banka",
                     bankAccounts[detail.BankId].CurrencyType.Name,
                     detail.Date, detail.Description, detail.DepositAmount, detail.WithdrawalAmount,
-                    detail.BankDetailId is not null, detail.CategoryId, categories)));
+                    detail.BankDetailId is not null, detail.CategoryId, categories,
+                    detail.ContactId, contacts)));
         }
 
         IEnumerable<MovementDto> result = movements;
@@ -134,6 +143,8 @@ internal sealed class MovementReader(
                 movement.Description.Contains(term, StringComparison.OrdinalIgnoreCase)
                 || movement.AccountName.Contains(term, StringComparison.OrdinalIgnoreCase)
                 || (movement.CategoryName ?? string.Empty)
+                    .Contains(term, StringComparison.OrdinalIgnoreCase)
+                || (movement.ContactName ?? string.Empty)
                     .Contains(term, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -172,10 +183,13 @@ internal sealed class MovementReader(
     private static MovementDto Map(
         Guid id, Guid accountId, string accountName, string kind, string currency,
         DateOnly date, string description, decimal deposit, decimal withdrawal,
-        bool isTransfer, Guid? categoryId, Dictionary<Guid, string> categories) =>
+        bool isTransfer, Guid? categoryId, Dictionary<Guid, string> categories,
+        Guid? contactId, Dictionary<Guid, string> contacts) =>
         new(id, accountId, accountName, kind, currency, date, description,
             deposit, withdrawal, isTransfer, categoryId,
-            categoryId is { } key && categories.TryGetValue(key, out string? name) ? name : null);
+            categoryId is { } key && categories.TryGetValue(key, out string? name) ? name : null,
+            contactId,
+            contactId is { } contact && contacts.TryGetValue(contact, out string? who) ? who : null);
 }
 
 internal sealed class GetRecentMovementsQueryHandler(

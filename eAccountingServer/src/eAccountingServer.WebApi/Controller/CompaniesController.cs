@@ -2,6 +2,7 @@
 using eAccountingServer.Domain.Users;
 using eAccountingServer.WebApi.Abstractions;
 using MediatR;
+using ResultKit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,6 +48,23 @@ public class CompaniesController : ApiController
     public async Task<IActionResult> MigrateAll(MigrateAllCompaniesCommand request, CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(request, cancellationToken);
+        return StatusCode(response.StatusCode, response);
+    }
+
+    /// <summary>
+    /// Oturumdaki firmanın belgelerde görünen bilgileri. Kimlik jetondan
+    /// okunuyor: istemcinin başka bir firmanın künyesini istemesine gerek yok,
+    /// izni de yok.
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
+    {
+        string? companyId = User.FindFirst("CompanyId")?.Value;
+
+        if (!Guid.TryParse(companyId, out Guid id))
+            return StatusCode(400, Result<CompanyProfileDto>.Failure("Firma seçili değil."));
+
+        var response = await _mediator.Send(new GetCompanyProfileQuery(id), cancellationToken);
         return StatusCode(response.StatusCode, response);
     }
 }

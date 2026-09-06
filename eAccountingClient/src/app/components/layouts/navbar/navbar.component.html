@@ -22,6 +22,11 @@
   </select>
   }
 
+  <!-- Kayıtlar ekranlara bölünmüş durumda; aramanın da bölünmesi için sebep yok. -->
+  @if(auth.hasCompany){
+  <app-global-search></app-global-search>
+  }
+
   <app-demo-banner></app-demo-banner>
 
   <div class="ak-topbar__spacer"></div>
