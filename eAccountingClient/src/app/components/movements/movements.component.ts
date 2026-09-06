@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { SharedModule } from '../../modules/shared.module';
 import { HttpService } from '../../services/http.service';
@@ -47,6 +48,7 @@ const EXPORT_LIMIT = 2000;
 export class MovementsComponent implements OnInit {
   readonly auth = inject(AuthService);
   private readonly http = inject(HttpService);
+  private readonly route = inject(ActivatedRoute);
   private readonly date = inject(DatePipe);
 
   movements: MovementModel[] = [];
@@ -79,6 +81,14 @@ export class MovementsComponent implements OnInit {
 
     this.startDate = this.format(from);
     this.endDate = this.format(today);
+
+    // Başka ekranlardan filtreli gelinebiliyor: kalem listesindeki "12 hareket"
+    // bağlantısı buraya o kalemi seçili olarak getiriyor.
+    const params = this.route.snapshot.queryParamMap;
+    this.categoryId = params.get('categoryId') ?? '';
+    this.accountId = params.get('accountId') ?? '';
+
+    if (params.get('direction')) this.direction = params.get('direction')!;
 
     this.loadAccounts();
     this.loadCategories();

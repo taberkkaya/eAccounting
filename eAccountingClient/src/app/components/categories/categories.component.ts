@@ -5,19 +5,24 @@ import { HttpService } from '../../services/http.service';
 import { SwalService } from '../../services/swal.service';
 import { AuthService } from '../../services/auth.service';
 import { CategoryModel } from '../../models/category.model';
-import { ModalComponent } from '../ui/modal/modal.component';
 import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 
 /**
- * Gelir ve gider kalemleri. Hareketler bunlarla etiketlenince "bu ay kiraya ne
- * verdim" sorusu tek filtreyle cevaplanabiliyor.
+ * Gelir ve gider kalemleri.
+ *
+ * Önceden ekran ikiye bölünmüştü: gelir solda, gider sağda, iki ayrı başlıksız
+ * tablo. Uygulamanın geri kalanı - cariler, ürünler, faturalar - tek liste artı
+ * tür filtresi biçiminde çalışıyor ve ön muhasebe programlarında da alışılmış
+ * olan bu. Bölünmüş düzen hem aramayı imkânsız kılıyordu hem de kalem sayısı
+ * artınca iki sütun birbirinden bağımsız uzuyordu.
  */
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [SharedModule, ModalComponent, NoCompanyComponent, ActionMenuComponent],
+  imports: [SharedModule, NoCompanyComponent, ActionMenuComponent],
   templateUrl: './categories.component.html',
+  styleUrl: './categories.component.css',
 })
 export class CategoriesComponent implements OnInit {
   readonly auth = inject(AuthService);
@@ -26,6 +31,10 @@ export class CategoriesComponent implements OnInit {
 
   categories: CategoryModel[] = [];
   loading = true;
+
+  /** '' hepsi, 0 gelir, 1 gider. */
+  directionFilter: '' | 0 | 1 = '';
+  search = '';
 
   createOpen = false;
   updateOpen = false;
@@ -42,14 +51,6 @@ export class CategoriesComponent implements OnInit {
     this.getAll();
   }
 
-  get income(): CategoryModel[] {
-    return this.categories.filter((c) => c.direction === 0);
-  }
-
-  get expense(): CategoryModel[] {
-    return this.categories.filter((c) => c.direction === 1);
-  }
-
   getAll(): void {
     this.loading = true;
 
@@ -64,7 +65,26 @@ export class CategoriesComponent implements OnInit {
     );
   }
 
-  openCreate(direction: number): void {
+  /** Filtre ve arama istemcide: liste kısa, sunucuya gitmeye değmez. */
+  get filtered(): CategoryModel[] {
+    const term = this.search.trim().toLocaleLowerCase('tr');
+
+    return this.categories.filter(
+      (category) =>
+        (this.directionFilter === '' || category.direction === this.directionFilter) &&
+        (!term || category.name.toLocaleLowerCase('tr').includes(term))
+    );
+  }
+
+  get counts(): { all: number; income: number; expense: number } {
+    return {
+      all: this.categories.length,
+      income: this.categories.filter((c) => c.direction === 0).length,
+      expense: this.categories.filter((c) => c.direction === 1).length,
+    };
+  }
+
+  openCreate(direction: 0 | 1): void {
     this.createModel = new CategoryModel();
     this.createModel.direction = direction;
     this.createOpen = true;
@@ -108,9 +128,15 @@ export class CategoriesComponent implements OnInit {
   }
 
   deleteById(model: CategoryModel): void {
+    // Kaç hareketi etkileyeceğini söylemek, "geçmiş etkilenmez" demekten daha
+    // somut: kullanıcı neyin yanında duracağını biliyor.
+    const used = model.usageCount
+      ? ` ${model.usageCount} harekette kullanılmış; o hareketler kalır, yalnızca etiketi görünmez olur.`
+      : '';
+
     this.swal.callSwal(
-      'Kalemi sil',
-      `"${model.name}" kalemini silmek istediğinize emin misiniz? Geçmiş hareketler etkilenmez.`,
+      'Kalemi sil?',
+      `"${model.name}" silinecek.${used}`,
       () => {
         this.http.post<string>('Categories/DeleteById', { id: model.id }, (res) => {
           this.swal.callToast(res, 'info');

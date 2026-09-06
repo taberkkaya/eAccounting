@@ -8,26 +8,60 @@ using ResultKit;
 
 namespace eAccountingServer.Application.Features.Categories;
 
-public sealed record CategoryDto(Guid Id, string Name, int Direction);
+/// <param name="UsageCount">
+/// Bu kalemle etiketlenmiş hareket sayısı. Listede durması, silmeden önce
+/// "buna dokunursam ne olur" sorusunu ekranda cevaplıyor.
+/// </param>
+public sealed record CategoryDto(Guid Id, string Name, int Direction, int UsageCount);
 
 // --- listeleme ---------------------------------------------------------------
 
 public sealed record GetAllCategoriesQuery() : IRequest<Result<List<CategoryDto>>>;
 
 internal sealed class GetAllCategoriesQueryHandler(
-    ICategoryRepository categoryRepository
+    ICategoryRepository categoryRepository,
+    ICashRegisterDetailRepository cashRegisterDetailRepository,
+    IBankDetailRepository bankDetailRepository
     ) : IRequestHandler<GetAllCategoriesQuery, Result<List<CategoryDto>>>
 {
     public async Task<Result<List<CategoryDto>>> Handle(
-        GetAllCategoriesQuery request, CancellationToken cancellationToken) =>
-        await categoryRepository
+        GetAllCategoriesQuery request, CancellationToken cancellationToken)
+    {
+        List<Category> categories = await categoryRepository
             .GetAll()
             // Önce gelir sonra gider, her biri kendi içinde alfabetik: listeler
             // her ekranda aynı sırada çıksın.
             .OrderBy(p => p.Direction)
             .ThenBy(p => p.Name)
-            .Select(p => new CategoryDto(p.Id, p.Name, p.Direction))
             .ToListAsync(cancellationToken);
+
+        Dictionary<Guid, int> usage = await UsageAsync(cancellationToken);
+
+        return categories
+            .Select(p => new CategoryDto(
+                p.Id, p.Name, p.Direction,
+                usage.TryGetValue(p.Id, out int count) ? count : 0))
+            .ToList();
+    }
+
+    /// <summary>Kalem başına kaç hareket; kasa ve banka birlikte sayılıyor.</summary>
+    private async Task<Dictionary<Guid, int>> UsageAsync(CancellationToken cancellationToken)
+    {
+        Dictionary<Guid, int> usage = await cashRegisterDetailRepository
+            .Where(p => p.CategoryId != null)
+            .GroupBy(p => p.CategoryId!.Value)
+            .Select(g => new { g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Key, x => x.Count, cancellationToken);
+
+        foreach (var row in await bankDetailRepository
+            .Where(p => p.CategoryId != null)
+            .GroupBy(p => p.CategoryId!.Value)
+            .Select(g => new { g.Key, Count = g.Count() })
+            .ToListAsync(cancellationToken))
+            usage[row.Key] = usage.TryGetValue(row.Key, out int count) ? count + row.Count : row.Count;
+
+        return usage;
+    }
 }
 
 // --- oluşturma ---------------------------------------------------------------

@@ -1,0 +1,36 @@
+.cat-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Yön simgesi renkli: tür sütununu okumadan gelir mi gider mi görünsün. */
+.cat-name__icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-success-soft);
+  color: var(--ak-success);
+  font-size: 0.72rem;
+}
+
+.cat-name__icon.is-expense {
+  background: var(--ak-danger-soft);
+  color: var(--ak-danger);
+}
+
+.cat-name strong {
+  font-weight: 600;
+}
+
+.cat-usage {
+  color: var(--ak-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.cat-usage:hover {
+  color: var(--ak-brand);
+}
