@@ -1,0 +1,258 @@
+<app-blank [pageName]="title" [routes]="['Kayıtlar', 'Faturalar', isEdit ? 'Düzenle' : 'Yeni']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+
+  <app-section sectionTitle="Fatura Bilgileri">
+    <div class="if-head">
+      <div class="ak-field">
+        <label class="ak-label">Cari</label>
+        <select class="ak-select" [(ngModel)]="contactId" name="contactId" [disabled]="isEdit">
+          <option value="">Seçin...</option>
+          @for(item of contacts; track item.id){
+          <option [value]="item.id">{{ item.name }} ({{ item.currencyName }})</option>
+          }
+        </select>
+        @if(isEdit){
+        <p class="ak-hint">Faturanın carisi değiştirilemez; yeni fatura kesin.</p>
+        }@else if(contacts.length === 0){
+        <p class="ak-hint">
+          Henüz cari yok. Önce <a routerLink="/contacts">Cariler</a> ekranından ekleyin.
+        </p>
+        }
+      </div>
+
+      <div class="ak-field">
+        <label class="ak-label">Fatura No</label>
+        <input
+          type="text"
+          class="ak-input"
+          [(ngModel)]="number"
+          name="number"
+          [disabled]="isEdit"
+        />
+        @if(!isEdit){
+        <p class="ak-hint">Sıradaki numara önerildi; kendi numaranızı yazabilirsiniz.</p>
+        }
+      </div>
+
+      <div class="ak-field">
+        <label class="ak-label">Fatura Tarihi</label>
+        <input type="date" class="ak-input" [(ngModel)]="invoiceDate" name="invoiceDate" />
+      </div>
+
+      <div class="ak-field">
+        <label class="ak-label">Vade Tarihi</label>
+        <input type="date" class="ak-input" [(ngModel)]="dueDate" name="dueDate" />
+        <div class="if-due-presets">
+          @for(preset of duePresets; track preset.days){
+          <button type="button" class="if-due" (click)="setDue(preset.days)">
+            {{ preset.label }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+  </app-section>
+
+  <app-section sectionTitle="Kalemler">
+    <div class="ak-table-wrap">
+      <table class="ak-table if-lines">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th class="if-col-product">Ürün / Hizmet</th>
+            <th class="if-col-desc">Açıklama</th>
+            <th class="if-col-qty">Miktar</th>
+            <th class="if-col-unit">Birim</th>
+            <th class="if-col-price">Birim Fiyat</th>
+            <th class="if-col-small">İnd. %</th>
+            <th class="if-col-small">KDV</th>
+            <th class="ak-table__amount">Tutar</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(line of lines; track line.id; let i = $index){
+          <tr>
+            <td class="ak-table__num">{{ i + 1 }}</td>
+            <td>
+              <select
+                class="ak-select"
+                [(ngModel)]="line.productId"
+                [name]="'product' + i"
+                (ngModelChange)="onProductChange(line)"
+              >
+                <option [ngValue]="null">Serbest satır</option>
+                @for(product of products; track product.id){
+                <option [ngValue]="product.id">{{ product.name }}</option>
+                }
+              </select>
+            </td>
+            <td>
+              <input
+                type="text"
+                class="ak-input"
+                [(ngModel)]="line.description"
+                [name]="'desc' + i"
+                placeholder="Satır açıklaması"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.001"
+                min="0"
+                class="ak-input ak-input--num"
+                [(ngModel)]="line.quantity"
+                [name]="'qty' + i"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                class="ak-input ak-input--num"
+                [(ngModel)]="line.unit"
+                [name]="'unit' + i"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                class="ak-input ak-input--num"
+                [(ngModel)]="line.unitPrice"
+                [name]="'price' + i"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                class="ak-input ak-input--num"
+                [(ngModel)]="line.discountRate"
+                [name]="'discount' + i"
+              />
+            </td>
+            <td>
+              <select class="ak-select" [(ngModel)]="line.vatRate" [name]="'vat' + i">
+                @for(rate of vatRates; track rate){
+                <option [ngValue]="rate">%{{ rate }}</option>
+                }
+              </select>
+            </td>
+            <td class="ak-table__amount ak-table__strong">
+              {{ lineTotal(line) | trCurrency : symbol : true }}
+            </td>
+            <td>
+              <button
+                type="button"
+                class="ak-btn ak-btn--ghost ak-btn--icon"
+                (click)="removeLine(i)"
+                [disabled]="lines.length === 1"
+                title="Satırı sil"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="if-add">
+      <button type="button" class="ak-btn" (click)="addLine()">
+        <i class="fas fa-plus"></i>
+        Satır Ekle
+      </button>
+    </div>
+  </app-section>
+
+  <div class="ak-form-grid">
+    <app-section sectionTitle="Not ve Ödeme">
+      <div class="if-panel">
+        <div class="ak-field">
+          <label class="ak-label">Fatura Notu</label>
+          <textarea rows="3" class="ak-input" [(ngModel)]="note" name="note"></textarea>
+        </div>
+
+        @if(!isEdit){
+        <div class="ak-field" style="margin-bottom: 0">
+          <label class="ak-label">Peşin mi?</label>
+          <select class="ak-select" [(ngModel)]="paidWithAccountId" name="paidWithAccountId">
+            <option value="">Hayır — açık hesap (vadeli)</option>
+            @for(account of eligibleAccounts; track account.id){
+            <option [value]="account.id">
+              Evet — {{ account.name }} ({{ account.kind }})
+            </option>
+            }
+          </select>
+          <p class="ak-hint">
+            Peşin seçilirse fatura tutarı kadar
+            {{ type === 1 ? "tahsilat" : "ödeme" }} da yazılır; ayrıca girmeye
+            gerek kalmaz.
+          </p>
+        </div>
+        }
+      </div>
+    </app-section>
+
+    <app-section sectionTitle="Toplam">
+      <div class="if-summary">
+        <div class="if-summary__row">
+          <span>Ara Toplam (KDV hariç)</span>
+          <strong>{{ subTotal | trCurrency : symbol : true }}</strong>
+        </div>
+
+        @if(discountTotal > 0){
+        <div class="if-summary__row">
+          <span>İndirim</span>
+          <strong class="ak-negative">−{{ discountTotal | trCurrency : symbol : true }}</strong>
+        </div>
+        }
+
+        @for(row of vatBreakdown; track row.rate){
+        <div class="if-summary__row if-summary__row--sub">
+          <span>KDV %{{ row.rate }} ({{ row.base | trCurrency : symbol : true }} matrah)</span>
+          <strong>{{ row.vat | trCurrency : symbol : true }}</strong>
+        </div>
+        }
+
+        <div class="if-summary__row if-summary__row--total">
+          <span>Genel Toplam</span>
+          <strong>{{ grandTotal | trCurrency : symbol : true }}</strong>
+        </div>
+      </div>
+
+      <div class="if-actions">
+        <button type="button" class="ak-btn" (click)="cancel()">Vazgeç</button>
+        <button
+          type="button"
+          class="ak-btn ak-btn--primary"
+          [disabled]="!canSave"
+          (click)="save()"
+        >
+          @if(saving){
+          <i class="fas fa-circle-notch ak-spin"></i>
+          Kaydediliyor...
+          }@else {
+          <i class="fas fa-check"></i>
+          {{ isEdit ? "Güncelle" : "Faturayı Kes" }}
+          }
+        </button>
+      </div>
+
+      @if(!canSave && !saving){
+      <p class="ak-hint if-blocker">
+        @if(!contactId){ Cari seçilmeli. }@else { Her satırda açıklama ve sıfırdan büyük
+        bir miktar olmalı. }
+      </p>
+      }
+    </app-section>
+  </div>
+  }
+</app-blank>

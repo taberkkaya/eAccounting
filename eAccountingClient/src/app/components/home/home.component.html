@@ -8,16 +8,89 @@
       <div class="ak-empty__text">Veriler yükleniyor...</div>
     </div>
   </div>
-  }@else if(accounts().length === 0){
+  }@else if(accounts().length === 0 && !hasAccounting){
   <div class="ak-panel">
     <div class="ak-empty">
       <i class="fas fa-chart-simple"></i>
       <div class="ak-empty__text">
-        Henüz kasa veya banka kaydı yok. Ekledikçe özet burada oluşacak.
+        Henüz kayıt yok. Başlamak için bir
+        <a routerLink="/accounts">kasa/banka</a> ya da bir
+        <a routerLink="/contacts">cari</a> ekleyin.
       </div>
     </div>
   </div>
   }@else {
+
+
+  <!-- Ön muhasebe özeti. Kasadaki para tek başına yetmiyor: tahsil edilmemiş
+       alacak da, ödenmemiş borç da işletmenin durumunun parçası. -->
+  @if(dashboard(); as data){
+  <div class="dash-kpis">
+    <a class="dash-kpi dash-kpi--in" routerLink="/contacts">
+      <span class="dash-kpi__label">
+        <i class="fas fa-hand-holding-dollar"></i> Alacaklarımız
+      </span>
+      @for(row of data.receivables; track row.currencyName){
+      <strong class="dash-kpi__value">
+        {{ row.amount | trCurrency : symbolOf(row.currencyName) : true }}
+      </strong>
+      }@empty {
+      <strong class="dash-kpi__value dash-kpi__value--zero">Yok</strong>
+      }
+      @for(row of data.overdueReceivables; track row.currencyName){
+      <span class="dash-kpi__note">
+        {{ row.amount | trCurrency : symbolOf(row.currencyName) : true }} vadesi geçmiş
+      </span>
+      }
+    </a>
+
+    <a class="dash-kpi dash-kpi--out" routerLink="/contacts">
+      <span class="dash-kpi__label">
+        <i class="fas fa-file-invoice-dollar"></i> Borçlarımız
+      </span>
+      @for(row of data.payables; track row.currencyName){
+      <strong class="dash-kpi__value">
+        {{ row.amount | trCurrency : symbolOf(row.currencyName) : true }}
+      </strong>
+      }@empty {
+      <strong class="dash-kpi__value dash-kpi__value--zero">Yok</strong>
+      }
+      @for(row of data.overduePayables; track row.currencyName){
+      <span class="dash-kpi__note">
+        {{ row.amount | trCurrency : symbolOf(row.currencyName) : true }} vadesi geçmiş
+      </span>
+      }
+    </a>
+
+    <a class="dash-kpi" routerLink="/invoices" [queryParams]="{ type: 1 }">
+      <span class="dash-kpi__label">
+        <i class="fas fa-file-invoice"></i> Bu Ay Satış
+      </span>
+      @for(row of data.monthSales; track row.currencyName){
+      <strong class="dash-kpi__value">
+        {{ row.amount | trCurrency : symbolOf(row.currencyName) : true }}
+      </strong>
+      }@empty {
+      <strong class="dash-kpi__value dash-kpi__value--zero">Yok</strong>
+      }
+      <span class="dash-kpi__note">{{ data.openInvoiceCount }} açık fatura</span>
+    </a>
+
+    <a class="dash-kpi" routerLink="/invoices">
+      <span class="dash-kpi__label">
+        <i class="fas fa-file-import"></i> Bu Ay Alış
+      </span>
+      @for(row of data.monthPurchases; track row.currencyName){
+      <strong class="dash-kpi__value">
+        {{ row.amount | trCurrency : symbolOf(row.currencyName) : true }}
+      </strong>
+      }@empty {
+      <strong class="dash-kpi__value dash-kpi__value--zero">Yok</strong>
+      }
+      <span class="dash-kpi__note">{{ data.contactCount }} cari</span>
+    </a>
+  </div>
+  }
 
   <!-- Hareket girmek için kasa/banka ayrımını bilmek gerekmesin -->
   <app-quick-entry
@@ -126,6 +199,108 @@
       </div>
     </div>
   </section>
+
+
+  @if(dashboard(); as data){
+  <div class="dash-split">
+    <!-- Vade takibi: ekrana bakma sebebi çoğu zaman bu. -->
+    <section class="ak-panel">
+      <div class="ak-panel__head">
+        <h2 class="ak-panel__title">Yaklaşan ve Geçmiş Vadeler</h2>
+        <a routerLink="/invoices" class="ak-btn ak-btn--sm">
+          Tümü
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="ak-panel__body ak-panel__body--flush">
+        @for(item of data.upcomingInvoices; track item.id){
+        <a class="due" [routerLink]="['/invoices', item.id]">
+          <span class="due__days" [class.is-late]="item.daysLeft < 0">
+            {{ item.daysLeft < 0 ? -item.daysLeft : item.daysLeft }}
+            <small>{{ item.daysLeft < 0 ? "gün geçti" : "gün kaldı" }}</small>
+          </span>
+
+          <span class="due__text">
+            <strong>{{ item.contactName }}</strong>
+            <small>
+              {{ item.number }} · {{ item.dueDate | date : "dd.MM.yyyy" }} ·
+              {{ item.type === 1 ? "tahsil edilecek" : "ödenecek" }}
+            </small>
+          </span>
+
+          <span class="due__amount" [class.ak-negative]="item.type === 2">
+            {{ item.remainingAmount | trCurrency : symbolOf(item.currencyName) : true }}
+          </span>
+        </a>
+        }@empty {
+        <div class="ak-empty">
+          <i class="fas fa-check-circle"></i>
+          <div class="ak-empty__text">Yaklaşan vade yok.</div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <section class="ak-panel">
+      <div class="ak-panel__head">
+        <h2 class="ak-panel__title">En Çok Borçlu Cariler</h2>
+        <a routerLink="/contacts" class="ak-btn ak-btn--sm">
+          Tümü
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="ak-panel__body ak-panel__body--flush">
+        @for(item of data.topDebtors; track item.id){
+        <a class="move" [routerLink]="['/contacts', item.id]">
+          <span class="move__dir move__dir--in"><i class="fas fa-user"></i></span>
+          <span class="move__text">
+            <strong>{{ item.name }}</strong>
+            <small>{{ item.currencyName }}</small>
+          </span>
+          <span class="move__amount ak-positive">
+            {{ item.balance | trCurrency : symbolOf(item.currencyName) : true }}
+          </span>
+        </a>
+        }@empty {
+        <div class="ak-empty">
+          <div class="ak-empty__text">Kimsenin açık borcu yok.</div>
+        </div>
+        }
+      </div>
+    </section>
+  </div>
+
+  @if(data.lowStock.length > 0){
+  <section class="ak-panel">
+    <div class="ak-panel__head">
+      <h2 class="ak-panel__title">Kritik Stok</h2>
+      <a routerLink="/products" class="ak-btn ak-btn--sm">
+        Ürünler
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="ak-panel__body ak-panel__body--flush">
+      @for(item of data.lowStock; track item.id){
+      <a class="move" routerLink="/products">
+        <span class="move__dir move__dir--out">
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+        <span class="move__text">
+          <strong>{{ item.name }}</strong>
+          <small>kritik seviye: {{ item.criticalStock }} {{ item.unit }}</small>
+        </span>
+        <span class="move__amount ak-negative">
+          {{ item.stockQuantity }} {{ item.unit }}
+        </span>
+      </a>
+      }
+    </div>
+  </section>
+  }
+  }
 
   <!-- Son hareketler: hesap hesap dolaşmadan, tabloya girmeden görülsün -->
   <section class="ak-panel dash-recent">

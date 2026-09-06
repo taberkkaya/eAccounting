@@ -38,6 +38,9 @@ namespace eAccountingServer.Application
             // İki hareket tablosunu birleştiren okuyucu; iki sorgu da onu kullanıyor.
             services.AddScoped<Features.Movements.MovementReader>();
 
+            // Cariye ve kasaya birlikte yazan defter; fatura ve tahsilat ondan geçiyor.
+            services.AddScoped<Features.Accounting.AccountingLedger>();
+
             return services;
         }
 

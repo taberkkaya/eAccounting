@@ -1,0 +1,556 @@
+<app-blank pageName="Ürün / Hizmet" [routes]="['Kayıtlar', 'Ürünler']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+  <app-section>
+    <div class="ak-toolbar">
+      <button type="button" class="ak-btn ak-btn--primary" (click)="openCreate(false)">
+        <i class="fas fa-box"></i>
+        Ürün Ekle
+      </button>
+      <button type="button" class="ak-btn ak-btn--primary" (click)="openCreate(true)">
+        <i class="fas fa-concierge-bell"></i>
+        Hizmet Ekle
+      </button>
+
+      <div class="ak-toolbar__spacer"></div>
+
+      <div class="ak-filters">
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="kindFilter === ''"
+          (click)="setKind('')"
+        >
+          Tümü <span>{{ counts.all }}</span>
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="kindFilter === 'product'"
+          (click)="setKind('product')"
+        >
+          Ürün <span>{{ counts.product }}</span>
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="kindFilter === 'service'"
+          (click)="setKind('service')"
+        >
+          Hizmet <span>{{ counts.service }}</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="ak-btn"
+        [class.ak-btn--primary]="onlyLowStock"
+        (click)="toggleLowStock()"
+        title="Kritik seviyenin altındakiler"
+      >
+        <i class="fas fa-exclamation-triangle"></i>
+        Kritik Stok
+      </button>
+
+      <input
+        [(ngModel)]="search"
+        (keyup.enter)="getAll()"
+        type="search"
+        class="ak-input"
+        placeholder="Ad veya kod ara"
+      />
+
+      <button type="button" class="ak-btn ak-btn--primary" (click)="getAll()">
+        <i class="fas fa-search"></i>
+        Ara
+      </button>
+    </div>
+
+    @if(stockValue.length > 0){
+    <div class="ak-totals">
+      @for(value of stockValue; track value.currency){
+      <div class="ak-total">
+        <span class="ak-total__currency">{{ value.currency }}</span>
+        <span class="ak-total__net">
+          Stok değeri (alış):
+          <strong>{{ value.amount | trCurrency : symbolFor(value.currency) : true }}</strong>
+        </span>
+      </div>
+      }
+    </div>
+    }
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>Ad</th>
+            <th>Tür</th>
+            <th class="ak-table__amount">Alış</th>
+            <th class="ak-table__amount">Satış</th>
+            <th>KDV</th>
+            <th class="ak-table__amount">Stok</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(product of products; track product.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td>
+              <div class="pr-name">
+                <span class="pr-name__icon">
+                  <i
+                    class="fas"
+                    [class.fa-box]="!product.isService"
+                    [class.fa-concierge-bell]="product.isService"
+                  ></i>
+                </span>
+                <span class="pr-name__text">
+                  <strong>{{ product.name }}</strong>
+                  @if(product.code){
+                  <small>{{ product.code }}</small>
+                  }
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="ak-tag" [class.ak-tag--brand]="product.isService">
+                {{ product.isService ? "Hizmet" : "Ürün" }}
+              </span>
+            </td>
+            <td class="ak-table__amount">
+              {{ product.purchasePrice | trCurrency : symbolFor(product.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount ak-positive">
+              {{ product.salePrice | trCurrency : symbolFor(product.currencyName) : true }}
+            </td>
+            <td><span class="ak-tag ak-tag--muted">%{{ product.vatRate }}</span></td>
+            <td class="ak-table__amount">
+              @if(product.isService){
+              <span class="ak-muted">—</span>
+              }@else {
+              <div class="pr-stock">
+                <strong [class.ak-negative]="product.stockQuantity < 0">
+                  {{ product.stockQuantity }} {{ product.unit }}
+                </strong>
+                @if(product.isBelowCritical){
+                <small class="pr-critical">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  kritik: {{ product.criticalStock }}
+                </small>
+                }
+              </div>
+              }
+            </td>
+            <td>
+              <app-action-menu>
+                @if(!product.isService){
+                <button type="button" class="menu__item" (click)="openStock(product, 0)">
+                  <i class="fas fa-arrow-down"></i> Stok Girişi
+                </button>
+                <button type="button" class="menu__item" (click)="openStock(product, 1)">
+                  <i class="fas fa-arrow-up"></i> Stok Çıkışı
+                </button>
+                <button type="button" class="menu__item" (click)="openHistory(product)">
+                  <i class="far fa-file-alt"></i> Stok Hareketleri
+                </button>
+                <div class="menu__separator"></div>
+                }
+                <button type="button" class="menu__item" (click)="openUpdate(product)">
+                  <i class="fas fa-pen"></i> Düzenle
+                </button>
+                <button
+                  type="button"
+                  class="menu__item menu__item--danger"
+                  (click)="deleteById(product)"
+                >
+                  <i class="fas fa-trash"></i> Sil
+                </button>
+              </app-action-menu>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="8">
+              <div class="ak-empty">
+                @if(loading){
+                <i class="fas fa-circle-notch ak-spin"></i>
+                <div class="ak-empty__text">Yükleniyor...</div>
+                }@else {
+                <i class="fas fa-box-open"></i>
+                <div class="ak-empty__text">
+                  @if(search || kindFilter || onlyLowStock){ Bu filtreyle kayıt bulunamadı.
+                  }@else { Henüz ürün ya da hizmet yok. Faturaya kalem girebilmek için
+                  buradan ekleyin. }
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+  }
+</app-blank>
+
+<!-- Yeni kayıt. Tür düğmeyle seçildiği için formda tekrar sorulmuyor. -->
+<app-modal
+  [open]="createOpen"
+  [title]="createModel.isService ? 'Yeni Hizmet' : 'Yeni Ürün'"
+  [wide]="true"
+  (closed)="createOpen = false"
+>
+  <form formValidate #createForm="ngForm" autocomplete="off" (ngSubmit)="create(createForm)">
+    <div class="ak-modal__body">
+      <div class="ak-form-grid">
+        <div class="ak-field">
+          <label class="ak-label">Ad</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.name"
+            class="ak-input"
+            name="name"
+            [placeholder]="createModel.isService ? 'Örn. Danışmanlık' : 'Örn. A4 Fotokopi Kağıdı'"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kod / Barkod</label>
+          <input type="text" [(ngModel)]="createModel.code" class="ak-input" name="code" />
+          <p class="ak-hint">Boş bırakılabilir; girilirse benzersiz olmalı.</p>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Birim</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="createModel.unit"
+            class="ak-input"
+            name="unit"
+            placeholder="Adet, kg, saat..."
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">KDV Oranı</label>
+          <select class="ak-select" name="vatRate" [(ngModel)]="createModel.vatRate">
+            @for(rate of vatRates; track rate){
+            <option [ngValue]="rate">%{{ rate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Alış Fiyatı</label>
+          <input
+            type="number"
+            step="0.01"
+            [(ngModel)]="createModel.purchasePrice"
+            class="ak-input"
+            name="purchasePrice"
+          />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Satış Fiyatı</label>
+          <input
+            type="number"
+            step="0.01"
+            [(ngModel)]="createModel.salePrice"
+            class="ak-input"
+            name="salePrice"
+          />
+          <p class="ak-hint">Faturaya bu fiyat öneriliyor; satırda değiştirilebilir.</p>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Para Birimi</label>
+          <select
+            class="ak-select"
+            name="currencyTypeValue"
+            [(ngModel)]="createModel.currencyTypeValue"
+          >
+            @for(currency of currencies; track currency.value){
+            <option [ngValue]="currency.value">{{ currency.name }}</option>
+            }
+          </select>
+        </div>
+
+        @if(!createModel.isService){
+        <div class="ak-field">
+          <label class="ak-label">Açılış Stoğu</label>
+          <input
+            type="number"
+            step="0.001"
+            [(ngModel)]="createModel.openingStock"
+            class="ak-input"
+            name="openingStock"
+          />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kritik Stok</label>
+          <input
+            type="number"
+            step="0.001"
+            [(ngModel)]="createModel.criticalStock"
+            class="ak-input"
+            name="criticalStock"
+          />
+          <p class="ak-hint">Bu miktarın altına düşünce ana sayfada uyarılır. 0 ise uyarı yok.</p>
+        </div>
+        }
+      </div>
+
+      <div class="ak-field" style="margin-bottom: 0">
+        <label class="ak-label">Açıklama</label>
+        <textarea
+          rows="2"
+          [(ngModel)]="createModel.description"
+          class="ak-input"
+          name="description"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="createOpen = false">Vazgeç</button>
+      <button type="submit" class="ak-btn ak-btn--primary">Kaydet</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Düzenleme. Stok buradan değişmiyor: miktarın bir hareketten gelmesi lazım. -->
+<app-modal [open]="updateOpen" title="Kaydı Düzenle" [wide]="true" (closed)="updateOpen = false">
+  <form formValidate #updateForm="ngForm" autocomplete="off" (ngSubmit)="update(updateForm)">
+    <div class="ak-modal__body">
+      <div class="ak-form-grid">
+        <div class="ak-field">
+          <label class="ak-label">Ad</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.name"
+            class="ak-input"
+            name="updateName"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Kod / Barkod</label>
+          <input type="text" [(ngModel)]="updateModel.code" class="ak-input" name="updateCode" />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Birim</label>
+          <input
+            type="text"
+            required
+            [(ngModel)]="updateModel.unit"
+            class="ak-input"
+            name="updateUnit"
+          />
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">KDV Oranı</label>
+          <select class="ak-select" name="updateVatRate" [(ngModel)]="updateModel.vatRate">
+            @for(rate of vatRates; track rate){
+            <option [ngValue]="rate">%{{ rate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Alış Fiyatı</label>
+          <input
+            type="number"
+            step="0.01"
+            [(ngModel)]="updateModel.purchasePrice"
+            class="ak-input"
+            name="updatePurchasePrice"
+          />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Satış Fiyatı</label>
+          <input
+            type="number"
+            step="0.01"
+            [(ngModel)]="updateModel.salePrice"
+            class="ak-input"
+            name="updateSalePrice"
+          />
+        </div>
+
+        <div class="ak-field">
+          <label class="ak-label">Para Birimi</label>
+          <select
+            class="ak-select"
+            name="updateCurrencyTypeValue"
+            [(ngModel)]="updateModel.currencyTypeValue"
+          >
+            @for(currency of currencies; track currency.value){
+            <option [ngValue]="currency.value">{{ currency.name }}</option>
+            }
+          </select>
+        </div>
+
+        @if(!updateModel.isService){
+        <div class="ak-field">
+          <label class="ak-label">Kritik Stok</label>
+          <input
+            type="number"
+            step="0.001"
+            [(ngModel)]="updateModel.criticalStock"
+            class="ak-input"
+            name="updateCriticalStock"
+          />
+          <p class="ak-hint">Stok miktarı buradan değişmez; stok girişi/çıkışı kullanın.</p>
+        </div>
+        }
+      </div>
+
+      <div class="ak-field" style="margin-bottom: 0">
+        <label class="ak-label">Açıklama</label>
+        <textarea
+          rows="2"
+          [(ngModel)]="updateModel.description"
+          class="ak-input"
+          name="updateDescription"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="ak-modal__foot">
+      <button type="button" class="ak-btn" (click)="updateOpen = false">Vazgeç</button>
+      <button type="submit" class="ak-btn ak-btn--primary">Güncelle</button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Stok düzeltme: sayımda çıkan fark da kayda geçmeli. -->
+<app-modal
+  [open]="stockOpen"
+  [title]="stockDirection === 0 ? 'Stok Girişi' : 'Stok Çıkışı'"
+  (closed)="stockOpen = false"
+>
+  <div class="ak-modal__body">
+    @if(stockProduct){
+    <p class="ak-muted pr-current">
+      <strong>{{ stockProduct.name }}</strong> — eldeki miktar:
+      {{ stockProduct.stockQuantity }} {{ stockProduct.unit }}
+    </p>
+    }
+
+    <div class="ak-field">
+      <label class="ak-label">Miktar</label>
+      <input
+        type="number"
+        step="0.001"
+        min="0"
+        [(ngModel)]="stockQuantity"
+        class="ak-input"
+        name="stockQuantity"
+      />
+    </div>
+
+    <div class="ak-field">
+      <label class="ak-label">Tarih</label>
+      <input type="date" [(ngModel)]="stockDate" class="ak-input" name="stockDate" />
+    </div>
+
+    <div class="ak-field" style="margin-bottom: 0">
+      <label class="ak-label">Açıklama</label>
+      <input
+        type="text"
+        [(ngModel)]="stockDescription"
+        class="ak-input"
+        name="stockDescription"
+        placeholder="Örn. Sayım farkı, fire, iade"
+      />
+    </div>
+  </div>
+
+  <div class="ak-modal__foot">
+    <button type="button" class="ak-btn" (click)="stockOpen = false">Vazgeç</button>
+    <button
+      type="button"
+      class="ak-btn ak-btn--primary"
+      [disabled]="stockQuantity <= 0"
+      (click)="saveStock()"
+    >
+      Kaydet
+    </button>
+  </div>
+</app-modal>
+
+<!-- Stok hareketleri: eldeki miktarın nereden geldiği -->
+<app-modal
+  [open]="historyOpen"
+  [title]="(historyProduct?.name || '') + ' — Stok Hareketleri'"
+  [wide]="true"
+  (closed)="historyOpen = false"
+>
+  <div class="ak-modal__body" style="padding: 0">
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th>Tarih</th>
+            <th>Açıklama</th>
+            <th>Yön</th>
+            <th class="ak-table__amount">Miktar</th>
+            <th class="ak-table__amount">Kalan</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(row of history; track row.id){
+          <tr>
+            <td>{{ row.date | date : "dd.MM.yyyy" }}</td>
+            <td class="ak-table__strong">{{ row.description }}</td>
+            <td>
+              <span class="ak-tag" [class.ak-tag--brand]="row.direction === 0">
+                {{ row.directionName }}
+              </span>
+            </td>
+            <td
+              class="ak-table__amount"
+              [class.ak-positive]="row.direction === 0"
+              [class.ak-negative]="row.direction === 1"
+            >
+              {{ row.direction === 0 ? "+" : "−" }}{{ row.quantity }}
+            </td>
+            <td class="ak-table__amount">
+              <strong>{{ row.runningQuantity }}</strong>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="5">
+              <div class="ak-empty">
+                <div class="ak-empty__text">Stok hareketi yok.</div>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="ak-modal__foot">
+    <button type="button" class="ak-btn" (click)="historyOpen = false">Kapat</button>
+  </div>
+</app-modal>

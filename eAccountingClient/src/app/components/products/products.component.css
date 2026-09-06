@@ -1,0 +1,68 @@
+/* --- ürün adı ---------------------------------------------------------------- */
+
+.pr-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pr-name__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+  color: var(--ak-gray);
+  font-size: 0.8rem;
+}
+
+.pr-name__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pr-name__text strong {
+  font-weight: 600;
+}
+
+.pr-name__text small {
+  font-size: 0.72rem;
+  color: var(--ak-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- stok -------------------------------------------------------------------- */
+
+.pr-stock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+/* Kritik seviyeyi miktarın yanında göstermek, ayrı bir sütun aramaktan iyi. */
+.pr-critical {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: var(--ak-warning-soft);
+  color: var(--ak-warning);
+  font-size: 0.68rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.pr-current {
+  margin: 0 0 16px;
+  padding: 10px 13px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+  font-size: 0.83rem;
+}

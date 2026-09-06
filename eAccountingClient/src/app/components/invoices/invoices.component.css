@@ -1,0 +1,105 @@
+/* --- fatura numarası --------------------------------------------------------- */
+
+.iv-number {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+}
+
+.iv-number__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-success-soft);
+  color: var(--ak-success);
+  font-size: 0.78rem;
+}
+
+/* Alış ve satış aynı listede; rengi ayırmak numarayı okumadan yönü söylüyor. */
+.iv-number__icon.is-purchase {
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand);
+}
+
+.iv-number__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.iv-number__text strong {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.iv-number:hover .iv-number__text strong {
+  color: var(--ak-brand);
+}
+
+.iv-number__text small {
+  font-size: 0.72rem;
+  color: var(--ak-muted);
+}
+
+.iv-contact {
+  color: var(--ak-gray);
+}
+
+.iv-contact:hover {
+  color: var(--ak-brand);
+}
+
+/* --- durum ------------------------------------------------------------------- */
+
+.iv-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.iv-status.is-open {
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
+}
+
+.iv-status.is-partial {
+  background: var(--ak-warning-soft);
+  color: var(--ak-warning);
+}
+
+.iv-status.is-paid {
+  background: var(--ak-success-soft);
+  color: var(--ak-success);
+}
+
+.iv-status.is-overdue {
+  background: var(--ak-danger-soft);
+  color: var(--ak-danger);
+}
+
+.iv-late {
+  color: var(--ak-danger);
+  font-weight: 600;
+}
+
+/* Gecikmiş sayısı düğmenin üstünde: listeye bakma sebebi çoğu zaman o. */
+.iv-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: var(--ak-danger);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+}

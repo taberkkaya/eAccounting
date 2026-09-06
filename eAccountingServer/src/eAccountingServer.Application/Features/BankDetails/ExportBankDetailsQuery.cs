@@ -1,4 +1,4 @@
-using eAccountingServer.Application.Services;
+﻿using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Repositories;
 using eAccountingServer.Domain.Reporting;
@@ -17,6 +17,7 @@ public sealed record ExportBankDetailsQuery(
 
 internal sealed class ExportBankDetailsQueryHandler(
     IBankRepository bankRepository,
+    IBankDetailRepository bankDetailRepository,
     IStatementReportBuilder reportBuilder
     ) : IRequestHandler<ExportBankDetailsQuery, Result<ReportFile>>
 {
@@ -32,6 +33,11 @@ internal sealed class ExportBankDetailsQueryHandler(
 
         if (bank is null)
             return Result<ReportFile>.Failure("Banka bulunamadı.");
+
+        // Aralıktan önceki hareketlerin neti; ekstre devirle başlasın.
+        decimal opening = await bankDetailRepository
+            .Where(d => d.BankId == request.BankId && d.Date < request.StartDate)
+            .SumAsync(d => d.DepositAmount - d.WithdrawalAmount, cancellationToken);
 
         Statement statement = new(
             "Banka",
@@ -49,7 +55,10 @@ internal sealed class ExportBankDetailsQueryHandler(
                     detail.DepositAmount,
                     detail.WithdrawalAmount,
                     detail.BankDetailId is not null))
-                .ToList());
+                .ToList())
+        {
+            OpeningBalance = opening
+        };
 
         return reportBuilder.Build(statement, request.Format);
     }

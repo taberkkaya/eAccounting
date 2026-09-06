@@ -1,0 +1,228 @@
+.id-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+/* --- belge -------------------------------------------------------------------
+   Ekran görünümü kâğıda basılan hâlin aynısı; yazdırırken sürpriz olmasın. */
+
+.id-doc {
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius);
+  background: var(--ak-surface);
+  box-shadow: var(--ak-shadow-sm);
+  overflow: hidden;
+}
+
+.id-doc__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 24px 26px;
+  border-bottom: 2px solid var(--ak-ink);
+}
+
+.id-doc__title h1 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.id-number {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ak-brand);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- taraflar ---------------------------------------------------------------- */
+
+.id-doc__parties {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 22px 26px;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.id-party {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.id-party__label,
+.id-note__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: var(--ak-muted);
+}
+
+.id-party strong {
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+
+.id-party__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 8px;
+  font-size: 0.81rem;
+  color: var(--ak-gray);
+}
+
+.id-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 210px;
+}
+
+.id-dates__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 0.83rem;
+}
+
+.id-dates__row span {
+  color: var(--ak-muted);
+}
+
+.id-dates__row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- kalemler ---------------------------------------------------------------- */
+
+.id-lines th {
+  white-space: nowrap;
+}
+
+/* --- toplamlar --------------------------------------------------------------- */
+
+.id-doc__foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 22px 26px;
+}
+
+.id-note {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.id-note p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ak-gray);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.id-totals {
+  min-width: 280px;
+  flex: 0 1 320px;
+}
+
+.id-totals__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 7px 0;
+  font-size: 0.86rem;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.id-totals__row span {
+  color: var(--ak-gray);
+}
+
+.id-totals__row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.id-totals__row--sub {
+  font-size: 0.8rem;
+}
+
+.id-totals__row--sub span {
+  color: var(--ak-muted);
+}
+
+.id-totals__row--total {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 2px solid var(--ak-ink);
+  border-bottom: 0;
+  font-size: 0.95rem;
+}
+
+.id-totals__row--total strong {
+  font-size: 1.3rem;
+  font-weight: 750;
+}
+
+.id-totals__row--remaining {
+  border-bottom: 0;
+  font-weight: 650;
+}
+
+/* --- durum rozeti ------------------------------------------------------------ */
+
+.iv-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.iv-status.is-open {
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
+}
+
+.iv-status.is-partial {
+  background: var(--ak-warning-soft);
+  color: var(--ak-warning);
+}
+
+.iv-status.is-paid {
+  background: var(--ak-success-soft);
+  color: var(--ak-success);
+}
+
+.iv-status.is-overdue {
+  background: var(--ak-danger-soft);
+  color: var(--ak-danger);
+}
+
+@media (max-width: 768px) {
+  .id-doc__head,
+  .id-doc__parties,
+  .id-doc__foot {
+    padding: 17px 14px;
+  }
+
+  .id-totals {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+}

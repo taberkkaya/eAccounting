@@ -28,6 +28,16 @@ internal static class DemoDataSeeder
     /// </summary>
     public static async Task WipeAsync(CompanyDbContext context, CancellationToken cancellationToken = default)
     {
+        // Ön muhasebe tarafı önce: fatura satırları ve hareketler, sonra
+        // başlıkları. Kasa/banka satırları cariye bağlı olabildiği için onlar da
+        // bu temizlikten sonra siliniyor.
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM [StockTransactions]", cancellationToken);
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM [ContactTransactions]", cancellationToken);
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM [InvoiceLines]", cancellationToken);
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM [Invoices]", cancellationToken);
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM [Contacts]", cancellationToken);
+        await context.Database.ExecuteSqlRawAsync("DELETE FROM [Products]", cancellationToken);
+
         await context.Database.ExecuteSqlRawAsync("DELETE FROM [BankDetails]", cancellationToken);
         await context.Database.ExecuteSqlRawAsync("DELETE FROM [Banks]", cancellationToken);
         await context.Database.ExecuteSqlRawAsync("DELETE FROM [CashRegisterDetails]", cancellationToken);
@@ -96,6 +106,11 @@ internal static class DemoDataSeeder
         await context.CashRegisters.AddRangeAsync(cashRegisters, cancellationToken);
         await context.Banks.AddRangeAsync(banks, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+
+        // Cari, ürün ve faturalar: kasa/banka tek başına ön muhasebe değil, ve
+        // ziyaretçi asıl ekranlara boş girmemeli.
+        await DemoAccountingSeeder.SeedAsync(
+            context, demoUserId, cashRegisters, banks, cancellationToken);
     }
 
     /// <summary>Demo kalemleri; adları hareketlerdekiyle birebir eşleşmeli.</summary>

@@ -88,3 +88,16 @@
   margin: 5px 4px;
   background: var(--ak-line);
 }
+
+/* Yapılamayan bir işlemi menüden gizlemek yerine sebebiyle göstermek, kullanıcıyı
+   "neden yok" diye aramaktan kurtarıyor. */
+:host ::ng-deep .menu__item--muted {
+  color: var(--ak-muted);
+  cursor: default;
+  font-style: italic;
+}
+
+:host ::ng-deep .menu__item--muted:hover {
+  background: transparent;
+  color: var(--ak-muted);
+}

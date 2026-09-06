@@ -44,7 +44,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
 
         // başlık bloğu
         sheet.Range("A1:F1").Merge();
-        sheet.Cell("A1").Value = $"{statement.AccountKind} Ekstresi";
+        sheet.Cell("A1").Value = $"{statement.AccountKind} {statement.Labels.Title}";
         sheet.Cell("A1").Style
             .Font.SetBold().Font.SetFontSize(16).Font.SetFontColor(XLColor.White)
             .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Navy))
@@ -65,7 +65,11 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
 
         // tablo başlığı
         const int headerRow = 4;
-        string[] headers = ["#", "Tarih", "Açıklama", "Giren", "Çıkan", "Dönem Bakiyesi"];
+        string[] headers =
+        [
+            "#", "Tarih", "Açıklama",
+            statement.Labels.Debit, statement.Labels.Credit, statement.Labels.Balance
+        ];
 
         for (int i = 0; i < headers.Length; i++)
         {
@@ -84,7 +88,21 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
 
         // satırlar
         int row = headerRow + 1;
-        decimal running = 0;
+        decimal running = statement.OpeningBalance;
+
+        // Devir satırı: aralığın öncesi varsa koşu bakiyesi oradan başlamalı.
+        if (statement.OpeningBalance != 0)
+        {
+            sheet.Range(row, 1, row, 5).Merge();
+            sheet.Cell(row, 1).Value = "Devreden bakiye";
+            sheet.Cell(row, 6).Value = statement.OpeningBalance;
+            sheet.Range(row, 1, row, 6).Style
+                .Font.SetItalic()
+                .Fill.SetBackgroundColor(XLColor.FromHtml(ReportTheme.Zebra));
+            sheet.Cell(row, 6).Style.NumberFormat.Format = money;
+            sheet.Cell(row, 1).Style.Alignment.SetIndent(1);
+            row++;
+        }
 
         foreach ((StatementLine line, int index) in statement.Lines.Select((l, i) => (l, i)))
         {
@@ -127,7 +145,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
         sheet.Cell(row, 1).Value = "TOPLAM";
         sheet.Cell(row, 4).Value = statement.TotalDeposit;
         sheet.Cell(row, 5).Value = statement.TotalWithdrawal;
-        sheet.Cell(row, 6).Value = statement.Net;
+        sheet.Cell(row, 6).Value = statement.ClosingBalance;
 
         sheet.Range(row, 1, row, 6).Style
             .Font.SetBold()
@@ -188,7 +206,7 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
         {
             row.RelativeItem().Column(column =>
             {
-                column.Item().Text($"{statement.AccountKind} Ekstresi")
+                column.Item().Text($"{statement.AccountKind} {statement.Labels.Title}")
                     .FontSize(17).SemiBold().FontColor(Colors.White);
 
                 column.Item().PaddingTop(3).Text(statement.AccountName)
@@ -224,18 +242,21 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
         container.Row(row =>
         {
             row.RelativeItem().Element(c => SummaryCard(
-                c, "GİREN", ReportTheme.Money(statement.TotalDeposit, statement.CurrencySymbol), ReportTheme.Green));
+                c, ReportTheme.Upper(statement.Labels.Debit),
+                ReportTheme.Money(statement.TotalDeposit, statement.CurrencySymbol), ReportTheme.Green));
 
             row.ConstantItem(10);
 
             row.RelativeItem().Element(c => SummaryCard(
-                c, "ÇIKAN", ReportTheme.Money(statement.TotalWithdrawal, statement.CurrencySymbol), ReportTheme.Red));
+                c, ReportTheme.Upper(statement.Labels.Credit),
+                ReportTheme.Money(statement.TotalWithdrawal, statement.CurrencySymbol), ReportTheme.Red));
 
             row.ConstantItem(10);
 
             row.RelativeItem().Element(c => SummaryCard(
-                c, "DÖNEM NETİ", ReportTheme.Money(statement.Net, statement.CurrencySymbol),
-                statement.Net < 0 ? ReportTheme.Red : ReportTheme.Blue));
+                c, ReportTheme.Upper(statement.Labels.Balance),
+                ReportTheme.Money(statement.ClosingBalance, statement.CurrencySymbol),
+                statement.ClosingBalance < 0 ? ReportTheme.Red : ReportTheme.Blue));
 
             row.ConstantItem(10);
 
@@ -284,13 +305,27 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
                 HeaderCell(header.Cell(), "#");
                 HeaderCell(header.Cell(), "Tarih");
                 HeaderCell(header.Cell(), "Açıklama");
-                HeaderCell(header.Cell(), "Giren", right: true);
-                HeaderCell(header.Cell(), "Çıkan", right: true);
-                HeaderCell(header.Cell(), "Dönem Bakiyesi", right: true);
+                HeaderCell(header.Cell(), statement.Labels.Debit, right: true);
+                HeaderCell(header.Cell(), statement.Labels.Credit, right: true);
+                HeaderCell(header.Cell(), statement.Labels.Balance, right: true);
             });
 
-            decimal running = 0;
+            decimal running = statement.OpeningBalance;
             int index = 0;
+
+            if (statement.OpeningBalance != 0)
+            {
+                table.Cell().ColumnSpan(5).Background(ReportTheme.Zebra)
+                    .BorderBottom(0.5f).BorderColor(ReportTheme.Line)
+                    .PaddingVertical(5).PaddingHorizontal(6)
+                    .Text("Devreden bakiye").Italic().FontColor(ReportTheme.Muted);
+
+                table.Cell().Background(ReportTheme.Zebra)
+                    .BorderBottom(0.5f).BorderColor(ReportTheme.Line)
+                    .PaddingVertical(5).PaddingHorizontal(6).AlignRight()
+                    .Text(ReportTheme.Money(statement.OpeningBalance, statement.CurrencySymbol))
+                    .SemiBold();
+            }
 
             foreach (StatementLine line in statement.Lines)
             {
@@ -329,8 +364,8 @@ internal sealed class StatementReportBuilder : IStatementReportBuilder
 
             TotalCell(table.Cell(), statement.TotalDeposit, statement.CurrencySymbol, ReportTheme.Green);
             TotalCell(table.Cell(), statement.TotalWithdrawal, statement.CurrencySymbol, ReportTheme.Red);
-            TotalCell(table.Cell(), statement.Net, statement.CurrencySymbol,
-                statement.Net < 0 ? ReportTheme.Red : ReportTheme.Navy);
+            TotalCell(table.Cell(), statement.ClosingBalance, statement.CurrencySymbol,
+                statement.ClosingBalance < 0 ? ReportTheme.Red : ReportTheme.Navy);
         });
     }
 

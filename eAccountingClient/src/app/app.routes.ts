@@ -61,6 +61,74 @@ export const routes: Routes = [
         component: AccountsComponent,
       },
       {
+        path: 'contacts',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/contacts/contacts.component').then(
+                (m) => m.ContactsComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./components/contact-detail/contact-detail.component').then(
+                (m) => m.ContactDetailComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'products',
+        loadComponent: () =>
+              import('./components/products/products.component').then(
+                (m) => m.ProductsComponent
+              ),
+      },
+      {
+        // "new" bir kimlik değil; :id'den önce gelmezse fatura formu yerine
+        // "new" kimlikli bir fatura aranırdı.
+        path: 'invoices',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./components/invoices/invoices.component').then(
+                (m) => m.InvoicesComponent
+              ),
+          },
+          {
+            path: 'new',
+            loadComponent: () =>
+              import('./components/invoice-form/invoice-form.component').then(
+                (m) => m.InvoiceFormComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./components/invoice-detail/invoice-detail.component').then(
+                (m) => m.InvoiceDetailComponent
+              ),
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('./components/invoice-form/invoice-form.component').then(
+                (m) => m.InvoiceFormComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+              import('./components/reports/reports.component').then(
+                (m) => m.ReportsComponent
+              ),
+      },
+      {
         path: 'cash-registers',
         children: [
           {

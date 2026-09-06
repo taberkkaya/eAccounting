@@ -1,0 +1,202 @@
+<app-blank
+  [pageName]="invoice?.number || 'Fatura'"
+  [routes]="['Kayıtlar', 'Faturalar', 'Detay']"
+>
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else if(loading){
+  <app-section>
+    <div class="ak-empty">
+      <i class="fas fa-circle-notch ak-spin"></i>
+      <div class="ak-empty__text">Yükleniyor...</div>
+    </div>
+  </app-section>
+  }@else if(invoice){
+
+  <!-- Yazdırmada gizlenir; belge tek başına kalsın. -->
+  <div class="id-actions ak-no-print">
+    <a class="ak-btn" routerLink="/invoices">
+      <i class="fas fa-arrow-left"></i>
+      Faturalar
+    </a>
+
+    <div class="ak-toolbar__spacer"></div>
+
+    @if(invoice.remainingAmount > 0 && contact){
+    <button type="button" class="ak-btn ak-btn--primary" (click)="openPayment()">
+      <i class="fas" [class.fa-arrow-down]="invoice.type === 1" [class.fa-arrow-up]="invoice.type === 2"></i>
+      {{ invoice.type === 1 ? "Tahsilat" : "Ödeme" }}
+    </button>
+    }
+
+    <a class="ak-btn" [routerLink]="['/invoices', invoice.id, 'edit']">
+      <i class="fas fa-pen"></i>
+      Düzenle
+    </a>
+
+    <button type="button" class="ak-btn" (click)="print()">
+      <i class="fas fa-print"></i>
+      Yazdır
+    </button>
+
+    <button type="button" class="ak-btn ak-btn--danger" (click)="deleteInvoice()">
+      <i class="fas fa-trash"></i>
+      Sil
+    </button>
+  </div>
+
+  <div class="id-doc">
+    <!-- başlık -->
+    <div class="id-doc__head">
+      <div class="id-doc__title">
+        <h1>{{ invoice.typeName }}</h1>
+        <span class="id-number">{{ invoice.number }}</span>
+      </div>
+
+      <div class="id-doc__status">
+        <span class="iv-status" [class]="statusClass()">
+          {{ invoice.isOverdue ? "Gecikmiş" : invoice.statusName }}
+        </span>
+      </div>
+    </div>
+
+    <!-- taraflar ve tarihler -->
+    <div class="id-doc__parties">
+      <div class="id-party">
+        <span class="id-party__label">
+          {{ invoice.type === 1 ? "ALICI" : "SATICI" }}
+        </span>
+        <strong>{{ invoice.contactName }}</strong>
+        @if(contact){
+        <div class="id-party__meta">
+          @if(contact.taxNumber){
+          <span>VKN/TCKN: {{ contact.taxNumber }}</span>
+          }
+          @if(contact.taxOffice){<span>{{ contact.taxOffice }} V.D.</span>}
+          @if(contact.address){<span>{{ contact.address }}</span>}
+          @if(contact.phone){<span>{{ contact.phone }}</span>}
+        </div>
+        }
+      </div>
+
+      <div class="id-dates">
+        <div class="id-dates__row">
+          <span>Fatura Tarihi</span>
+          <strong>{{ invoice.date | date : "dd.MM.yyyy" }}</strong>
+        </div>
+        <div class="id-dates__row">
+          <span>Vade Tarihi</span>
+          <strong [class.ak-negative]="invoice.isOverdue">
+            {{ invoice.dueDate | date : "dd.MM.yyyy" }}
+          </strong>
+        </div>
+        <div class="id-dates__row">
+          <span>Para Birimi</span>
+          <strong>{{ invoice.currencyName }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- kalemler -->
+    <div class="ak-table-wrap">
+      <table class="ak-table id-lines">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>Açıklama</th>
+            <th class="ak-table__amount">Miktar</th>
+            <th class="ak-table__amount">Birim Fiyat</th>
+            <th class="ak-table__amount">İnd.</th>
+            <th class="ak-table__amount">KDV</th>
+            <th class="ak-table__amount">Tutar</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(line of invoice.lines; track line.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td class="ak-table__strong">{{ line.description }}</td>
+            <td class="ak-table__amount">{{ line.quantity }} {{ line.unit }}</td>
+            <td class="ak-table__amount">
+              {{ line.unitPrice | trCurrency : symbol : true }}
+            </td>
+            <td class="ak-table__amount">
+              @if(line.discountRate > 0){ %{{ line.discountRate }} }@else { — }
+            </td>
+            <td class="ak-table__amount">%{{ line.vatRate }}</td>
+            <td class="ak-table__amount ak-table__strong">
+              {{ lineTotal(line) | trCurrency : symbol : true }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- toplamlar -->
+    <div class="id-doc__foot">
+      <div class="id-note">
+        @if(invoice.note){
+        <span class="id-note__label">NOT</span>
+        <p>{{ invoice.note }}</p>
+        }
+      </div>
+
+      <div class="id-totals">
+        <div class="id-totals__row">
+          <span>Ara Toplam</span>
+          <strong>{{ invoice.subTotal | trCurrency : symbol : true }}</strong>
+        </div>
+
+        @if(invoice.discountTotal > 0){
+        <div class="id-totals__row">
+          <span>İndirim</span>
+          <strong class="ak-negative">
+            −{{ invoice.discountTotal | trCurrency : symbol : true }}
+          </strong>
+        </div>
+        }
+
+        @for(row of vatBreakdown; track row.rate){
+        <div class="id-totals__row id-totals__row--sub">
+          <span>KDV %{{ row.rate }}</span>
+          <strong>{{ row.vat | trCurrency : symbol : true }}</strong>
+        </div>
+        }
+
+        <div class="id-totals__row id-totals__row--total">
+          <span>Genel Toplam</span>
+          <strong>{{ invoice.grandTotal | trCurrency : symbol : true }}</strong>
+        </div>
+
+        @if(invoice.paidAmount > 0){
+        <div class="id-totals__row">
+          <span>{{ invoice.type === 1 ? "Tahsil edilen" : "Ödenen" }}</span>
+          <strong class="ak-positive">
+            {{ invoice.paidAmount | trCurrency : symbol : true }}
+          </strong>
+        </div>
+        }
+
+        @if(invoice.remainingAmount > 0){
+        <div class="id-totals__row id-totals__row--remaining">
+          <span>Kalan</span>
+          <strong class="ak-negative">
+            {{ invoice.remainingAmount | trCurrency : symbol : true }}
+          </strong>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</app-blank>
+
+<app-payment-dialog
+  [open]="paymentOpen"
+  [contact]="contact"
+  [invoice]="invoice"
+  [direction]="paymentDirection"
+  (closed)="paymentOpen = false"
+  (saved)="load()"
+></app-payment-dialog>

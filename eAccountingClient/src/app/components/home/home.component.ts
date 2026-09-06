@@ -10,6 +10,7 @@ import { QuickEntryComponent } from '../ui/quick-entry/quick-entry.component';
 import { QuickAccount } from '../ui/quick-entry/quick-entry.model';
 import { MovementModel } from '../../models/movement.model';
 import { CategoryModel } from '../../models/category.model';
+import { DashboardModel, currencySymbol } from '../../models/accounting.model';
 
 type AccountKind = 'Kasa' | 'Banka';
 
@@ -55,6 +56,13 @@ export class HomeComponent implements OnInit {
   readonly movements = signal<MovementModel[]>([]);
   readonly categories = signal<CategoryModel[]>([]);
 
+  /**
+   * Ön muhasebe özeti. Kasadaki para "ne kadarım var" sorusunu cevaplıyor;
+   * bu blok "kim bana borçlu, ben kime borçluyum, ne gecikti" sorusunu.
+   * İkincisi olmadan ekran bir kasa defteri panosu olarak kalıyordu.
+   */
+  readonly dashboard = signal<DashboardModel | null>(null);
+
   readonly donutCircumference = DONUT_CIRCUMFERENCE;
 
   ngOnInit(): void {
@@ -66,6 +74,26 @@ export class HomeComponent implements OnInit {
     }
 
     this.load();
+  }
+
+  private loadDashboard(): void {
+    this.http.post<DashboardModel>(
+      'Dashboard/Get',
+      { upcomingDays: 30 },
+      (res) => this.dashboard.set(res),
+      () => this.dashboard.set(null)
+    );
+  }
+
+  /** Cari ya da fatura varsa hesap olmasa da panoyu göstermek gerekiyor. */
+  get hasAccounting(): boolean {
+    const data = this.dashboard();
+
+    return !!data && (data.contactCount > 0 || data.openInvoiceCount > 0);
+  }
+
+  symbolOf(name: string): string {
+    return currencySymbol(name);
   }
 
   private loadMovements(): void {
@@ -90,6 +118,7 @@ export class HomeComponent implements OnInit {
   private load(): void {
     this.loadMovements();
     this.loadCategories();
+    this.loadDashboard();
 
     let pending = 2;
     let cashRegisters: CashRegisterModel[] = [];

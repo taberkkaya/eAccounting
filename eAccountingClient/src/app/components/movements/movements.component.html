@@ -94,19 +94,19 @@
 
     <!-- Seçili aralığın toplamı: filtreyi daralttıkça değişiyor. -->
     @if(totals.length > 0){
-    <div class="mv-totals">
+    <div class="ak-totals">
       @for(total of totals; track total.currency){
-      <div class="mv-total">
-        <span class="mv-total__currency">{{ total.currency }}</span>
-        <span class="mv-total__in">
+      <div class="ak-total">
+        <span class="ak-total__currency">{{ total.currency }}</span>
+        <span class="ak-total__in">
           <i class="fas fa-arrow-down"></i>
           {{ total.deposit | trCurrency : symbolFor(total.currency) : true }}
         </span>
-        <span class="mv-total__out">
+        <span class="ak-total__out">
           <i class="fas fa-arrow-up"></i>
           {{ total.withdrawal | trCurrency : symbolFor(total.currency) : true }}
         </span>
-        <span class="mv-total__net">
+        <span class="ak-total__net">
           Net:
           <strong [class.ak-negative]="total.deposit - total.withdrawal < 0">
             {{ total.deposit - total.withdrawal | trCurrency : symbolFor(total.currency) : true }}

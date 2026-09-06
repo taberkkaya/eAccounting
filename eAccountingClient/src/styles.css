@@ -1271,3 +1271,200 @@ app-footer {
   border-radius: var(--ak-radius) !important;
   font-family: var(--ak-font-body) !important;
 }
+
+/* --- filtre şeridi ---------------------------------------------------------
+   Tür seçimi ayrı bir sayfa değil bir filtre; üç ekranda da aynı şerit. */
+
+.ak-filters {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--ak-line);
+  border-radius: 99px;
+  background: var(--ak-surface-3);
+}
+
+.ak-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--ak-gray);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.13s, color 0.13s;
+}
+
+.ak-filter span {
+  color: var(--ak-muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ak-filter:hover {
+  color: var(--ak-ink);
+}
+
+.ak-filter.is-active {
+  background: var(--ak-surface);
+  color: var(--ak-ink);
+  box-shadow: var(--ak-shadow-sm);
+}
+
+.ak-filter.is-active span {
+  color: var(--ak-brand);
+}
+
+/* --- para birimi toplamları -------------------------------------------------
+   Farklı birimler toplanmaz; her biri kendi şeridinde durur. */
+
+.ak-totals {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ak-line);
+  background: var(--ak-surface-2);
+}
+
+.ak-total {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 8px 14px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ak-total__currency {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.ak-total__in {
+  color: var(--ak-success);
+}
+
+.ak-total__out {
+  color: var(--ak-danger);
+}
+
+.ak-total__in i,
+.ak-total__out i {
+  margin-right: 4px;
+  font-size: 0.7rem;
+}
+
+.ak-total__net {
+  color: var(--ak-muted);
+}
+
+.ak-total__net strong {
+  color: var(--ak-ink);
+  margin-left: 4px;
+}
+
+/* Alan altındaki açıklama; kuralı forma yazmak, kullanıcıyı denemeye
+   bırakmaktan iyi. */
+.ak-hint {
+  margin: 6px 0 0;
+  font-size: 0.76rem;
+  color: var(--ak-muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 768px) {
+  .ak-totals {
+    padding: 12px 13px;
+  }
+
+  .ak-total {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .ak-filters {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* İkinci sıra araç çubuğu: eylemler üstte, filtreler altta. Hepsini tek satıra
+   sıkıştırmak dar ekranda okunmaz bir yığın çıkarıyordu. */
+.ak-toolbar--secondary {
+  background: var(--ak-surface);
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+
+/* --- yazdırma ----------------------------------------------------------------
+   Fatura çoğu zaman kâğıda dökülüp müşteriye veriliyor. Kenar çubuğu, üst
+   çubuk ve düğmeler kâğıtta işe yaramıyor; belge tek başına kalıyor. */
+
+.ak-no-print {
+  /* Ekranda normal; yalnızca yazdırmada gizleniyor. */
+}
+
+@media print {
+  :root {
+    --ak-bg: #fff;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  app-main-sidebar,
+  app-navbar,
+  app-footer,
+  .ak-no-print,
+  .ak-breadcrumb,
+  .ak-page-head {
+    display: none !important;
+  }
+
+  .ak-shell,
+  .ak-main,
+  .ak-content {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .ak-panel {
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Tablolar kâğıtta kaymaz; kayan kutu yerine tam genişlik. */
+  .ak-table-wrap {
+    overflow: visible !important;
+  }
+
+  /* Satırlar sayfa arasında bölünmesin. */
+  tr,
+  .id-doc__parties,
+  .id-doc__foot {
+    break-inside: avoid;
+  }
+
+  a[href]::after {
+    content: none !important;
+  }
+}

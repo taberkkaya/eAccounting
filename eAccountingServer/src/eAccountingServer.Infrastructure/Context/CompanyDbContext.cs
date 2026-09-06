@@ -36,8 +36,17 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
     public DbSet<Bank> Banks { get; set; }
     public DbSet<BankDetail> BankDetails { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Contact> Contacts { get; set; }
+    public DbSet<ContactTransaction> ContactTransactions { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
+    public DbSet<InvoiceLine> InvoiceLines { get; set; }
+    public DbSet<StockTransaction> StockTransactions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        ConfigureAccounting(modelBuilder);
+
         #region CashRegister
         modelBuilder.Entity<CashRegister>().Property(p => p.DepositAmount).HasColumnType("money");
         modelBuilder.Entity<CashRegister>().Property(p => p.WithdrawalAmount).HasColumnType("money");
@@ -75,6 +84,106 @@ internal sealed class CompanyDbContext : DbContext, IUnitOfWorkCompany
         modelBuilder.Entity<BankDetail>().HasQueryFilter(p => !p.IsDeleted);
         #endregion
 
+    }
+
+    /// <summary>
+    /// Cari, ürün ve fatura tarafı. Kasa/banka ile aynı dosyada ama ayrı bir
+    /// metotta: o taraf uygulamanın kasa defteri, burası ön muhasebe kısmı.
+    /// </summary>
+    private static void ConfigureAccounting(ModelBuilder modelBuilder)
+    {
+        #region Contact
+        modelBuilder.Entity<Contact>(entity =>
+        {
+            entity.Property(p => p.Name).HasMaxLength(160).IsRequired();
+            entity.Property(p => p.TaxNumber).HasMaxLength(20);
+            entity.Property(p => p.TaxOffice).HasMaxLength(80);
+            entity.Property(p => p.Phone).HasMaxLength(40);
+            entity.Property(p => p.Email).HasMaxLength(160);
+            entity.Property(p => p.Address).HasMaxLength(400);
+            entity.Property(p => p.Note).HasMaxLength(1000);
+            entity.Property(p => p.DebitAmount).HasColumnType("money");
+            entity.Property(p => p.CreditAmount).HasColumnType("money");
+            entity.Property(p => p.CurrencyType)
+                .HasConversion(type => type.Value, value => CurrencyTypeEnum.FromValue(value));
+            entity.HasMany(p => p.Transactions).WithOne().HasForeignKey(p => p.ContactId);
+            entity.Ignore(p => p.Balance);
+            entity.HasQueryFilter(p => !p.IsDeleted);
+        });
+        #endregion
+
+        #region ContactTransaction
+        modelBuilder.Entity<ContactTransaction>(entity =>
+        {
+            entity.Property(p => p.Description).HasMaxLength(400).IsRequired();
+            entity.Property(p => p.DebitAmount).HasColumnType("money");
+            entity.Property(p => p.CreditAmount).HasColumnType("money");
+            entity.HasIndex(p => new { p.ContactId, p.Date });
+            entity.HasQueryFilter(p => !p.IsDeleted);
+        });
+        #endregion
+
+        #region Product
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.Property(p => p.Code).HasMaxLength(40);
+            entity.Property(p => p.Name).HasMaxLength(200).IsRequired();
+            entity.Property(p => p.Unit).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.Description).HasMaxLength(1000);
+            entity.Property(p => p.PurchasePrice).HasColumnType("money");
+            entity.Property(p => p.SalePrice).HasColumnType("money");
+            entity.Property(p => p.StockQuantity).HasPrecision(18, 3);
+            entity.Property(p => p.CriticalStock).HasPrecision(18, 3);
+            entity.Property(p => p.CurrencyType)
+                .HasConversion(type => type.Value, value => CurrencyTypeEnum.FromValue(value));
+            entity.HasQueryFilter(p => !p.IsDeleted);
+        });
+        #endregion
+
+        #region Invoice
+        modelBuilder.Entity<Invoice>(entity =>
+        {
+            entity.Property(p => p.Number).HasMaxLength(30).IsRequired();
+            entity.Property(p => p.Note).HasMaxLength(1000);
+            entity.Property(p => p.SubTotal).HasColumnType("money");
+            entity.Property(p => p.DiscountTotal).HasColumnType("money");
+            entity.Property(p => p.VatTotal).HasColumnType("money");
+            entity.Property(p => p.GrandTotal).HasColumnType("money");
+            entity.Property(p => p.PaidAmount).HasColumnType("money");
+            entity.Property(p => p.CurrencyType)
+                .HasConversion(type => type.Value, value => CurrencyTypeEnum.FromValue(value));
+            entity.HasOne(p => p.Contact).WithMany().HasForeignKey(p => p.ContactId);
+            entity.HasMany(p => p.Lines).WithOne().HasForeignKey(p => p.InvoiceId);
+            entity.HasIndex(p => new { p.Type, p.Number });
+            entity.Ignore(p => p.RemainingAmount);
+            entity.HasQueryFilter(p => !p.IsDeleted);
+        });
+        #endregion
+
+        #region InvoiceLine
+        modelBuilder.Entity<InvoiceLine>(entity =>
+        {
+            entity.Property(p => p.Description).HasMaxLength(400).IsRequired();
+            entity.Property(p => p.Unit).HasMaxLength(20).IsRequired();
+            entity.Property(p => p.Quantity).HasPrecision(18, 3);
+            entity.Property(p => p.DiscountRate).HasPrecision(5, 2);
+            entity.Property(p => p.UnitPrice).HasColumnType("money");
+            entity.Property(p => p.LineTotal).HasColumnType("money");
+            entity.Property(p => p.VatAmount).HasColumnType("money");
+            entity.HasQueryFilter(p => !p.IsDeleted);
+        });
+        #endregion
+
+        #region StockTransaction
+        modelBuilder.Entity<StockTransaction>(entity =>
+        {
+            entity.Property(p => p.Description).HasMaxLength(400).IsRequired();
+            entity.Property(p => p.Quantity).HasPrecision(18, 3);
+            entity.Property(p => p.UnitPrice).HasColumnType("money");
+            entity.HasIndex(p => new { p.ProductId, p.Date });
+            entity.HasQueryFilter(p => !p.IsDeleted);
+        });
+        #endregion
     }
 
     private void CreateConnectionString(IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)

@@ -447,3 +447,164 @@
     padding: 18px;
   }
 }
+
+/* --- ön muhasebe göstergeleri ------------------------------------------------
+   Ekranın ilk bakılan yeri: kasadaki para değil, tahsil edilmemiş alacak ve
+   ödenmemiş borç. Kasa özeti bunun altında kalıyor. */
+
+.dash-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dash-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 18px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius);
+  background: var(--ak-surface);
+  box-shadow: var(--ak-shadow-sm);
+  color: inherit;
+}
+
+.dash-kpi:hover {
+  border-color: var(--ak-brand);
+}
+
+.dash-kpi__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--ak-muted);
+}
+
+.dash-kpi__label i {
+  font-size: 0.8rem;
+}
+
+.dash-kpi__value {
+  font-size: 1.4rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.dash-kpi__value--zero {
+  color: var(--ak-muted);
+  font-weight: 600;
+}
+
+.dash-kpi__note {
+  font-size: 0.73rem;
+  color: var(--ak-muted);
+}
+
+.dash-kpi--in .dash-kpi__value {
+  color: var(--ak-success);
+}
+
+.dash-kpi--out .dash-kpi__value {
+  color: var(--ak-danger);
+}
+
+/* Gecikmiş tutar not satırında ama vurgulu: göz kaçırmasın. */
+.dash-kpi--in .dash-kpi__note,
+.dash-kpi--out .dash-kpi__note {
+  color: var(--ak-warning);
+  font-weight: 600;
+}
+
+/* --- iki panelli sıra -------------------------------------------------------- */
+
+.dash-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* --- vade satırı ------------------------------------------------------------- */
+
+.due {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--ak-line);
+  color: inherit;
+}
+
+.due:last-child {
+  border-bottom: 0;
+}
+
+.due:hover {
+  background: var(--ak-surface-2);
+}
+
+/* Kalan gün sayısı en solda ve en büyük: sıralamayı o belirliyor. */
+.due__days {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  flex: none;
+  padding: 6px 0;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand-dark);
+  font-size: 1.05rem;
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.due__days small {
+  font-size: 0.58rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.due__days.is-late {
+  background: var(--ak-danger-soft);
+  color: var(--ak-danger);
+}
+
+.due__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.due__text strong {
+  font-size: 0.87rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.due__text small {
+  font-size: 0.73rem;
+  color: var(--ak-muted);
+}
+
+.due__amount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .due {
+    padding: 11px 13px;
+  }
+}

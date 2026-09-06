@@ -1,0 +1,129 @@
+/* --- künye şeridi ------------------------------------------------------------ */
+
+.cd-head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+}
+
+.cd-identity {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.cd-identity__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-brand-soft);
+  color: var(--ak-brand);
+  font-size: 1.1rem;
+}
+
+.cd-identity__text h2 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.cd-identity__meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--ak-muted);
+}
+
+/* --- bakiye ------------------------------------------------------------------ */
+
+.cd-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-end;
+}
+
+/* İşareti okumak yerine tarafı yazıyla söylüyoruz; eksi bakiye herkese
+   aynı şeyi anlatmıyor. */
+.cd-balance__label {
+  font-size: 0.74rem;
+  color: var(--ak-muted);
+}
+
+.cd-balance__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cd-balance__overdue {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: var(--ak-warning-soft);
+  color: var(--ak-warning);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.cd-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* --- ekstre ------------------------------------------------------------------ */
+
+.cd-opening td {
+  background: var(--ak-surface-2);
+  font-style: italic;
+  color: var(--ak-gray);
+}
+
+.cd-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ak-gray);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.cd-source i {
+  color: var(--ak-muted);
+  font-size: 0.76rem;
+}
+
+a.cd-source:hover,
+a.cd-source:hover i {
+  color: var(--ak-brand);
+}
+
+@media (max-width: 768px) {
+  .cd-head {
+    padding: 15px 13px;
+    gap: 14px;
+  }
+
+  .cd-balance {
+    align-items: flex-start;
+  }
+
+  .cd-actions {
+    width: 100%;
+  }
+
+  .cd-actions .ak-btn {
+    flex: 1;
+  }
+}

@@ -1,0 +1,110 @@
+<app-modal [open]="open" [title]="title" (closed)="closed.emit()">
+  <div class="ak-modal__body">
+    @if(contact){
+    <div class="pay-contact">
+      <span class="pay-contact__name">{{ contact.name }}</span>
+      <span class="pay-contact__balance" [class.ak-negative]="contact.balance < 0">
+        Bakiye: {{ contact.balance | trCurrency : symbol : true }}
+      </span>
+    </div>
+    }
+
+    @if(invoice){
+    <p class="ak-muted pay-note">
+      Bu tutar <strong>{{ invoice.number }}</strong> numaralı faturaya sayılacak.
+      Kalan: {{ invoice.remainingAmount | trCurrency : symbol : true }}
+    </p>
+    }
+
+    <label class="pay-label" for="paymentAmount">Ne kadar?</label>
+    <div class="pay-amount" [class.pay-amount--out]="direction === 1">
+      <input
+        id="paymentAmount"
+        type="text"
+        inputmode="decimal"
+        class="pay-amount__input"
+        placeholder="0"
+        [(ngModel)]="amountText"
+        name="paymentAmount"
+        autocomplete="off"
+      />
+      <span class="pay-amount__symbol">{{ symbol }}</span>
+    </div>
+
+    <label class="pay-label" for="paymentAccount">
+      {{ direction === 0 ? "Nereye girdi?" : "Nereden çıktı?" }}
+    </label>
+
+    @if(eligibleAccounts.length === 0){
+    <div class="ak-empty pay-empty">
+      <i class="fas fa-triangle-exclamation"></i>
+      <div class="ak-empty__text">
+        {{ contact?.currencyName }} para biriminde bir kasa ya da banka yok.
+        Önce Hesaplar ekranından bir tane ekleyin.
+      </div>
+    </div>
+    }@else {
+    <div class="pay-accounts">
+      @for(account of eligibleAccounts; track account.id){
+      <button
+        type="button"
+        class="pay-account"
+        [class.is-selected]="account.id === accountId"
+        (click)="accountId = account.id"
+      >
+        <span class="pay-account__icon">
+          <i
+            class="fas"
+            [class.fa-cash-register]="account.kind === 'Kasa'"
+            [class.fa-university]="account.kind === 'Banka'"
+          ></i>
+        </span>
+        <span class="pay-account__text">
+          <strong>{{ account.name }}</strong>
+          <small>{{ account.kind }} · {{ account.currencyName }}</small>
+        </span>
+        <span class="pay-account__check"><i class="fas fa-check"></i></span>
+      </button>
+      }
+    </div>
+    }
+
+    <label class="pay-label" for="paymentDescription">Açıklama</label>
+    <input
+      id="paymentDescription"
+      type="text"
+      class="ak-input pay-input"
+      [placeholder]="direction === 0 ? 'Boş bırakılırsa otomatik yazılır' : 'Boş bırakılırsa otomatik yazılır'"
+      [(ngModel)]="description"
+      name="paymentDescription"
+      autocomplete="off"
+    />
+
+    <label class="pay-label" for="paymentDate">Tarih</label>
+    <input
+      id="paymentDate"
+      type="date"
+      class="ak-input pay-input"
+      [(ngModel)]="entryDate"
+      name="paymentDate"
+    />
+  </div>
+
+  <div class="ak-modal__foot">
+    <button type="button" class="ak-btn" (click)="closed.emit()">Vazgeç</button>
+    <button
+      type="button"
+      class="ak-btn ak-btn--primary"
+      [disabled]="!canSave"
+      (click)="save()"
+    >
+      @if(saving){
+      <i class="fas fa-circle-notch ak-spin"></i>
+      Kaydediliyor...
+      }@else {
+      <i class="fas fa-check"></i>
+      {{ direction === 0 ? "Tahsilatı Kaydet" : "Ödemeyi Kaydet" }}
+      }
+    </button>
+  </div>
+</app-modal>

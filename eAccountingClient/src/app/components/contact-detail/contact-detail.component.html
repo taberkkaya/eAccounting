@@ -1,0 +1,270 @@
+<app-blank
+  [pageName]="contact?.name || 'Cari Ekstresi'"
+  [routes]="['Kayıtlar', 'Cariler', 'Ekstre']"
+>
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+
+  <!-- Künye: kiminle çalıştığımız ve nerede durduğumuz -->
+  @if(contact){
+  <app-section>
+    <div class="cd-head">
+      <div class="cd-identity">
+        <span class="cd-identity__icon">
+          <i
+            class="fas"
+            [class.fa-user]="contact.type === 1"
+            [class.fa-truck]="contact.type === 2"
+            [class.fa-user-tie]="contact.type === 3"
+          ></i>
+        </span>
+        <div class="cd-identity__text">
+          <h2>{{ contact.name }}</h2>
+          <div class="cd-identity__meta">
+            <span class="ak-tag" [class.ak-tag--brand]="contact.type !== 1">
+              {{ contact.typeName }}
+            </span>
+            <span class="ak-tag ak-tag--muted">{{ contact.currencyName }}</span>
+            @if(contact.taxNumber){
+            <span>VKN/TCKN: {{ contact.taxNumber }}</span>
+            }
+            @if(contact.phone){<span>{{ contact.phone }}</span>}
+            @if(contact.email){<span>{{ contact.email }}</span>}
+          </div>
+        </div>
+      </div>
+
+      <div class="cd-balance">
+        <span class="cd-balance__label">{{ balanceLabel }}</span>
+        <strong
+          class="cd-balance__value"
+          [class.ak-negative]="contact.balance < 0"
+          [class.ak-positive]="contact.balance > 0"
+        >
+          {{ contact.balance | trCurrency : symbol : true }}
+        </strong>
+        @if(contact.overdueAmount > 0){
+        <span class="cd-balance__overdue">
+          <i class="fas fa-clock"></i>
+          {{ contact.overdueAmount | trCurrency : symbol : true }} vadesi geçmiş
+        </span>
+        }
+      </div>
+
+      <div class="cd-actions">
+        <button type="button" class="ak-btn ak-btn--primary" (click)="openPayment(0)">
+          <i class="fas fa-arrow-down"></i>
+          Tahsilat
+        </button>
+        <button type="button" class="ak-btn" (click)="openPayment(1)">
+          <i class="fas fa-arrow-up"></i>
+          Ödeme
+        </button>
+      </div>
+    </div>
+  </app-section>
+  }
+
+  <app-section sectionTitle="Ekstre">
+    <div class="ak-toolbar">
+      <input type="date" class="ak-input" [(ngModel)]="startDate" aria-label="Başlangıç tarihi" />
+      <input type="date" class="ak-input" [(ngModel)]="endDate" aria-label="Bitiş tarihi" />
+
+      <button type="button" class="ak-btn ak-btn--primary" (click)="loadStatement()">
+        <i class="fas fa-filter"></i>
+        Listele
+      </button>
+
+      <div class="ak-toolbar__spacer"></div>
+
+      <button
+        type="button"
+        class="ak-btn"
+        (click)="export('excel')"
+        [disabled]="exporting !== null"
+        title="Ekstreyi Excel olarak indir"
+      >
+        <i
+          class="fas"
+          [class.fa-file-excel]="exporting !== 'excel'"
+          [class.ak-btn__excel]="exporting !== 'excel'"
+          [class.fa-circle-notch]="exporting === 'excel'"
+          [class.ak-spin]="exporting === 'excel'"
+        ></i>
+        Excel
+      </button>
+
+      <button
+        type="button"
+        class="ak-btn"
+        (click)="export('pdf')"
+        [disabled]="exporting !== null"
+        title="Ekstreyi PDF olarak indir - mutabakat için"
+      >
+        <i
+          class="fas"
+          [class.fa-file-pdf]="exporting !== 'pdf'"
+          [class.ak-btn__pdf]="exporting !== 'pdf'"
+          [class.fa-circle-notch]="exporting === 'pdf'"
+          [class.ak-spin]="exporting === 'pdf'"
+        ></i>
+        PDF
+      </button>
+    </div>
+
+    @if(statement){
+    <div class="ak-totals">
+      <div class="ak-total">
+        <span class="ak-total__currency">{{ statement.currencyName }}</span>
+        <span class="ak-total__net">
+          Devir:
+          <strong [class.ak-negative]="statement.openingBalance < 0">
+            {{ statement.openingBalance | trCurrency : symbol : true }}
+          </strong>
+        </span>
+        <span class="ak-total__in">
+          <i class="fas fa-arrow-down"></i>
+          Borç: {{ statement.totalDebit | trCurrency : symbol : true }}
+        </span>
+        <span class="ak-total__out">
+          <i class="fas fa-arrow-up"></i>
+          Alacak: {{ statement.totalCredit | trCurrency : symbol : true }}
+        </span>
+        <span class="ak-total__net">
+          Bakiye:
+          <strong [class.ak-negative]="statement.closingBalance < 0">
+            {{ statement.closingBalance | trCurrency : symbol : true }}
+          </strong>
+        </span>
+      </div>
+    </div>
+    }
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>Tarih</th>
+            <th>Açıklama</th>
+            <th>Tür</th>
+            <th>Kaynak</th>
+            <th class="ak-table__amount">Borç</th>
+            <th class="ak-table__amount">Alacak</th>
+            <th class="ak-table__amount">Bakiye</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Devir satırı tabloda da var: aradaki fark aranmasın. -->
+          @if(statement && statement.openingBalance !== 0){
+          <tr class="cd-opening">
+            <td class="ak-table__num"></td>
+            <td>{{ statement.startDate | date : "dd.MM.yyyy" }}</td>
+            <td class="ak-table__strong">Devreden bakiye</td>
+            <td colspan="4"></td>
+            <td class="ak-table__amount">
+              <strong [class.ak-negative]="statement.openingBalance < 0">
+                {{ statement.openingBalance | trCurrency : symbol : true }}
+              </strong>
+            </td>
+            <td></td>
+          </tr>
+          }
+
+          @for(line of statement?.lines ?? []; track line.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td>{{ line.date | date : "dd.MM.yyyy" }}</td>
+            <td class="ak-table__strong">{{ line.description }}</td>
+            <td>
+              <span
+                class="ak-tag"
+                [class.ak-tag--brand]="line.kind === 1"
+                [class.ak-tag--muted]="line.kind === 0"
+              >
+                {{ line.kindName }}
+              </span>
+            </td>
+            <td>
+              @if(line.invoiceNumber){
+              <a class="cd-source" [routerLink]="['/invoices', line.invoiceId]">
+                <i class="far fa-file-alt"></i> {{ line.invoiceNumber }}
+              </a>
+              }@else if(line.accountName){
+              <span class="cd-source"><i class="fas fa-wallet"></i> {{ line.accountName }}</span>
+              }@else {
+              <span class="ak-muted">—</span>
+              }
+            </td>
+            <td class="ak-table__amount ak-positive">
+              @if(line.debitAmount > 0){
+              {{ line.debitAmount | trCurrency : symbol : true }}
+              }@else { — }
+            </td>
+            <td class="ak-table__amount ak-negative">
+              @if(line.creditAmount > 0){
+              {{ line.creditAmount | trCurrency : symbol : true }}
+              }@else { — }
+            </td>
+            <td class="ak-table__amount">
+              <strong [class.ak-negative]="line.runningBalance < 0">
+                {{ line.runningBalance | trCurrency : symbol : true }}
+              </strong>
+            </td>
+            <td>
+              <app-action-menu>
+                @if(line.invoiceId){
+                <a class="menu__item" [routerLink]="['/invoices', line.invoiceId]">
+                  <i class="far fa-file-alt"></i> Faturaya git
+                </a>
+                }
+                @if(canDelete(line)){
+                <div class="menu__separator"></div>
+                <button
+                  type="button"
+                  class="menu__item menu__item--danger"
+                  (click)="deleteLine(line)"
+                >
+                  <i class="fas fa-trash"></i> Sil
+                </button>
+                }@else {
+                <span class="menu__item menu__item--muted">
+                  <i class="fas fa-lock"></i> Faturadan geliyor
+                </span>
+                }
+              </app-action-menu>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="9">
+              <div class="ak-empty">
+                @if(loading){
+                <i class="fas fa-circle-notch ak-spin"></i>
+                <div class="ak-empty__text">Yükleniyor...</div>
+                }@else {
+                <i class="far fa-file-alt"></i>
+                <div class="ak-empty__text">
+                  Bu aralıkta hareket yok. Tarih aralığını genişletin ya da fatura kesin.
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+  }
+</app-blank>
+
+<app-payment-dialog
+  [open]="paymentOpen"
+  [contact]="contact"
+  [direction]="paymentDirection"
+  (closed)="paymentOpen = false"
+  (saved)="refresh()"
+></app-payment-dialog>

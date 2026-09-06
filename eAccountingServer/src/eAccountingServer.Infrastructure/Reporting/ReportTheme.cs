@@ -23,6 +23,13 @@ internal static class ReportTheme
     public static void EnsureLicense() =>
         QuestPDF.Settings.License = LicenseType.Community;
 
+    /// <summary>
+    /// Türkçe büyük harf. Değişmez kültür "Bakiye"yi "BAKIYE" yapıyor: noktalı i
+    /// noktasız I'ya dönüşüyor ve başlık yanlış yazılmış görünüyor.
+    /// </summary>
+    public static string Upper(string value) =>
+        value.ToUpper(System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
+
     /// <summary>Tutarlar Türkçe biçimde, binlik ayracıyla ve sembolle yazılır.</summary>
     public static string Money(decimal amount, string symbol) =>
         string.Create(

@@ -1,0 +1,179 @@
+/* --- üst bilgiler ------------------------------------------------------------ */
+
+.if-head {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.if-head .ak-field {
+  margin-bottom: 0;
+}
+
+/* Vade hazır aralıkları: en sık kullanılan dördü, tarih saymaya gerek kalmasın. */
+.if-due-presets {
+  display: flex;
+  gap: 5px;
+  margin-top: 7px;
+  flex-wrap: wrap;
+}
+
+.if-due {
+  padding: 3px 10px;
+  border: 1px solid var(--ak-line);
+  border-radius: 20px;
+  background: var(--ak-surface-2);
+  color: var(--ak-gray);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.if-due:hover {
+  border-color: var(--ak-brand);
+  color: var(--ak-brand);
+}
+
+/* --- kalem tablosu ----------------------------------------------------------- */
+
+.if-lines td {
+  padding: 7px 8px;
+  vertical-align: middle;
+}
+
+.if-lines .ak-input,
+.if-lines .ak-select {
+  width: 100%;
+  height: 34px;
+  font-size: 0.82rem;
+}
+
+/* Sayı alanları sağa yaslı: rakamlar alt alta hizalanınca okunuyor. */
+.if-lines .ak-input--num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dar sütundaki açılır kutuda okun ayırıcısı yeri boşa harcıyor ve "%20"
+   "%2" diye kırpılıyordu; satır içinde sade bir ok yetiyor. */
+.if-lines .ak-select {
+  padding-right: 26px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 8px center;
+  background-size: 13px;
+}
+
+.if-col-product {
+  min-width: 170px;
+}
+
+.if-col-desc {
+  min-width: 190px;
+}
+
+.if-col-qty,
+.if-col-unit {
+  min-width: 92px;
+}
+
+.if-col-price {
+  min-width: 120px;
+}
+
+.if-col-small {
+  min-width: 96px;
+}
+
+.if-add {
+  padding: 13px 20px;
+  border-top: 1px solid var(--ak-line);
+}
+
+/* --- yan paneller ------------------------------------------------------------ */
+
+.if-panel {
+  padding: 18px 20px;
+}
+
+.if-summary {
+  padding: 18px 20px;
+}
+
+.if-summary__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 0.86rem;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.if-summary__row span {
+  color: var(--ak-gray);
+}
+
+.if-summary__row strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.if-summary__row--sub {
+  font-size: 0.8rem;
+}
+
+.if-summary__row--sub span {
+  color: var(--ak-muted);
+}
+
+.if-summary__row--total {
+  margin-top: 4px;
+  padding-top: 13px;
+  border-bottom: 0;
+  border-top: 2px solid var(--ak-ink);
+  font-size: 1rem;
+}
+
+.if-summary__row--total strong {
+  font-size: 1.35rem;
+  font-weight: 750;
+}
+
+.if-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 0 20px 18px;
+}
+
+.if-actions .ak-btn {
+  min-width: 120px;
+}
+
+/* Kaydet kapalıysa sebebini söylemek, düğmeye tıklayıp beklemekten iyi. */
+.if-blocker {
+  padding: 0 20px 18px;
+  margin: 0;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .if-head,
+  .if-panel,
+  .if-summary {
+    padding: 15px 13px;
+  }
+
+  .if-add {
+    padding: 12px 13px;
+  }
+
+  .if-actions {
+    padding: 0 13px 15px;
+  }
+
+  .if-actions .ak-btn {
+    flex: 1;
+  }
+}

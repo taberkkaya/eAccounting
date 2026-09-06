@@ -16,10 +16,10 @@
       <div class="ak-toolbar__spacer"></div>
 
       <!-- Tür bir filtre; ayrı sayfa olmasına gerek yok. -->
-      <div class="acc-filters">
+      <div class="ak-filters">
         <button
           type="button"
-          class="acc-filter"
+          class="ak-filter"
           [class.is-active]="kindFilter === ''"
           (click)="kindFilter = ''"
         >
@@ -27,7 +27,7 @@
         </button>
         <button
           type="button"
-          class="acc-filter"
+          class="ak-filter"
           [class.is-active]="kindFilter === 'Kasa'"
           (click)="kindFilter = 'Kasa'"
         >
@@ -35,7 +35,7 @@
         </button>
         <button
           type="button"
-          class="acc-filter"
+          class="ak-filter"
           [class.is-active]="kindFilter === 'Banka'"
           (click)="kindFilter = 'Banka'"
         >

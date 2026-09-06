@@ -1,0 +1,83 @@
+/* --- cari adı ---------------------------------------------------------------- */
+
+.ct-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+}
+
+.ct-name__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+  color: var(--ak-gray);
+  font-size: 0.8rem;
+}
+
+.ct-name:hover .ct-name__icon {
+  background: var(--ak-brand);
+  color: #fff;
+}
+
+.ct-name__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ct-name__text strong {
+  font-weight: 600;
+}
+
+.ct-name:hover .ct-name__text strong {
+  color: var(--ak-brand);
+}
+
+.ct-name__text small {
+  font-size: 0.72rem;
+  color: var(--ak-muted);
+}
+
+/* --- iletişim ---------------------------------------------------------------- */
+
+.ct-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.82rem;
+}
+
+.ct-contact small {
+  font-size: 0.72rem;
+  color: var(--ak-muted);
+}
+
+/* --- bakiye ------------------------------------------------------------------ */
+
+.ct-balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+/* Gecikmiş tutar bakiyenin altında: "ne kadar" ile "ne kadarı gecikti"
+   yan yana okunmalı, ayrı bir sütun aramaya gerek kalmasın. */
+.ct-overdue {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: var(--ak-warning-soft);
+  color: var(--ak-warning);
+  font-size: 0.68rem;
+  font-weight: 650;
+  white-space: nowrap;
+}

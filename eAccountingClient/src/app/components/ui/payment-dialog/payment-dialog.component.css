@@ -1,0 +1,160 @@
+:host {
+  display: contents;
+}
+
+.pay-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+}
+
+.pay-contact__name {
+  font-weight: 650;
+}
+
+.pay-contact__balance {
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ak-gray);
+}
+
+.pay-note {
+  margin: -6px 0 16px;
+  font-size: 0.8rem;
+}
+
+.pay-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--ak-gray);
+}
+
+.pay-label:not(:first-child) {
+  margin-top: 18px;
+}
+
+/* Tutar en büyük alan: pencerede önce o doldurulur. */
+.pay-amount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+}
+
+.pay-amount:focus-within {
+  border-color: var(--ak-brand);
+  box-shadow: 0 0 0 3px var(--ak-brand-soft);
+}
+
+.pay-amount__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--ak-success);
+  font-variant-numeric: tabular-nums;
+}
+
+.pay-amount--out .pay-amount__input {
+  color: var(--ak-danger);
+}
+
+.pay-amount__symbol {
+  font-size: 1.2rem;
+  font-weight: 650;
+  color: var(--ak-muted);
+}
+
+.pay-accounts {
+  display: grid;
+  gap: 8px;
+}
+
+.pay-account {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.pay-account:hover {
+  border-color: var(--ak-brand);
+}
+
+.pay-account.is-selected {
+  border-color: var(--ak-brand);
+  background: var(--ak-brand-soft);
+}
+
+.pay-account__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+  color: var(--ak-gray);
+}
+
+.pay-account.is-selected .pay-account__icon {
+  background: var(--ak-brand);
+  color: #fff;
+}
+
+.pay-account__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pay-account__text strong {
+  font-size: 0.87rem;
+}
+
+.pay-account__text small {
+  font-size: 0.74rem;
+  color: var(--ak-muted);
+}
+
+.pay-account__check {
+  color: var(--ak-brand);
+  opacity: 0;
+}
+
+.pay-account.is-selected .pay-account__check {
+  opacity: 1;
+}
+
+.pay-input {
+  width: 100%;
+}
+
+.pay-empty {
+  padding: 18px;
+  border: 1px dashed var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+}

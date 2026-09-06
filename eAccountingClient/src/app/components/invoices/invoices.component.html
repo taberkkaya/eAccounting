@@ -1,0 +1,234 @@
+<app-blank pageName="Faturalar" [routes]="['Kayıtlar', 'Faturalar']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+  <app-section>
+    <div class="ak-toolbar">
+      <a class="ak-btn ak-btn--primary" [routerLink]="['/invoices/new']" [queryParams]="{ type: 1 }">
+        <i class="fas fa-file-invoice"></i>
+        Satış Faturası
+      </a>
+      <a class="ak-btn ak-btn--primary" [routerLink]="['/invoices/new']" [queryParams]="{ type: 2 }">
+        <i class="fas fa-file-import"></i>
+        Alış Faturası
+      </a>
+
+      <div class="ak-toolbar__spacer"></div>
+
+      <div class="ak-filters">
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="typeFilter === ''"
+          (click)="setType('')"
+        >
+          Tümü <span>{{ counts.all }}</span>
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="typeFilter === 1"
+          (click)="setType(1)"
+        >
+          Satış <span>{{ counts.sales }}</span>
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="typeFilter === 2"
+          (click)="setType(2)"
+        >
+          Alış <span>{{ counts.purchase }}</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="ak-btn"
+        [class.ak-btn--primary]="onlyOverdue"
+        (click)="toggleOverdue()"
+        title="Vadesi geçmiş açık faturalar"
+      >
+        <i class="fas fa-clock"></i>
+        Gecikmiş
+        @if(counts.overdue > 0){
+        <span class="iv-badge">{{ counts.overdue }}</span>
+        }
+      </button>
+    </div>
+
+    <div class="ak-toolbar ak-toolbar--secondary">
+      <input type="date" class="ak-input" [(ngModel)]="startDate" aria-label="Başlangıç tarihi" />
+      <input type="date" class="ak-input" [(ngModel)]="endDate" aria-label="Bitiş tarihi" />
+
+      <select class="ak-select" [(ngModel)]="contactId" aria-label="Cari">
+        <option value="">Tüm cariler</option>
+        @for(contact of contacts; track contact.id){
+        <option [value]="contact.id">{{ contact.name }}</option>
+        }
+      </select>
+
+      <select class="ak-select" [(ngModel)]="statusFilter" aria-label="Durum">
+        <option value="">Tüm durumlar</option>
+        <option value="1">Açık</option>
+        <option value="2">Kısmi Ödendi</option>
+        <option value="3">Ödendi</option>
+      </select>
+
+      <input
+        [(ngModel)]="search"
+        (keyup.enter)="getAll()"
+        type="search"
+        class="ak-input"
+        placeholder="Numara, cari, not ara"
+      />
+
+      <button type="button" class="ak-btn ak-btn--primary" (click)="getAll()">
+        <i class="fas fa-filter"></i>
+        Listele
+      </button>
+
+      <button type="button" class="ak-btn" (click)="clear()" title="Filtreleri temizle">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    @if(totals.length > 0){
+    <div class="ak-totals">
+      @for(total of totals; track total.currency){
+      <div class="ak-total">
+        <span class="ak-total__currency">{{ total.currency }}</span>
+        <span class="ak-total__net">
+          Toplam:
+          <strong>{{ total.total | trCurrency : symbolFor(total.currency) : true }}</strong>
+        </span>
+        <span class="ak-total__out">
+          <i class="fas fa-hourglass-half"></i>
+          Kalan: {{ total.remaining | trCurrency : symbolFor(total.currency) : true }}
+        </span>
+      </div>
+      }
+    </div>
+    }
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th class="ak-table__num">#</th>
+            <th>Fatura</th>
+            <th>Cari</th>
+            <th>Tarih</th>
+            <th>Vade</th>
+            <th>Durum</th>
+            <th class="ak-table__amount">Tutar</th>
+            <th class="ak-table__amount">Kalan</th>
+            <th>İşlemler</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(invoice of invoices; track invoice.id){
+          <tr>
+            <td class="ak-table__num">{{ $index + 1 }}</td>
+            <td>
+              <a class="iv-number" [routerLink]="['/invoices', invoice.id]">
+                <span class="iv-number__icon" [class.is-purchase]="invoice.type === 2">
+                  <i
+                    class="fas"
+                    [class.fa-file-invoice]="invoice.type === 1"
+                    [class.fa-file-import]="invoice.type === 2"
+                  ></i>
+                </span>
+                <span class="iv-number__text">
+                  <strong>{{ invoice.number }}</strong>
+                  <small>{{ invoice.type === 1 ? "Satış" : "Alış" }}</small>
+                </span>
+              </a>
+            </td>
+            <td>
+              <a class="iv-contact" [routerLink]="['/contacts', invoice.contactId]">
+                {{ invoice.contactName }}
+              </a>
+            </td>
+            <td>{{ invoice.date | date : "dd.MM.yyyy" }}</td>
+            <td [class.iv-late]="invoice.isOverdue">
+              {{ invoice.dueDate | date : "dd.MM.yyyy" }}
+            </td>
+            <td>
+              <span class="iv-status" [class]="statusClass(invoice)">
+                {{ invoice.isOverdue ? "Gecikmiş" : invoice.statusName }}
+              </span>
+            </td>
+            <td class="ak-table__amount ak-table__strong">
+              {{ invoice.grandTotal | trCurrency : symbolFor(invoice.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              @if(invoice.remainingAmount > 0){
+              <strong class="ak-negative">
+                {{ invoice.remainingAmount | trCurrency : symbolFor(invoice.currencyName) : true }}
+              </strong>
+              }@else {
+              <span class="ak-positive">Kapandı</span>
+              }
+            </td>
+            <td>
+              <app-action-menu>
+                <a class="menu__item" [routerLink]="['/invoices', invoice.id]">
+                  <i class="far fa-file-alt"></i> Görüntüle
+                </a>
+                @if(invoice.remainingAmount > 0){
+                <button type="button" class="menu__item" (click)="openPayment(invoice)">
+                  <i
+                    class="fas"
+                    [class.fa-arrow-down]="invoice.type === 1"
+                    [class.fa-arrow-up]="invoice.type === 2"
+                  ></i>
+                  {{ invoice.type === 1 ? "Tahsilat" : "Ödeme" }}
+                </button>
+                }
+                <a class="menu__item" [routerLink]="['/invoices', invoice.id, 'edit']">
+                  <i class="fas fa-pen"></i> Düzenle
+                </a>
+                <div class="menu__separator"></div>
+                <button
+                  type="button"
+                  class="menu__item menu__item--danger"
+                  (click)="deleteById(invoice)"
+                >
+                  <i class="fas fa-trash"></i> Sil
+                </button>
+              </app-action-menu>
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="9">
+              <div class="ak-empty">
+                @if(loading){
+                <i class="fas fa-circle-notch ak-spin"></i>
+                <div class="ak-empty__text">Yükleniyor...</div>
+                }@else {
+                <i class="fas fa-file-invoice"></i>
+                <div class="ak-empty__text">
+                  Bu filtrelerle fatura bulunamadı.
+                </div>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-section>
+  }
+</app-blank>
+
+<app-payment-dialog
+  [open]="paymentOpen"
+  [contact]="paymentContact"
+  [invoice]="paymentInvoice"
+  [direction]="paymentDirection"
+  (closed)="paymentOpen = false"
+  (saved)="getAll()"
+></app-payment-dialog>

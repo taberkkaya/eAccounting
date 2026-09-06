@@ -1,0 +1,208 @@
+/* --- rapor başlığı ------------------------------------------------------------
+   Yazdırıldığında hangi rapora, hangi tarihe baktığı kâğıtta da yazsın. */
+
+.rp-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ak-line);
+  background: var(--ak-surface-2);
+}
+
+.rp-caption strong {
+  font-size: 0.95rem;
+}
+
+.rp-caption span {
+  font-size: 0.79rem;
+  color: var(--ak-muted);
+}
+
+.rp-link {
+  color: var(--ak-gray);
+  font-weight: 600;
+  margin-right: 7px;
+}
+
+.rp-link:hover {
+  color: var(--ak-brand);
+}
+
+/* Vadesi ilerlemiş kovalar renkleniyor; 90+ zaten kırmızı. */
+.rp-warn {
+  color: var(--ak-warning);
+}
+
+.rp-total td {
+  background: var(--ak-brand-soft);
+  font-weight: 700;
+  border-top: 2px solid var(--ak-ink);
+}
+
+/* --- iki sütunlu bölümler ---------------------------------------------------- */
+
+.rp-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0;
+}
+
+.rp-column {
+  border-right: 1px solid var(--ak-line);
+  min-width: 0;
+}
+
+.rp-column:last-child {
+  border-right: 0;
+}
+
+/* Sütun tabloları yalnızca üç dört sütun; genel tablo alt sınırı burada
+   taşmaya yol açıyordu. Gerekirse yine kendi içinde kayıyorlar. */
+.rp-column .ak-table {
+  min-width: 0;
+}
+
+.rp-column__title {
+  margin: 0;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--ak-line);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ak-gray);
+}
+
+/* --- sonuç şeridi ------------------------------------------------------------ */
+
+.rp-result {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  border-top: 2px solid var(--ak-ink);
+  background: var(--ak-brand-soft);
+}
+
+.rp-result.is-negative {
+  background: var(--ak-success-soft);
+}
+
+.rp-result__label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ak-gray);
+}
+
+.rp-result__value {
+  font-size: 1.5rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-result__note {
+  font-size: 0.75rem;
+  color: var(--ak-muted);
+}
+
+/* --- kartlar ----------------------------------------------------------------- */
+
+.rp-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--ak-line);
+}
+
+.rp-card {
+  padding: 14px 16px;
+  border: 1px solid var(--ak-line);
+  border-radius: var(--ak-radius-sm);
+  background: var(--ak-surface-2);
+}
+
+.rp-card__label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.73rem;
+  font-weight: 650;
+  color: var(--ak-muted);
+}
+
+.rp-card__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sonuç kartı öne çıkıyor: rapora bakma sebebi o. */
+.rp-card--result {
+  border-color: var(--ak-success);
+  background: var(--ak-success-soft);
+}
+
+.rp-card--result .rp-card__value {
+  color: var(--ak-success);
+}
+
+.rp-card--result.is-loss {
+  border-color: var(--ak-danger);
+  background: var(--ak-danger-soft);
+}
+
+.rp-card--result.is-loss .rp-card__value {
+  color: var(--ak-danger);
+}
+
+/* --- gider çubukları ---------------------------------------------------------- */
+
+.rp-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 18px 20px;
+}
+
+.rp-bar__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+}
+
+.rp-bar__head strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.rp-bar__track {
+  height: 7px;
+  border-radius: 20px;
+  background: var(--ak-surface-3);
+  overflow: hidden;
+}
+
+.rp-bar__fill {
+  height: 100%;
+  border-radius: 20px;
+  background: var(--ak-brand);
+}
+
+@media (max-width: 768px) {
+  .rp-caption,
+  .rp-cards,
+  .rp-bars,
+  .rp-result,
+  .rp-column__title {
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .rp-column {
+    border-right: 0;
+    border-bottom: 1px solid var(--ak-line);
+  }
+}

@@ -1,0 +1,363 @@
+<app-blank pageName="Raporlar" [routes]="['Raporlar']">
+  @if(!auth.hasCompany){
+  <app-no-company></app-no-company>
+  }@else {
+  <app-section>
+    <div class="ak-toolbar ak-no-print">
+      <div class="ak-filters">
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="tab === 'aging'"
+          (click)="setTab('aging')"
+        >
+          Yaşlandırma
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="tab === 'vat'"
+          (click)="setTab('vat')"
+        >
+          KDV
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="tab === 'profit'"
+          (click)="setTab('profit')"
+        >
+          Kâr / Zarar
+        </button>
+      </div>
+
+      <div class="ak-toolbar__spacer"></div>
+
+      @if(tab === 'aging'){
+      <div class="ak-filters">
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="agingType === 1"
+          (click)="setAgingType(1)"
+        >
+          Alacaklarımız
+        </button>
+        <button
+          type="button"
+          class="ak-filter"
+          [class.is-active]="agingType === 2"
+          (click)="setAgingType(2)"
+        >
+          Borçlarımız
+        </button>
+      </div>
+      }@else {
+      <input type="date" class="ak-input" [(ngModel)]="startDate" aria-label="Başlangıç" />
+      <input type="date" class="ak-input" [(ngModel)]="endDate" aria-label="Bitiş" />
+      <button type="button" class="ak-btn ak-btn--primary" (click)="load()">
+        <i class="fas fa-filter"></i>
+        Listele
+      </button>
+      }
+
+      <button type="button" class="ak-btn" (click)="print()" title="Raporu yazdır">
+        <i class="fas fa-print"></i>
+        Yazdır
+      </button>
+    </div>
+
+    @if(loading){
+    <div class="ak-empty">
+      <i class="fas fa-circle-notch ak-spin"></i>
+      <div class="ak-empty__text">Yükleniyor...</div>
+    </div>
+    }
+
+    <!-- ---------- yaşlandırma ---------- -->
+    @if(!loading && tab === 'aging' && aging){
+    <div class="rp-caption">
+      <strong>{{ aging.typeName }}</strong>
+      <span>{{ aging.asOf | date : "dd.MM.yyyy" }} itibarıyla açık faturalar</span>
+    </div>
+
+    <div class="ak-table-wrap">
+      <table class="ak-table">
+        <thead>
+          <tr>
+            <th>Cari</th>
+            <th class="ak-table__amount">Vadesi Gelmemiş</th>
+            <th class="ak-table__amount">1-30 gün</th>
+            <th class="ak-table__amount">31-60 gün</th>
+            <th class="ak-table__amount">61-90 gün</th>
+            <th class="ak-table__amount">90+ gün</th>
+            <th class="ak-table__amount">Toplam</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(row of aging.rows; track row.contactId){
+          <tr>
+            <td>
+              <a class="rp-link" [routerLink]="['/contacts', row.contactId]">
+                {{ row.contactName }}
+              </a>
+              <span class="ak-tag ak-tag--muted">{{ row.currencyName }}</span>
+            </td>
+            <td class="ak-table__amount">
+              {{ row.notDue | trCurrency : symbolFor(row.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              {{ row.days1To30 | trCurrency : symbolFor(row.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount rp-warn">
+              {{ row.days31To60 | trCurrency : symbolFor(row.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount rp-warn">
+              {{ row.days61To90 | trCurrency : symbolFor(row.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount ak-negative">
+              {{ row.over90 | trCurrency : symbolFor(row.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount ak-table__strong">
+              {{ row.total | trCurrency : symbolFor(row.currencyName) : true }}
+            </td>
+          </tr>
+          }@empty {
+          <tr>
+            <td colspan="7">
+              <div class="ak-empty">
+                <i class="fas fa-check-circle"></i>
+                <div class="ak-empty__text">Açık fatura yok. Her şey kapanmış.</div>
+              </div>
+            </td>
+          </tr>
+          }
+
+          @for(total of aging.totals; track total.currencyName){
+          <tr class="rp-total">
+            <td>TOPLAM · {{ total.currencyName }}</td>
+            <td class="ak-table__amount">
+              {{ total.notDue | trCurrency : symbolFor(total.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              {{ total.days1To30 | trCurrency : symbolFor(total.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              {{ total.days31To60 | trCurrency : symbolFor(total.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              {{ total.days61To90 | trCurrency : symbolFor(total.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              {{ total.over90 | trCurrency : symbolFor(total.currencyName) : true }}
+            </td>
+            <td class="ak-table__amount">
+              {{ total.total | trCurrency : symbolFor(total.currencyName) : true }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+
+    <!-- ---------- KDV ---------- -->
+    @if(!loading && tab === 'vat' && vat){
+    <div class="rp-caption">
+      <strong>KDV Özeti</strong>
+      <span>
+        {{ vat.startDate | date : "dd.MM.yyyy" }} — {{ vat.endDate | date : "dd.MM.yyyy" }}
+        · yalnızca TL faturalar
+      </span>
+    </div>
+
+    <div class="rp-columns">
+      <div class="rp-column">
+        <h3 class="rp-column__title">Hesaplanan KDV (satış)</h3>
+        <div class="ak-table-wrap">
+          <table class="ak-table">
+            <thead>
+              <tr>
+                <th>Oran</th>
+                <th class="ak-table__amount">Matrah</th>
+                <th class="ak-table__amount">KDV</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row of vat.collected; track row.rate){
+              <tr>
+                <td>%{{ row.rate }}</td>
+                <td class="ak-table__amount">{{ row.base | trCurrency : "₺" : true }}</td>
+                <td class="ak-table__amount ak-positive">
+                  {{ row.vat | trCurrency : "₺" : true }}
+                </td>
+              </tr>
+              }@empty {
+              <tr>
+                <td colspan="3"><div class="ak-empty"><div class="ak-empty__text">Satış faturası yok.</div></div></td>
+              </tr>
+              }
+              <tr class="rp-total">
+                <td>TOPLAM</td>
+                <td></td>
+                <td class="ak-table__amount">{{ vat.collectedTotal | trCurrency : "₺" : true }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="rp-column">
+        <h3 class="rp-column__title">İndirilecek KDV (alış)</h3>
+        <div class="ak-table-wrap">
+          <table class="ak-table">
+            <thead>
+              <tr>
+                <th>Oran</th>
+                <th class="ak-table__amount">Matrah</th>
+                <th class="ak-table__amount">KDV</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row of vat.deductible; track row.rate){
+              <tr>
+                <td>%{{ row.rate }}</td>
+                <td class="ak-table__amount">{{ row.base | trCurrency : "₺" : true }}</td>
+                <td class="ak-table__amount ak-negative">
+                  {{ row.vat | trCurrency : "₺" : true }}
+                </td>
+              </tr>
+              }@empty {
+              <tr>
+                <td colspan="3"><div class="ak-empty"><div class="ak-empty__text">Alış faturası yok.</div></div></td>
+              </tr>
+              }
+              <tr class="rp-total">
+                <td>TOPLAM</td>
+                <td></td>
+                <td class="ak-table__amount">{{ vat.deductibleTotal | trCurrency : "₺" : true }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-result" [class.is-negative]="vat.payable < 0">
+      <span class="rp-result__label">
+        {{ vat.payable >= 0 ? "Ödenecek KDV" : "Devreden KDV" }}
+      </span>
+      <strong class="rp-result__value">
+        {{ (vat.payable < 0 ? -vat.payable : vat.payable) | trCurrency : "₺" : true }}
+      </strong>
+      <span class="rp-result__note">
+        Hesaplanan − indirilecek. Beyanname değil, özet bir gösterge.
+      </span>
+    </div>
+    }
+
+    <!-- ---------- kâr / zarar ---------- -->
+    @if(!loading && tab === 'profit' && profit){
+    <div class="rp-caption">
+      <strong>Kâr / Zarar</strong>
+      <span>
+        {{ profit.startDate | date : "dd.MM.yyyy" }} —
+        {{ profit.endDate | date : "dd.MM.yyyy" }} · KDV hariç, yalnızca TL
+      </span>
+    </div>
+
+    <div class="rp-cards">
+      <div class="rp-card">
+        <span class="rp-card__label">Satış Geliri</span>
+        <strong class="rp-card__value ak-positive">
+          {{ profit.revenue | trCurrency : "₺" : true }}
+        </strong>
+      </div>
+      <div class="rp-card">
+        <span class="rp-card__label">Alış Maliyeti</span>
+        <strong class="rp-card__value ak-negative">
+          {{ profit.cost | trCurrency : "₺" : true }}
+        </strong>
+      </div>
+      <div class="rp-card">
+        <span class="rp-card__label">Diğer Giderler</span>
+        <strong class="rp-card__value ak-negative">
+          {{ profit.otherExpenses | trCurrency : "₺" : true }}
+        </strong>
+      </div>
+      <div class="rp-card rp-card--result" [class.is-loss]="profit.profit < 0">
+        <span class="rp-card__label">{{ profit.profit >= 0 ? "Kâr" : "Zarar" }}</span>
+        <strong class="rp-card__value">
+          {{ (profit.profit < 0 ? -profit.profit : profit.profit) | trCurrency : "₺" : true }}
+        </strong>
+      </div>
+    </div>
+
+    <div class="rp-columns">
+      <div class="rp-column">
+        <h3 class="rp-column__title">Gider Kalemleri</h3>
+        @if(profit.expenseByCategory.length === 0){
+        <div class="ak-empty">
+          <div class="ak-empty__text">Bu aralıkta faturasız gider yok.</div>
+        </div>
+        }@else {
+        <div class="rp-bars">
+          @for(row of profit.expenseByCategory; track row.name){
+          <div class="rp-bar">
+            <div class="rp-bar__head">
+              <span>{{ row.name }}</span>
+              <strong>{{ row.amount | trCurrency : "₺" : true }}</strong>
+            </div>
+            <div class="rp-bar__track">
+              <div class="rp-bar__fill" [style.width]="expenseWidth(row.amount)"></div>
+            </div>
+          </div>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="rp-column">
+        <h3 class="rp-column__title">Aylık Seyir</h3>
+        <div class="ak-table-wrap">
+          <table class="ak-table">
+            <thead>
+              <tr>
+                <th>Ay</th>
+                <th class="ak-table__amount">Satış</th>
+                <th class="ak-table__amount">Alış</th>
+                <th class="ak-table__amount">Fark</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row of profit.monthly; track row.year + '-' + row.month){
+              <tr>
+                <td>{{ monthName(row.month) }} {{ row.year }}</td>
+                <td class="ak-table__amount ak-positive">
+                  {{ row.revenue | trCurrency : "₺" : true }}
+                </td>
+                <td class="ak-table__amount ak-negative">
+                  {{ row.cost | trCurrency : "₺" : true }}
+                </td>
+                <td class="ak-table__amount ak-table__strong">
+                  <span [class.ak-negative]="row.revenue - row.cost < 0">
+                    {{ row.revenue - row.cost | trCurrency : "₺" : true }}
+                  </span>
+                </td>
+              </tr>
+              }@empty {
+              <tr>
+                <td colspan="4">
+                  <div class="ak-empty"><div class="ak-empty__text">Bu aralıkta fatura yok.</div></div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    }
+  </app-section>
+  }
+</app-blank>
