@@ -154,6 +154,18 @@
         [(ngModel)]="demoEmail"
         (keyup.enter)="sendDemoCode()"
       />
+
+      @if(demoEmail){
+      <button
+        type="button"
+        class="ak-btn ak-btn--ghost ak-btn--sm"
+        style="margin-top: 10px"
+        (click)="useAnotherEmail()"
+      >
+        <i class="fas fa-user-slash"></i>
+        Bu adresi unut
+      </button>
+      }
     </div>
     }@else {
     <p class="login__demo-text" style="margin-top: 0">

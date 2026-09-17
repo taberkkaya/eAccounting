@@ -34,8 +34,27 @@ export class DemoPromptComponent {
     this.demo.openContactPage();
   }
 
+  /**
+   * Oturum bittikten sonra jeton da ölmüş olabilir; o zaman reset yetkisiz düşer.
+   * Eskiden bu ziyaretçiyi giriş ekranına atıyordu ve orada tüketilmiş koduyla
+   * geri giremiyordu. Artık doğrulanmış adresiyle yerinde yeni oturum açılıyor.
+   */
   startFresh(): void {
     this.demo.reset().subscribe({
+      next: () => window.location.reload(),
+      error: () => this.restart(),
+    });
+  }
+
+  private restart(): void {
+    const email = this.demo.rememberedEmail;
+
+    if (!email) {
+      this.demo.exit();
+      return;
+    }
+
+    this.demo.start(email).subscribe({
       next: () => window.location.reload(),
       error: () => this.demo.exit(),
     });

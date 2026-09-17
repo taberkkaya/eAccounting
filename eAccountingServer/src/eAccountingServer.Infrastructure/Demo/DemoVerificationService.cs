@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Demo;
@@ -41,6 +41,14 @@ internal sealed class DemoVerificationService(
             .FirstOrDefaultAsync(p => p.Email == normalized, cancellationToken);
 
         DateTimeOffset now = DateTimeOffset.Now;
+
+        // Zaten doğrulanmış bir adrese kod göndermenin anlamı yok: ziyaretçi bu
+        // adresin kendisine ait olduğunu kanıtlamıştı. Bu dal olmadan, oturumunu
+        // erken kapatıp geri dönen biri tüketilmiş koduyla giremiyor, yenisini de
+        // CodeResendSeconds dolmadan isteyemiyordu.
+        if (IsWithinGrace(visitor, now))
+            return DemoVerificationResult.Skip(
+                "Adresiniz daha önce doğrulanmıştı; demoyu doğrudan başlatabilirsiniz.");
 
         if (visitor is null)
         {
@@ -174,19 +182,46 @@ internal sealed class DemoVerificationService(
         return DemoVerificationResult.Ok("E-posta adresiniz doğrulandı.");
     }
 
-    public async Task RecordSessionAsync(string email, CancellationToken cancellationToken = default)
+    public async Task<bool> HasValidVerificationAsync(
+        string email, CancellationToken cancellationToken = default)
     {
-        if (!TryNormalize(email, out string normalized, out _)) return;
+        if (!TryNormalize(email, out string normalized, out _)) return false;
+
+        DemoVisitor? visitor = await context.DemoVisitors
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Email == normalized, cancellationToken);
+
+        return IsWithinGrace(visitor, DateTimeOffset.Now);
+    }
+
+    /// <summary>
+    /// Doğrulamanın hâlâ geçerli sayıldığı pencere. Süre sıfırlanırsa her oturum
+    /// için yeniden kod istenir; kapatmak isteyen kurulum bunu sıfıra çeker.
+    /// </summary>
+    private bool IsWithinGrace(DemoVisitor? visitor, DateTimeOffset now) =>
+        visitor?.VerifiedAt is { } verifiedAt
+        && _demo.VerifiedGraceHours > 0
+        && verifiedAt.AddHours(_demo.VerifiedGraceHours) > now;
+
+    public async Task<DemoVisitorSnapshot?> RecordSessionAsync(
+        string email, CancellationToken cancellationToken = default)
+    {
+        if (!TryNormalize(email, out string normalized, out _)) return null;
 
         DemoVisitor? visitor = await context.DemoVisitors
             .FirstOrDefaultAsync(p => p.Email == normalized, cancellationToken);
 
-        if (visitor is null) return;
+        if (visitor is null) return null;
 
         visitor.SessionCount++;
         visitor.LastSessionAt = DateTimeOffset.Now;
 
         await context.SaveChangesAsync(cancellationToken);
+
+        return new DemoVisitorSnapshot(
+            visitor.DisplayEmail == string.Empty ? visitor.Email : visitor.DisplayEmail,
+            visitor.Country,
+            visitor.City);
     }
 
     // --- yardımcılar --------------------------------------------------------

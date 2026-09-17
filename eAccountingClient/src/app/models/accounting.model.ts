@@ -82,6 +82,20 @@ export class ProductModel {
   criticalStock: number = 0;
   description: string | null = null;
   isBelowCritical: boolean = false;
+
+  /**
+   * Tezgah'taki (ERP) karşılığı. Doluysa stoğun sahibi orası: stockQuantity
+   * oradan okunur ve faturadan doğan hareket Defter'de değil orada tutulur.
+   */
+  erpProductId: string | null = null;
+}
+
+/** Ürün kartındaki eşleme kutusunu dolduran Tezgah ürünü. */
+export class ErpProductModel {
+  id: string = '';
+  name: string = '';
+  productType: string = '';
+  stock: number = 0;
 }
 
 export class ProductFormModel {
@@ -97,6 +111,9 @@ export class ProductFormModel {
   openingStock: number = 0;
   criticalStock: number = 0;
   description: string = '';
+
+  /** Boş bırakılırsa stok Defter'de tutulur. */
+  erpProductId: string | null = null;
 }
 
 export class StockTransactionModel {

@@ -1,11 +1,13 @@
 ﻿using eAccountingServer.Application.Features.DemoVisitors;
 using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Demo;
+using eAccountingServer.Domain.Integration;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Repositories;
 using eAccountingServer.Domain.Users;
 using eAccountingServer.Infrastructure.Context;
 using eAccountingServer.Infrastructure.Demo;
+using eAccountingServer.Infrastructure.Integration;
 using eAccountingServer.Infrastructure.Options;
 using eAccountingServer.Infrastructure.Service;
 using GenericRepository;
@@ -152,6 +154,9 @@ namespace eAccountingServer.Infrastructure
         private static IServiceCollection AddDemo(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<DemoOptions>(configuration.GetSection(DemoOptions.SectionName));
+            services.Configure<DemoTelemetryOptions>(
+                configuration.GetSection(DemoTelemetryOptions.SectionName));
+            services.Configure<ErpOptions>(configuration.GetSection(ErpOptions.SectionName));
 
             services.AddScoped<IDemoContext, DemoContext>();
 
@@ -160,6 +165,12 @@ namespace eAccountingServer.Infrastructure
             services.AddScoped<IDemoVisitorReader, DemoVisitorReader>();
 
             // One pool of sandbox tenants for the whole process.
+            // Panele bildirim: süreç geneli tek örnek, havuzla aynı ömürde.
+            services.AddSingleton<IDemoTelemetryPublisher, DemoTelemetryPublisher>();
+
+            // Tezgah'in stok tarafiyla konusan gecit. Durumsuz; tek ornek yeter.
+            services.AddSingleton<IErpStockGateway, ErpStockGateway>();
+
             services.AddSingleton<DemoSessionService>();
             services.AddSingleton<IDemoSessionService>(srv => srv.GetRequiredService<DemoSessionService>());
             services.AddHostedService<DemoHostedService>();

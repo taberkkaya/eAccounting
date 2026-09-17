@@ -23,6 +23,15 @@ export interface DemoConfigModel {
   emailVerificationRequired: boolean;
 }
 
+/**
+ * Kod isteğinin sonucu. alreadyVerified true ise kod gönderilmedi ve gerekmiyor:
+ * adres yakın zamanda doğrulanmış, kod adımı atlanır.
+ */
+export interface DemoCodeResultModel {
+  message: string;
+  alreadyVerified: boolean;
+}
+
 /** Why the demo prompt is on screen. */
 export type DemoPromptKind = 'nudge' | 'ended';
 

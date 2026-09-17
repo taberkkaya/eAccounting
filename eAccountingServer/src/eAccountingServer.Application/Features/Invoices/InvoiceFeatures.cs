@@ -1,4 +1,5 @@
-using eAccountingServer.Application.Features.Accounting;
+﻿using eAccountingServer.Application.Features.Accounting;
+using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Enums;
 using eAccountingServer.Domain.Repositories;
@@ -300,6 +301,7 @@ internal sealed class CreateInvoiceCommandHandler(
     IContactRepository contactRepository,
     IProductRepository productRepository,
     IStockTransactionRepository stockTransactionRepository,
+    IErpStockGateway erp,
     AccountingLedger ledger,
     IUnitOfWorkCompany unitOfWork
     ) : IRequestHandler<CreateInvoiceCommand, Result<string>>
@@ -352,9 +354,11 @@ internal sealed class CreateInvoiceCommandHandler(
 
         await invoiceRepository.AddAsync(invoice, cancellationToken);
 
+        List<ErpStockLine> erpLines = [];
+
         Result<string>? failure = await WriteLinesAsync(
             invoice, request.Lines, productRepository, invoiceLineRepository,
-            stockTransactionRepository, cancellationToken);
+            stockTransactionRepository, erp, erpLines, cancellationToken);
 
         if (failure is not null) return failure;
 
@@ -395,19 +399,34 @@ internal sealed class CreateInvoiceCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return $"{invoice.Number} numaralı fatura oluşturuldu.";
+        // Fatura önce kaydediliyor, stok sonra bildiriliyor: Tezgah'a
+        // ulaşılamaması geçerli bir faturanın kaydını engellememeli. Aksarsa
+        // sebebi mesaja ekleniyor, fatura düzenlenip yeniden kaydedilince
+        // bildirim de tekrarlanıyor.
+        ErpResult pushed = await erp.PushInvoiceAsync(
+            invoice.Id, invoice.Number, type == InvoiceType.Purchase, erpLines, cancellationToken);
+
+        return pushed.Succeeded
+            ? $"{invoice.Number} numaralı fatura oluşturuldu."
+            : $"{invoice.Number} numaralı fatura oluşturuldu ancak {pushed.Message}";
     }
 
     /// <summary>
     /// Satırları yazar, toplamları hesaplar ve stoğu hareketlendirir. Oluşturma
     /// ve güncelleme aynı yolu kullanıyor ki iki yerde farklı davranmasın.
     /// </summary>
+    /// <param name="erpLines">
+    /// Tezgah'a gönderilecek satırlar buraya toplanıyor. Entegrasyon kapalıysa ya
+    /// da ürün oraya eşlenmemişse liste boş kalır ve stok eskisi gibi burada tutulur.
+    /// </param>
     internal static async Task<Result<string>?> WriteLinesAsync(
         Invoice invoice,
         List<InvoiceLineInput> inputs,
         IProductRepository productRepository,
         IInvoiceLineRepository invoiceLineRepository,
         IStockTransactionRepository stockTransactionRepository,
+        IErpStockGateway erp,
+        List<ErpStockLine> erpLines,
         CancellationToken cancellationToken)
     {
         decimal subTotal = 0, vatTotal = 0, discountTotal = 0;
@@ -447,6 +466,14 @@ internal sealed class CreateInvoiceCommandHandler(
             if (product is null || product.IsService) continue;
 
             bool isOut = invoice.Type == InvoiceType.Sales;
+
+            // Ürün Tezgah'a eşlenmişse stoğun sahibi orası. Burada hem sayacı
+            // artırıp hem oraya yazmak, aynı hareketi iki yerde tutmak olurdu.
+            if (erp.Enabled && product.ErpProductId is { } erpProductId)
+            {
+                erpLines.Add(new ErpStockLine(erpProductId, input.Quantity, input.UnitPrice));
+                continue;
+            }
 
             product.StockQuantity += isOut ? -input.Quantity : input.Quantity;
 
@@ -506,6 +533,7 @@ internal sealed class UpdateInvoiceCommandHandler(
     IContactRepository contactRepository,
     IProductRepository productRepository,
     IStockTransactionRepository stockTransactionRepository,
+    IErpStockGateway erp,
     AccountingLedger ledger,
     IUnitOfWorkCompany unitOfWork
     ) : IRequestHandler<UpdateInvoiceCommand, Result<string>>
@@ -538,9 +566,11 @@ internal sealed class UpdateInvoiceCommandHandler(
         invoice.DueDate = request.DueDate;
         invoice.Note = request.Note?.Trim();
 
+        List<ErpStockLine> erpLines = [];
+
         Result<string>? failure = await CreateInvoiceCommandHandler.WriteLinesAsync(
             invoice, request.Lines, productRepository, invoiceLineRepository,
-            stockTransactionRepository, cancellationToken);
+            stockTransactionRepository, erp, erpLines, cancellationToken);
 
         if (failure is not null) return failure;
 
@@ -557,7 +587,16 @@ internal sealed class UpdateInvoiceCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return "Fatura güncellendi.";
+        // Tezgah aynı belge kimliğini görünce eski hareketleri silip yenilerini
+        // yazıyor; ayrıca bir silme çağrısına gerek yok. Satırların hepsi
+        // eşlemeden çıktıysa boş liste gidiyor ve orada da bir şey kalmıyor.
+        ErpResult pushed = await erp.PushInvoiceAsync(
+            invoice.Id, invoice.Number, invoice.Type == InvoiceType.Purchase,
+            erpLines, cancellationToken);
+
+        return pushed.Succeeded
+            ? "Fatura güncellendi."
+            : $"Fatura güncellendi ancak {pushed.Message}";
     }
 
     /// <summary>
@@ -616,6 +655,7 @@ internal sealed class DeleteInvoiceByIdCommandHandler(
     IInvoiceLineRepository invoiceLineRepository,
     IProductRepository productRepository,
     IStockTransactionRepository stockTransactionRepository,
+    IErpStockGateway erp,
     AccountingLedger ledger,
     IUnitOfWorkCompany unitOfWork
     ) : IRequestHandler<DeleteInvoiceByIdCommand, Result<string>>
@@ -636,6 +676,12 @@ internal sealed class DeleteInvoiceByIdCommandHandler(
         invoiceRepository.Delete(invoice);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return "Fatura silindi.";
+        // Faturanın Tezgah'ta bıraktığı hareket de gitmeli; kalsaydı karşılığı
+        // olmayan bir giriş stoğu şişirirdi.
+        ErpResult removed = await erp.RemoveInvoiceAsync(invoice.Id, cancellationToken);
+
+        return removed.Succeeded
+            ? "Fatura silindi."
+            : $"Fatura silindi ancak {removed.Message}";
     }
 }

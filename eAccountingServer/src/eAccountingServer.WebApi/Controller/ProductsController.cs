@@ -26,6 +26,14 @@ public class ProductsController : ApiController
         return StatusCode(response.StatusCode, response);
     }
 
+    /// <summary>Tezgah'taki ürünler; ürün kartındaki eşleme kutusu bunu okuyor.</summary>
+    [HttpPost]
+    public async Task<IActionResult> GetErpProducts(GetErpProductsQuery request, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
+        return StatusCode(response.StatusCode, response);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(CreateProductCommand request, CancellationToken cancellationToken)
     {

@@ -23,6 +23,7 @@ namespace eAccountingServer.Infrastructure.Demo;
 internal sealed class DemoSessionService(
     IServiceScopeFactory scopeFactory,
     IOptions<DemoOptions> demoOptions,
+    IDemoTelemetryPublisher telemetry,
     ILogger<DemoSessionService> logger
     ) : IDemoSessionService
 {
@@ -88,6 +89,10 @@ internal sealed class DemoSessionService(
 
         _slots = [.. slots];
         _ready = _slots.Length > 0;
+
+        // Havuz hazır olur olmaz panele haber ver: ilk ziyaretçiyi beklemeden
+        // uygulamanın ayakta olduğu görünsün.
+        telemetry.Heartbeat(Enabled, _slots.Length, 0);
 
         if (!_ready)
             logger.LogError("No demo slot could be provisioned; the demo endpoints will report as unavailable.");
@@ -206,6 +211,8 @@ internal sealed class DemoSessionService(
 
         slot.SessionId = session.Id;
         _sessions[session.Id] = session;
+
+        telemetry.SessionStarted(session.Id, now);
 
         string accessToken = await CreateTokenAsync(session, cancellationToken);
 
@@ -341,6 +348,8 @@ internal sealed class DemoSessionService(
             }
         }
 
+        telemetry.SessionEnded(sessionId, reason.ToString(), session.WriteCount, _options.WriteLimit);
+
         logger.LogInformation("Demo session {SessionId} ended ({Reason}).", sessionId, reason);
 
         return true;
@@ -436,6 +445,10 @@ internal sealed class DemoSessionService(
         }
 
         await ReclaimForMemoryAsync(cancellationToken);
+
+        // Nabız temizlik turuna biniyor: ayrı bir zamanlayıcı kurmadan düzenli
+        // aralıkla atıyor ve havuzun o anki doluluğunu taşıyor.
+        telemetry.Heartbeat(Enabled, _slots.Length, _slots.Count(slot => !slot.IsFree));
     }
 
     private async Task ReclaimForMemoryAsync(CancellationToken cancellationToken)

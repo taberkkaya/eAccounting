@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { api } from '../constants';
 import {
+  DemoCodeResultModel,
   DemoConfigModel,
   DemoErrorCode,
   DemoPromptKind,
@@ -14,6 +15,12 @@ import { ResultModel } from '../models/result.model';
 
 const DEMO_FLAG_KEY = 'demoSession';
 const TOKEN_KEY = 'accessToken';
+
+/**
+ * Doğrulanmış adres. Oturum bitse de silinmiyor: ziyaretçinin bu adrese sahip
+ * olduğunu kanıtlaması bir kez yeterli, her dönüşünde tekrar kod beklemesin.
+ */
+const DEMO_EMAIL_KEY = 'demoEmail';
 
 @Injectable({ providedIn: 'root' })
 export class DemoService {
@@ -48,9 +55,26 @@ export class DemoService {
     return this.http.get<ResultModel<DemoConfigModel>>(`${api()}/demo/config`);
   }
 
-  /** Ziyaretçinin adresine tek kullanımlık kod gönderir. */
-  requestCode(email: string): Observable<ResultModel<string>> {
-    return this.http.post<ResultModel<string>>(`${api()}/demo/request-code`, { email });
+  /**
+   * Doğrulanmış adres varsa onu döner. Giriş ekranı bunu görünce kod turuna hiç
+   * girmeden demoyu başlatmayı dener.
+   */
+  get rememberedEmail(): string {
+    return localStorage.getItem(DEMO_EMAIL_KEY) ?? '';
+  }
+
+  /** Ziyaretçi başka bir adresle girmek istediğinde. */
+  forgetEmail(): void {
+    localStorage.removeItem(DEMO_EMAIL_KEY);
+  }
+
+  /**
+   * Ziyaretçinin adresine tek kullanımlık kod gönderir. Adres zaten doğrulanmışsa
+   * sunucu kod göndermez, yanıtta alreadyVerified döner.
+   */
+  requestCode(email: string): Observable<ResultModel<DemoCodeResultModel>> {
+    return this.http.post<ResultModel<DemoCodeResultModel>>(
+      `${api()}/demo/request-code`, { email });
   }
 
   /**
@@ -65,7 +89,14 @@ export class DemoService {
       .pipe(tap({
         next: (res) => {
           this.starting.set(false);
-          if (res.data) this.adopt(res.data);
+
+          if (!res.data) return;
+
+          // Oturum gerçekten açıldıysa adres doğrulanmış demektir; bir dahakine
+          // kod adımı atlanabilsin diye saklanıyor.
+          if (email.trim()) localStorage.setItem(DEMO_EMAIL_KEY, email.trim());
+
+          this.adopt(res.data);
         },
         error: () => this.starting.set(false),
       }));

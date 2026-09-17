@@ -4,6 +4,11 @@
 veritabanında** tutulur; oturum açan kullanıcının firması JWT üzerinden çözülerek
 bağlantı çalışma zamanında kurulur.
 
+Cari, fatura, alış–satış, kasa/banka ve raporlar burada yürür. Üretim tarafıyla
+(stok, depo, reçete, sipariş) çalışan bir kurulumda bunlar
+[Tezgah](https://github.com/taberkkaya/ERP)'ta durur ve iki uygulama birbirine
+bağlanır; bkz. [Tezgah entegrasyonu](#-tezgah-erp-entegrasyonu).
+
 Uygulama aynı zamanda **herkese açık bir demo** olarak çalışabilir: her ziyaretçiye
 kendi izole veritabanı verilir, oturum boyunca kayıt ekleyip silebilir, oturum bitince
 her şey sıfırlanır.
@@ -45,6 +50,10 @@ hazırlar (migrate eder ve örnek veriyle doldurur). Bir ziyaretçi `POST /api/d
 çağırdığında bunlardan biri o oturuma kiralanır ve oturuma özel bir JWT üretilir.
 
 - Sandbox, kiralanma anında sıfırlanır; her ziyaretçi aynı başlangıç verisiyle açar.
+- Adresini bir kez doğrulayan ziyaretçi `Demo:VerifiedGraceHours` boyunca kod
+  istemeden geri dönebilir. Bu olmadan, oturumunu erken kapatan biri elindeki
+  tüketilmiş kodla giremiyor, yenisini de `CodeResendSeconds` dolmadan
+  isteyemiyordu.
 - Yazma işlemleri (`Create`, `Update`, `DeleteById`) sayılır ve `Demo:WriteLimit`
   aşıldığında reddedilir.
 - Boşta kalma, mutlak süre ve **çalışma kümesi (working set) eşiği** için bir arka plan
@@ -60,10 +69,30 @@ API, demo'ya özel retleri gövdede bir `demoCode` ile bildirir (`session_ended`
 
 | Endpoint | Açıklama |
 | --- | --- |
-| `POST /api/demo/start` | Anonim. Sandbox kiralar, token döner. |
+| `POST /api/demo/request-code` | Anonim. Adrese tek kullanımlık kod gönderir. Adres zaten doğrulanmışsa kod göndermeden `alreadyVerified` döner. |
+| `POST /api/demo/start` | Anonim. Sandbox kiralar, token döner. Doğrulanmış adres kodsuz da geçer. |
 | `GET /api/demo/status` | Kalan işlem hakkı ve süre. |
 | `POST /api/demo/reset` | Sandbox'ı sıfırlar, yeni oturum açar. |
 | `POST /api/demo/end` | Oturumu kapatır, sandbox'ı iade eder. |
+
+## 🔌 Tezgah (ERP) entegrasyonu
+
+`Erp:Enabled` kapalıyken Defter tek başına çalışır ve stoğu kendi tutar — tek
+uygulamayla idare eden bir kurulumun istediği budur.
+
+Açıkken **stoğun sahibi Tezgah olur.** Ürün kartındaki *Tezgah Ürünü* kutusundan
+eşlenen kalemler için:
+
+- Eldeki miktar Tezgah'tan okunur; Defter'in `StockQuantity` alanı güncellenmez.
+- Onaylanan fatura, doğan stok hareketini Tezgah'a yazar (alış girer, satış çıkar).
+- Fatura düzeltilirse aynı belge kimliğiyle yeniden gönderilir; Tezgah eski
+  hareketleri silip yenilerini yazar. Fatura silinirse hareketleri de kaldırılır.
+
+Eşlenmemiş ürünlerde hiçbir şey değişmez: stok eskisi gibi Defter'de tutulur.
+Böylece iki uygulama birlikte de, ayrı ayrı da çalışabiliyor.
+
+Fatura önce kaydedilir, stok sonra bildirilir: Tezgah'a ulaşılamaması geçerli bir
+faturanın kaydını engellememeli. Aksarsa sebebi yanıt mesajında yazar.
 
 ## ⚙️ Yapılandırma
 
@@ -79,7 +108,9 @@ ayırır):
 | `Identity__RequireConfirmedEmail` | E-posta onayı zorunluluğu. |
 | `Mail__SmtpHost` | Boşsa mailler sessizce düşürülür (SMTP sunucusu olmadan da çalışır). |
 | `Seed__AdminPassword` | İlk admin kullanıcısının parolası. |
-| `Demo__*` | `DemoOptions` alanları: `Enabled`, `SlotCount`, `WriteLimit`, `NudgeAfterWrites`, `IdleTimeoutMinutes`, `AbsoluteTimeoutMinutes`, `MemoryThresholdMegabytes`, `ContactUrl`. |
+| `Demo__*` | `DemoOptions` alanları: `Enabled`, `SlotCount`, `WriteLimit`, `NudgeAfterWrites`, `IdleTimeoutMinutes`, `AbsoluteTimeoutMinutes`, `MemoryThresholdMegabytes`, `ContactUrl`, `VerifiedGraceHours`. |
+| `Erp__*` | Tezgah bağlantısı: `Enabled`, `BaseUrl`, `ApiKey`, `DefaultDepotId`. |
+| `DemoTelemetry__*` | Demo kullanımının ataberkkaya.com paneline bildirilmesi: `Enabled`, `BaseUrl`, `ApiKey`, `AppKey`, `AppName`, `AppUrl`. |
 
 ## 🐳 Docker ile çalıştırma
 

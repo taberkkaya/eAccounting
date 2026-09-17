@@ -1,3 +1,4 @@
+﻿using eAccountingServer.Application.Services;
 using eAccountingServer.Domain.Entities;
 using eAccountingServer.Domain.Enums;
 using eAccountingServer.Domain.Repositories;
@@ -23,7 +24,9 @@ public sealed record ProductDto(
     decimal CriticalStock,
     string? Description,
     /// <summary>Kritik seviye verilmiş ve altına düşülmüşse.</summary>
-    bool IsBelowCritical);
+    bool IsBelowCritical,
+    /// <summary>Tezgah'taki karşılığı. Doluysa stoğun sahibi orası.</summary>
+    Guid? ErpProductId);
 
 // --- listeleme ---------------------------------------------------------------
 
@@ -34,7 +37,8 @@ public sealed record GetAllProductsQuery(
     bool OnlyLowStock = false) : IRequest<Result<List<ProductDto>>>;
 
 internal sealed class GetAllProductsQueryHandler(
-    IProductRepository productRepository
+    IProductRepository productRepository,
+    IErpStockGateway erp
     ) : IRequestHandler<GetAllProductsQuery, Result<List<ProductDto>>>
 {
     public async Task<Result<List<ProductDto>>> Handle(
@@ -56,20 +60,71 @@ internal sealed class GetAllProductsQueryHandler(
                 .ToList();
         }
 
+        // Eşlenmiş ürünlerin miktarı Tezgah'ta tutuluyor ve buradaki alan artık
+        // güncellenmiyor; onu göstermek eski bir sayıyı doğruymuş gibi sunardı.
+        // Tek çağrı: ürün başına sormak, katalog büyüdükçe listeyi kilitlerdi.
+        Dictionary<Guid, decimal> erpStock = [];
+
+        if (erp.Enabled && products.Exists(p => p.ErpProductId is not null))
+        {
+            erpStock = (await erp.GetProductsAsync(cancellationToken))
+                .ToDictionary(p => p.Id, p => p.Stock);
+        }
+
+        // Kritik stok süzgeci de aynı miktara bakmalı; Tezgah'taki değer düşükken
+        // Defter'deki eski değere bakıp listeyi boş göstermek yanlış olurdu.
         if (request.OnlyLowStock)
             products = products
-                .Where(p => !p.IsService && p.CriticalStock > 0 && p.StockQuantity <= p.CriticalStock)
+                .Where(p => !p.IsService && p.CriticalStock > 0 && StockOf(p, erpStock) <= p.CriticalStock)
                 .ToList();
 
-        return products.Select(Map).ToList();
+        return products.Select(p => Map(p, StockOf(p, erpStock))).ToList();
     }
 
-    internal static ProductDto Map(Product p) => new(
+    /// <summary>
+    /// Eldeki miktar. Ürün Tezgah'a eşlenmişse oradaki değer geçerli; Tezgah'a
+    /// ulaşılamadıysa son bilinen yerel değer gösteriliyor — boş bir liste
+    /// yüzünden bütün stoğun sıfır görünmesi, hiç göstermemekten kötü.
+    /// </summary>
+    private static decimal StockOf(Product product, Dictionary<Guid, decimal> erpStock) =>
+        product.ErpProductId is { } erpId && erpStock.TryGetValue(erpId, out decimal stock)
+            ? stock
+            : product.StockQuantity;
+
+    internal static ProductDto Map(Product p) => Map(p, p.StockQuantity);
+
+    internal static ProductDto Map(Product p, decimal stock) => new(
         p.Id, p.Code, p.Name, p.Unit, p.IsService,
         p.PurchasePrice, p.SalePrice, p.VatRate,
         p.CurrencyType.Name, p.CurrencyType.Value,
-        p.StockQuantity, p.CriticalStock, p.Description,
-        !p.IsService && p.CriticalStock > 0 && p.StockQuantity <= p.CriticalStock);
+        stock, p.CriticalStock, p.Description,
+        !p.IsService && p.CriticalStock > 0 && stock <= p.CriticalStock,
+        p.ErpProductId);
+}
+
+// --- Tezgah eşlemesi ---------------------------------------------------------
+
+/// <summary>
+/// Tezgah'taki ürünler. Ürün kartındaki eşleme kutusunu doldurmak için;
+/// entegrasyon kapalıysa boş liste döner ve kutu hiç görünmez.
+/// </summary>
+public sealed record GetErpProductsQuery() : IRequest<Result<List<ErpProductDto>>>;
+
+public sealed record ErpProductDto(Guid Id, string Name, string ProductType, decimal Stock);
+
+internal sealed class GetErpProductsQueryHandler(
+    IErpStockGateway erp
+    ) : IRequestHandler<GetErpProductsQuery, Result<List<ErpProductDto>>>
+{
+    public async Task<Result<List<ErpProductDto>>> Handle(
+        GetErpProductsQuery request, CancellationToken cancellationToken)
+    {
+        IReadOnlyList<ErpProduct> products = await erp.GetProductsAsync(cancellationToken);
+
+        return products
+            .Select(p => new ErpProductDto(p.Id, p.Name, p.ProductType, p.Stock))
+            .ToList();
+    }
 }
 
 // --- oluşturma ---------------------------------------------------------------
@@ -85,7 +140,9 @@ public sealed record CreateProductCommand(
     int CurrencyTypeValue,
     decimal OpeningStock,
     decimal CriticalStock,
-    string? Description) : IRequest<Result<string>>;
+    string? Description,
+    /// <summary>Tezgah'taki karşılığı; boş bırakılırsa stok Defter'de tutulur.</summary>
+    Guid? ErpProductId = null) : IRequest<Result<string>>;
 
 public sealed class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
@@ -142,6 +199,8 @@ internal sealed class CreateProductCommandHandler(
             CurrencyType = CurrencyTypeEnum.FromValue(request.CurrencyTypeValue),
             CriticalStock = request.IsService ? 0 : request.CriticalStock,
             StockQuantity = 0,
+            // Hizmetin stoğu yok; eşleme de anlamsız olurdu.
+            ErpProductId = request.IsService ? null : request.ErpProductId,
             Description = request.Description?.Trim()
         };
 
@@ -182,7 +241,9 @@ public sealed record UpdateProductCommand(
     int VatRate,
     int CurrencyTypeValue,
     decimal CriticalStock,
-    string? Description) : IRequest<Result<string>>;
+    string? Description,
+    /// <summary>Tezgah'taki karşılığı; boş bırakılırsa stok Defter'de tutulur.</summary>
+    Guid? ErpProductId = null) : IRequest<Result<string>>;
 
 public sealed class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
@@ -233,6 +294,8 @@ internal sealed class UpdateProductCommandHandler(
         product.VatRate = request.VatRate;
         product.CurrencyType = CurrencyTypeEnum.FromValue(request.CurrencyTypeValue);
         product.CriticalStock = request.IsService ? 0 : request.CriticalStock;
+        // Hizmete çevrilen bir kartın eşlemesi de düşüyor: hizmetin stoğu yok.
+        product.ErpProductId = request.IsService ? null : request.ErpProductId;
         product.Description = request.Description?.Trim();
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -270,6 +333,7 @@ public sealed class AdjustStockCommandValidator : AbstractValidator<AdjustStockC
 internal sealed class AdjustStockCommandHandler(
     IProductRepository productRepository,
     IStockTransactionRepository stockTransactionRepository,
+    IErpStockGateway erp,
     IUnitOfWorkCompany unitOfWork
     ) : IRequestHandler<AdjustStockCommand, Result<string>>
 {
@@ -284,6 +348,13 @@ internal sealed class AdjustStockCommandHandler(
 
         if (product.IsService)
             return Result<string>.Failure("Hizmetlerin stoğu tutulmuyor.");
+
+        // Ürün Tezgah'a eşlenmişse miktarın sahibi orası. Buraya yazılan düzeltme
+        // listede zaten görünmezdi — miktar Tezgah'tan okunuyor — ve kullanıcı
+        // sayının neden değişmediğini anlamazdı.
+        if (erp.Enabled && product.ErpProductId is not null)
+            return Result<string>.Failure(
+                "Bu ürünün stoğu Tezgah'ta tutuluyor; düzeltmeyi oradan yapın.");
 
         bool isIn = request.Direction == 0;
 

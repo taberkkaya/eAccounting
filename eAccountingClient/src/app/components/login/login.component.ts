@@ -43,6 +43,9 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Daha önce doğrulanmış adres varsa alan dolu açılsın.
+    this.demoEmail = this.demo.rememberedEmail;
+
     this.demo.config().subscribe({
       next: (res) => {
         this.demoNeedsVerification = res.data?.emailVerificationRequired ?? false;
@@ -56,15 +59,37 @@ export class LoginComponent implements OnInit {
   // --- demo akışı ---------------------------------------------------------
 
   startDemo() {
-    if (this.demoNeedsVerification) {
-      this.demoStep = 'email';
-      this.demoCode = '';
-      this.demoNote = '';
-      this.demoOpen = true;
+    if (!this.demoNeedsVerification) {
+      this.runDemoStart();
       return;
     }
 
-    this.runDemoStart();
+    const remembered = this.demo.rememberedEmail;
+
+    // Adresini daha önce doğrulamış ziyaretçi kod turuna hiç girmeden geçer.
+    // Sunucudaki doğrulama penceresi kapanmışsa istek reddedilir ve aşağıdaki
+    // yedek e-posta adımını açar; bu bir hata değil, normal akış.
+    if (remembered) {
+      this.demoEmail = remembered;
+      this.runDemoStart(remembered, '', () => this.openDemoDialog());
+      return;
+    }
+
+    this.openDemoDialog();
+  }
+
+  private openDemoDialog() {
+    this.demoStep = 'email';
+    this.demoCode = '';
+    this.demoNote = '';
+    this.demoOpen = true;
+  }
+
+  /** Saklanan adresi unutur; ziyaretçi başka bir adresle baştan doğrulanır. */
+  useAnotherEmail() {
+    this.demo.forgetEmail();
+    this.demoEmail = '';
+    this.backToEmail();
   }
 
   sendDemoCode() {
@@ -78,7 +103,14 @@ export class LoginComponent implements OnInit {
     this.demo.requestCode(this.demoEmail).subscribe({
       next: (res) => {
         this.isDemoLoading = false;
-        this.demoNote = res.data ?? '';
+
+        // Adres zaten doğrulanmışsa sunucu kod göndermedi; kod adımı atlanır.
+        if (res.data?.alreadyVerified) {
+          this.runDemoStart(this.demoEmail, '');
+          return;
+        }
+
+        this.demoNote = res.data?.message ?? '';
         this.demoStep = 'code';
       },
       error: (err: HttpErrorResponse) => {
@@ -103,7 +135,12 @@ export class LoginComponent implements OnInit {
     this.demoNote = '';
   }
 
-  private runDemoStart(email = '', code = '') {
+  /**
+   * onFailure verilirse hata ziyaretçiye gösterilmez. Kodsuz denemenin reddedilmesi
+   * beklenen bir durum: doğrulama penceresi kapanmış olabilir. Bunun karşılığı bir
+   * uyarı değil, sessizce e-posta adımına düşmek.
+   */
+  private runDemoStart(email = '', code = '', onFailure?: () => void) {
     this.isDemoLoading = true;
 
     this.demo.start(email, code).subscribe({
@@ -114,6 +151,12 @@ export class LoginComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.isDemoLoading = false;
+
+        if (onFailure) {
+          onFailure();
+          return;
+        }
+
         this.swal.callToast(this.demoError(err), 'error');
       },
     });

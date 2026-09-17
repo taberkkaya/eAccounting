@@ -41,6 +41,25 @@ services:
       Demo__AbsoluteTimeoutMinutes: ${DEMO_SESSION_MINUTES:-10}
       Demo__MemoryThresholdMegabytes: ${DEMO_MEMORY_MB}
       Demo__ContactUrl: ${CONTACT_URL}
+      # Demo kullanimi ataberkkaya.com/admin panelinde gorunsun. ApiKey iki
+      # tarafta da ayni olmali; bos birakilirsa bildirim gonderilmez ve demo
+      # eskisi gibi calisir.
+      DemoTelemetry__Enabled: ${DEMO_TELEMETRY_ENABLED:-false}
+      DemoTelemetry__BaseUrl: ${DEMO_TELEMETRY_URL:-https://ataberkkaya.com}
+      DemoTelemetry__ApiKey: ${DEMO_TELEMETRY_KEY:-}
+      DemoTelemetry__AppKey: defter
+      DemoTelemetry__AppName: Defter
+      DemoTelemetry__AppUrl: ${SERVICE_FQDN_CLIENT_80:-}
+
+      # Tezgah (ERP) baglantisi. Acikken stogun sahibi Tezgah olur: Defter
+      # fatura keser, dogan stok hareketini oraya yazar ve eldeki miktari
+      # oradan okur. Kapaliyken Defter stogu kendi tutar ve tek basina calisir.
+      # ERP_DEPOT_ID, Tezgah'taki bir deponun kimligi olmali; bos birakilirsa
+      # entegrasyon kendiliginden kapali kalir.
+      Erp__Enabled: ${ERP_ENABLED:-false}
+      Erp__BaseUrl: ${ERP_BASE_URL:-}
+      Erp__ApiKey: ${ERP_API_KEY:-}
+      Erp__DefaultDepotId: ${ERP_DEPOT_ID:-}
       # Demoya girmeden önce e-posta doğrulaması. Mail ayarları boşken kod
       # gönderilemeyeceği için doğrulama kendiliğinden devre dışı kalır.
       Demo__RequireEmailVerification: "true"

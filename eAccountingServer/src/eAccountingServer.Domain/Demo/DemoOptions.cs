@@ -70,6 +70,16 @@ public sealed class DemoOptions
 
     public int CodeLifetimeMinutes { get; set; } = 10;
 
+    /// <summary>
+    /// Adresini bir kez doğrulayan ziyaretçi bu süre boyunca yeniden kod istemeden
+    /// demo açabilir.
+    ///
+    /// Bu olmadan, oturumunu erken kapatıp geri dönen biri zaten kanıtladığı şeyi
+    /// tekrar kanıtlamak zorunda kalıyordu: elindeki kod tüketilmiş oluyor, yenisini
+    /// istemek de <see cref="CodeResendSeconds"/> kadar beklemek demek oluyordu.
+    /// </summary>
+    public int VerifiedGraceHours { get; set; } = 24;
+
     /// <summary>Aynı adrese iki kod arasında beklenmesi gereken süre.</summary>
     public int CodeResendSeconds { get; set; } = 60;
 

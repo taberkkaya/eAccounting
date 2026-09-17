@@ -308,6 +308,24 @@
           />
           <p class="ak-hint">Bu miktarın altına düşünce ana sayfada uyarılır. 0 ise uyarı yok.</p>
         </div>
+
+        <!-- Yalnızca Tezgah bağlıyken çizilir; entegrasyon kapalıyken seçenek
+             sunulamayan bir alan görünmesin. -->
+        @if(erpLinked){
+        <div class="ak-field">
+          <label class="ak-label">Tezgah Ürünü</label>
+          <select [(ngModel)]="createModel.erpProductId" class="ak-input" name="erpProductId">
+            <option [ngValue]="null">Eşleme yok — stok Defter'de tutulsun</option>
+            @for(item of erpProducts; track item.id){
+            <option [ngValue]="item.id">{{ item.name }} ({{ item.stock }})</option>
+            }
+          </select>
+          <p class="ak-hint">
+            Eşlenirse stoğun sahibi Tezgah olur: eldeki miktar oradan okunur, faturadan
+            doğan hareket oraya yazılır.
+          </p>
+        </div>
+        }
         }
       </div>
 
@@ -419,6 +437,22 @@
           />
           <p class="ak-hint">Stok miktarı buradan değişmez; stok girişi/çıkışı kullanın.</p>
         </div>
+
+        @if(erpLinked){
+        <div class="ak-field">
+          <label class="ak-label">Tezgah Ürünü</label>
+          <select [(ngModel)]="updateModel.erpProductId" class="ak-input" name="updateErpProductId">
+            <option [ngValue]="null">Eşleme yok — stok Defter'de tutulsun</option>
+            @for(item of erpProducts; track item.id){
+            <option [ngValue]="item.id">{{ item.name }} ({{ item.stock }})</option>
+            }
+          </select>
+          <p class="ak-hint">
+            Eşlenirse stoğun sahibi Tezgah olur: eldeki miktar oradan okunur, faturadan
+            doğan hareket oraya yazılır.
+          </p>
+        </div>
+        }
         }
       </div>
 

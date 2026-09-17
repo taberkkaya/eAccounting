@@ -1,4 +1,4 @@
-using eAccountingServer.Domain.Abstractions;
+﻿using eAccountingServer.Domain.Abstractions;
 using eAccountingServer.Domain.Enums;
 
 namespace eAccountingServer.Domain.Entities;
@@ -30,8 +30,21 @@ public sealed class Product : Entity
 
     public CurrencyTypeEnum CurrencyType { get; set; } = CurrencyTypeEnum.TL;
 
-    /// <summary>Eldeki miktar. Hizmetlerde her zaman sıfır.</summary>
+    /// <summary>
+    /// Eldeki miktar. Hizmetlerde her zaman sıfır.
+    ///
+    /// Tezgah entegrasyonu açık ve ürün oraya eşlenmişse bu alan artık
+    /// güncellenmiyor: stoğun sahibi Tezgah olur ve miktar oradan okunur.
+    /// Eşlenmemiş ürünlerde eskisi gibi burada tutuluyor.
+    /// </summary>
     public decimal StockQuantity { get; set; }
+
+    /// <summary>
+    /// Tezgah'taki (ERP) karşılığının kimliği. Doluysa faturadan doğan stok
+    /// hareketi oraya yazılır. İki uygulama ayrı veritabanlarında olduğu için
+    /// yabancı anahtar değil, düz bir kimlik.
+    /// </summary>
+    public Guid? ErpProductId { get; set; }
 
     /// <summary>
     /// Bu miktarın altına düşünce ana sayfada uyarılır. Sıfır ise uyarı yok.

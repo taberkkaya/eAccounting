@@ -9,6 +9,7 @@ import { NoCompanyComponent } from '../ui/no-company/no-company.component';
 import { ActionMenuComponent } from '../ui/action-menu/action-menu.component';
 import {
   CurrencyOptions,
+  ErpProductModel,
   ProductFormModel,
   ProductModel,
   StockTransactionModel,
@@ -43,6 +44,13 @@ export class ProductsComponent implements OnInit {
   products: ProductModel[] = [];
   loading = true;
 
+  /**
+   * Tezgah'taki ürünler. Boş kalırsa (entegrasyon kapalı ya da Tezgah'a
+   * ulaşılamıyor) eşleme kutusu hiç çizilmiyor: seçenek sunulamayan bir alanı
+   * göstermenin anlamı yok.
+   */
+  erpProducts: ErpProductModel[] = [];
+
   kindFilter: '' | 'product' | 'service' = '';
   search = '';
   onlyLowStock = false;
@@ -63,11 +71,24 @@ export class ProductsComponent implements OnInit {
   historyProduct: ProductModel | null = null;
   history: StockTransactionModel[] = [];
 
+  get erpLinked(): boolean {
+    return this.erpProducts.length > 0;
+  }
+
   ngOnInit(): void {
     if (!this.auth.hasCompany) {
       this.loading = false;
       return;
     }
+
+    // Sessizce yükleniyor: entegrasyon kapalıyken boş liste dönüyor ve ekranın
+    // geri kalanı bundan etkilenmemeli.
+    this.http.post<ErpProductModel[]>(
+      'Products/GetErpProducts',
+      {},
+      (res) => (this.erpProducts = res ?? []),
+      () => (this.erpProducts = [])
+    );
 
     this.getAll();
   }
@@ -160,6 +181,7 @@ export class ProductsComponent implements OnInit {
       openingStock: 0,
       criticalStock: product.criticalStock,
       description: product.description ?? '',
+      erpProductId: product.erpProductId ?? null,
     };
 
     this.updateOpen = true;
